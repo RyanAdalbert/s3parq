@@ -1,0 +1,22 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+echo $DIR
+
+if ! [[ $(which docker) && $(docker --version) ]]; then
+   echo "Please install docker before running this script."
+   exit
+fi
+
+docker build -f $DIR/dockerfiles/notebook.dockerfile . -t ichain/noteboook
+
+docker run -it --rm \
+  -w /host \
+  -v /Users:/Users \
+  -v $HOME:/host/home \
+  -v $HOME/.aws:/root/.aws \
+  -v $DIR:/host/project \
+  -p 8888:8888 -p 4040:4040 -p 8080:8080 \
+  -e AWS_ACCESS_KEY_ID=$(aws --profile default configure get aws_access_key_id) \
+  -e AWS_SECRET_ACCESS_KEY=$(aws --profile default configure get aws_secret_access_key) \
+  ichain/noteboook --allow-root --ip 0.0.0.0 --NotebookApp.token='';

@@ -6,6 +6,11 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 echo $DIR
 
+if ! [[ $(which docker) && $(docker --version) ]]; then
+   echo "Please install docker before running this script."
+   exit
+fi
+
 # Run the python test suite
 
 # Build the python 3.7 image so the requirements are up to date
@@ -14,8 +19,5 @@ docker build -f $DIR/dockerfiles/python3-7.dockerfile . -t ichain/python:3.7
 # Mount the entire repo and run the test
 docker run --rm -it \
   -v $DIR:/usr/src/app \
-  -v $HOME:/host/home \
-  -e AWS_ACCESS_KEY_ID=$(aws --profile default configure get aws_access_key_id) \
-  -e AWS_SECRET_ACCESS_KEY=$(aws --profile default configure get aws_secret_access_key) \
   ichain/python:3.7 \
   pytest
