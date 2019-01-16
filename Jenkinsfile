@@ -6,11 +6,9 @@ node {
     }
     stage('Build') {
         echo "Building..."
-        sh "make build"
     }
     stage('Test') {
         echo "Testing..."
-        sh "make test"
     }
     stage ('Deploy') {
         echo "We are currently working on branch: ${env.BRANCH_NAME}"
@@ -29,6 +27,5 @@ node {
     }
         if (env.DEPLOYMENT_ENVIRONMENT != 'no_deploy') {
             echo "Trying to deploy to ${env.DEPLOYMENT_ENVIRONMENT}."
-            sh "make publish"
     }
 }
