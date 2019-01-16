@@ -1,4 +1,6 @@
 *.ipynb_checkpoints
-*__init__.py
 *.pyc
 *~
+*.egg*
+build
+.coverage
