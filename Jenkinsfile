@@ -8,6 +8,7 @@ node {
         echo "Building..."
     }
     stage('Test') {
+        sh "script/citest"
         echo "Testing..."
     }
     stage ('Deploy') {
