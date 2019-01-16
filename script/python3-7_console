@@ -11,5 +11,14 @@ echo $DIR
 # Build the python 3.7 image so the requirements are up to date
 docker build -f $DIR/dockerfiles/python3-7.dockerfile . -t ichain/python:3.7
 
-# Mount the entire repo and get a shell into the docker container running python
-docker run --rm -it -v $DIR:/usr/src/app ichain/python:3.7 /bin/bash
+# Kind of a big commmand it:
+#  mounts the repo to /usr/src/app
+#  mounts your home directory to /host/home
+#  sets up AWS credentials
+docker run --rm -it \
+  -v $DIR:/usr/src/app \
+  -v $HOME:/host/home \
+  -e AWS_ACCESS_KEY_ID=$(aws --profile default configure get aws_access_key_id) \
+  -e AWS_SECRET_ACCESS_KEY=$(aws --profile default configure get aws_secret_access_key) \
+  ichain/python:3.7 \
+  /bin/bash
