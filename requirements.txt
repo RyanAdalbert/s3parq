@@ -1,2 +1,3 @@
 awscli
 pytest
+python-coveralls
