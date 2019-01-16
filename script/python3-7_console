@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# script/test: Run the entire test suite
+
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+echo $DIR
+
+# Run the python test suite
+
+# Build the python 3.7 image so the requirements are up to date
+docker build -f $DIR/dockerfiles/python3-7.dockerfile . -t ichain/python:3.7
+
+# Mount the entire repo and get a shell into the docker container running python
+docker run --rm -it -v $DIR:/usr/src/app ichain/python:3.7 /bin/bash
