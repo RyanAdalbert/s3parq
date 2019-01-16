@@ -1,3 +1,5 @@
 awscli
 pytest
 python-coveralls
+click
+
