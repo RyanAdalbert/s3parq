@@ -1,0 +1,8 @@
+#!/bin/sh
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+
+if ! [[ $(which docker) && $(docker --version) ]]; then
+   echo "Please install docker before running this script."
+   exit
+fi

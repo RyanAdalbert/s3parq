@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. script/script_setup
+echo $DIR
+
+# Run the python test suite
+
+# Build the python 3.7 image so the requirements are up to date
+docker build -f $DIR/dockerfiles/python3-7.dockerfile . -t ichain/python:3.7
+
+# Mount the entire repo and run the test
+docker run --rm -it -v $DIR:/usr/src/app ichain/python:3.7 bash -c "coverage run --source core /usr/local/bin/pytest tests  && coverage report"
