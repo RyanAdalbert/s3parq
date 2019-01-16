@@ -1,13 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+. script/script_setup
 echo $DIR
 
-if ! [[ $(which docker) && $(docker --version) ]]; then
-   echo "Please install docker before running this script."
-   exit
-fi
-
+# Build the notebook image so the requirements are up to date
 docker build -f $DIR/dockerfiles/notebook.dockerfile . -t ichain/noteboook
 
 docker run -it --rm \
