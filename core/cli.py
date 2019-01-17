@@ -27,9 +27,10 @@ def publish(env):
 @click.argument('env', type=click.Choice(['local']))
 def tidy(env):
     if env == 'local':
+        AWS_ACCOUNT_ID = "687531504312"
         repo = Repo('.')
         branch_name = repo.active_branch.name
-        docker.remove_image(branch_name)
+        docker.remove_image(branch_name, AWS_ACCOUNT_ID)
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))

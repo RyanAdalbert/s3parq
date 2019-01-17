@@ -12,6 +12,7 @@ my_session = boto3.session.Session()
 AWS_REGION = my_session.region_name
 
 docker_client = docker.APIClient(base_url='unix://var/run/docker.sock')
+docker_basic_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 ecr_client = boto3.client('ecr')
 
 # builds a docker image of the current state of the project and
@@ -23,12 +24,29 @@ def build_image(tag: str) -> str:
     )]
     return full_tag
 
-def remove_image(tag: str):
+def remove_image(tag: str, account_id: str):
     full_tag = f"{DOCKER_REPO}:{tag}"
-    docker_client.remove_image(full_tag)
+    repo = get_aws_repository(full_tag, account_id)
+    ecr_login(account_id)
+    image = docker_basic_client.images.get(full_tag)
+    repo_digest = image.attrs['RepoDigests'][0]
+    digest_sha = repo_digest.split("@")[-1]
+
+    response = ecr_client.batch_delete_image(
+        registryId=account_id,
+        repositoryName=DOCKER_REPO,
+        imageIds=[
+            {
+                'imageDigest': digest_sha,
+                'imageTag': tag
+            },
+        ]
+    )
+    print(response)
+
 
 def register_image(full_tag: str, account_id: str):
-    repo = f"{account_id}.dkr.ecr.{AWS_REGION}.amazonaws.com/{full_tag}"
+    repo = get_aws_repository(full_tag, account_id)
     ecr_login(account_id)
     docker_client.tag(full_tag, repo)
     response = docker_client.push(repo)
@@ -51,4 +69,5 @@ def ecr_login(registry_id: str):
     )
     print(docker_response)
 
-# docker tag ichain/gluestick:latest 687531504312.dkr.ecr.us-east-1.amazonaws.com/ichain/gluestick:latest
+def get_aws_repository(full_tag: str, account_id: str) -> str:
+    return f"{account_id}.dkr.ecr.{AWS_REGION}.amazonaws.com/{full_tag}"
