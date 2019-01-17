@@ -2,4 +2,6 @@ awscli
 pytest
 python-coveralls
 click
-
+boto3
+docker
+gitpython
