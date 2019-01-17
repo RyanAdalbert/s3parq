@@ -43,7 +43,7 @@ CREATE TABLE brands (
   id SERIAL PRIMARY KEY,
   name VARCHAR NOT NULL UNIQUE,
   display_name VARCHAR NOT NULL UNIQUE,
-  pharmaceutical_company_id INT REFERENCES pharmaceutical_companies(id),
+  pharmaceutical_company_id INT NOT NULL REFERENCES pharmaceutical_companies(id),
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   run_frequency VARCHAR,
   is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
