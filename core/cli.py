@@ -1,5 +1,6 @@
 import click
-from core.helpers import git, docker
+from git import Repo
+from core.helpers import docker
 
 @click.group()
 def cli(): # pragma: no cover
@@ -16,8 +17,17 @@ def add(a, b):
 @click.argument('env', type=click.Choice(['local']))
 def publish(env):
     if env == 'local':
-        tag = docker.build_branch_image()
-        
+        repo = Repo('.')
+        branch_name = repo.active_branch.name
+        docker.build_image(branch_name)
+
+@cli.command()
+@click.argument('env', type=click.Choice(['local']))
+def tidy(env):
+    if env == 'local':
+        repo = Repo('.')
+        branch_name = repo.active_branch.name
+        docker.remove_image(branch_name)   
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))
