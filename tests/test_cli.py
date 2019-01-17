@@ -28,4 +28,4 @@ def test_generate_configuration_migration(cleanup_migration_files):
     if __name__ == '__main__':
         cleanup_migration_files(result.output + '_up.sql')
         cleanup_migration_files(result.output + '_down.sql')
-   
+    
