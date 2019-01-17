@@ -17,9 +17,11 @@ def add(a, b):
 @click.argument('env', type=click.Choice(['local']))
 def publish(env):
     if env == 'local':
+        AWS_ACCOUNT_ID = "687531504312"
         repo = Repo('.')
         branch_name = repo.active_branch.name
-        docker.build_image(branch_name)
+        full_tag = docker.build_image(branch_name)
+        docker.register_image(full_tag, AWS_ACCOUNT_ID)
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))
@@ -27,7 +29,7 @@ def tidy(env):
     if env == 'local':
         repo = Repo('.')
         branch_name = repo.active_branch.name
-        docker.remove_image(branch_name)   
+        docker.remove_image(branch_name)
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))
