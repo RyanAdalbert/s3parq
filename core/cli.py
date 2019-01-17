@@ -15,7 +15,7 @@ def add(a, b):
     return a + b
 
 @cli.command()
-def generate_migration():
+def generate_configuration_migration():
     ''' INTENT: creates paired 'up' and 'down' sql migration files
         RETURNS: None
     '''
@@ -24,5 +24,5 @@ def generate_migration():
     for suffix in ('up','down'):
         filepath = path + os.path.sep + 'database' + os.path.sep + ts + '_' + suffix + '.sql'
         open(filepath, "w").close()
-    click.echo(f'created migration {ts}')
-
+    click.echo(ts)
+    return ts
