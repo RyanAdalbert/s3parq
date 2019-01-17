@@ -56,39 +56,11 @@ CREATE INDEX "FK" ON  "pipeline_states" ("pipeline_id", "pipeline_state_type_id"
 
 CREATE INDEX " " ON  "pipeline_states" ("is_active", "is_deleted");
 
-CREATE TABLE "segments" (
-  "id" int,
-  "name" varchar,
-  "is_deleted" bool,
-  PRIMARY KEY ("id")
-);
 
-CREATE INDEX " " ON  "segments" ("name", "is_deleted");
 
-CREATE TABLE "pipelines" (
-  "id" int,
-  "display_name" varchar,
-  "pipeline_type_id" int,
-  "brand_id" int,
-  "is_active" bool,
-  "run_frequency" varchar,
-  "is_deleted" bool,
-  PRIMARY KEY ("id")
-);
 
-CREATE INDEX "FK" ON  "pipelines" ("pipeline_type_id", "brand_id");
 
-CREATE INDEX " " ON  "pipelines" ("is_active", "run_frequency", "is_deleted");
 
-CREATE TABLE "pipeline_types" (
-  "id" int,
-  "name" varchar,
-  "segment_id" int,
-  "is_deleted" bool,
-  PRIMARY KEY ("id")
-);
-
-CREATE INDEX " " ON  "pipeline_types" ("name", "segment_id", "is_deleted");
 
 CREATE TABLE "source_path_sets" (
   "id" int,
