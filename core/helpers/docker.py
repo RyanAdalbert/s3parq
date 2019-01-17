@@ -3,7 +3,7 @@ from git import Repo
 import os
 
 cwd = os.getcwd()
-DOCKERFILE_LOCATION = cwd+'/dockerfiles/python3-7.dockerfile'
+DOCKERFILE_LOCATION = cwd+'/dockerfiles/core.dockerfile'
 BASE_DOCKER_TAG = 'ichain/core'
 
 # builds a docker image of the current state of the project and
