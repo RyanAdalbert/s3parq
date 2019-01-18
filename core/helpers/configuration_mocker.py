@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 import core.models.configuration as config
 import logging
 
+
 class ConfigurationMocker:
     ''' for development, creates in-memory database instance and a matching session.
         optionally gives you a bunch of mocked data.
@@ -42,13 +43,19 @@ class ConfigurationMocker:
         logging.debug('Generating extract_configuation mocks...')
         ex = config.ExtractConfiguration
         self.session.add_all([
-            ex(id=1, transformation_id=2, filesystem_path='', prefix='',secret_name='bluth'),
-            ex(id=2, transformation_id=2, filesystem_path='banana_stand', prefix='gob',secret_name='bluth'),
-            ex(id=3, transformation_id=3, filesystem_path='sudden_valley', prefix='',secret_name='bluth'),
-            ex(id=4, transformation_id=1, filesystem_path='', prefix='',secret_name='sitwell'),
-            ex(id=5, transformation_id=1, filesystem_path='', prefix='001545',secret_name='sitwell'),
-            ex(id=6, transformation_id=1, filesystem_path='200-1', prefix='',secret_name='sitwell')
-            ])
+            ex(id=1, transformation_id=2, filesystem_path='',
+               prefix='', secret_name='bluth'),
+            ex(id=2, transformation_id=2, filesystem_path='banana_stand',
+               prefix='gob', secret_name='bluth'),
+            ex(id=3, transformation_id=3, filesystem_path='sudden_valley',
+               prefix='', secret_name='bluth'),
+            ex(id=4, transformation_id=1, filesystem_path='',
+               prefix='', secret_name='sitwell'),
+            ex(id=5, transformation_id=1, filesystem_path='',
+               prefix='001545', secret_name='sitwell'),
+            ex(id=6, transformation_id=1, filesystem_path='200-1',
+               prefix='', secret_name='sitwell')
+        ])
         self.session.commit()
         logging.debug('Done generating extract_configuration mocks.')
 
@@ -61,4 +68,3 @@ class ConfigurationMocker:
         ])
         self.session.commit()
         logging.debug('Done generating transformation_template mocks.')
-

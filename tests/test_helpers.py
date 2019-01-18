@@ -25,9 +25,8 @@ def test_mock_transformation_relationships():
     secrets = []
     for v in q:
         for row in v.extract_configurations:
-           secrets.append(row.secret_name)
-    
+            secrets.append(row.secret_name)
+
     assert len(secrets) == 3
 
     assert set(secrets) == set(['sitwell'])
-
