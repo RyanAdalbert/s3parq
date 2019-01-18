@@ -25,7 +25,8 @@ def build_image(full_tag: str) -> str:
 def remove_image(full_tag: str):
     image = docker_client.images.get(full_tag)
     response = docker_api_client.remove_image(full_tag)
-    print(response)
+    # print(response)
+    return response
 
 def remove_ecr_image(tag: str, repo_name: str, account_id: str):
     ecr_login(account_id)
@@ -33,7 +34,6 @@ def remove_ecr_image(tag: str, repo_name: str, account_id: str):
     ecr_tagged_image_name = get_aws_repository(full_tag, account_id)
     image = docker_client.images.get(ecr_tagged_image_name)
     repo_digest = image.attrs['RepoDigests'][0]
-
     digest_sha = repo_digest.split("@")[-1]
 
     # remove the image from ECR
@@ -49,18 +49,20 @@ def remove_ecr_image(tag: str, repo_name: str, account_id: str):
     )
     # remove the local image
     docker_api_client.remove_image(ecr_tagged_image_name)
-    print(response)
+    return response
 
-def register_image(full_tag: str, account_id: str):
+def register_image(tag: str, repo_name: str, account_id: str):
+    full_tag = f"{repo_name}:{tag}"
     repo = get_aws_repository(full_tag, account_id)
     ecr_login(account_id)
     docker_api_client.tag(full_tag, repo)
     response = docker_api_client.push(repo)
-    print(response)
+    # print(response)
+    return response
 
 #takes a single registry id and logs docker into the ECR Registry
-def ecr_login(registry_id: str):
-    ecr_response = ecr_client.get_authorization_token(registryIds=[registry_id])
+def ecr_login(account_id: str):
+    ecr_response = ecr_client.get_authorization_token(registryIds=[account_id])
     auth_data = ecr_response['authorizationData'][0]
     decoded_token = base64.b64decode(auth_data['authorizationToken']).decode("utf-8")
     user = decoded_token.split(':')[0]
@@ -73,7 +75,11 @@ def ecr_login(registry_id: str):
         registry=registry_url,
         reauth=True
     )
-    # print(docker_response)
+
+    # Try to actually do something on the ECR account
+    ecr_describe_response = ecr_client.describe_repositories(registryId=account_id, maxResults=1)
+    # print(ecr_describe_response)
+    return docker_response
 
 def get_aws_repository(full_tag: str, account_id: str) -> str:
     return f"{account_id}.dkr.ecr.{AWS_REGION}.amazonaws.com/{full_tag}"

@@ -24,7 +24,7 @@ def publish(env):
         branch_name = repo.active_branch.name
         full_tag = docker.build_image(f"{DOCKER_REPO}:{branch_name}")
 
-        docker.register_image(full_tag, AWS_ACCOUNT_ID)
+        docker.register_image(branch_name, DOCKER_REPO, AWS_ACCOUNT_ID)
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))
