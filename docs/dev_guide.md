@@ -12,6 +12,7 @@ We manage these configurations via a configuration application, which in turn st
 
 You use [SQLAlchemy Sessions](https://docs.sqlalchemy.org/en/rel_1_2/orm/tutorial.html#querying) to query that class.
 In development it can be useful to get the functionality without setting up and migrating a database, so we have a helper class that builds an in-memory sqlite instance and can populate mock data. 
+
     # using configurations
     from core.helpers.configuration_mocker import ConfigurationMocker as CMock
     import core.models.configuration as config
