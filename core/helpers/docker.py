@@ -25,7 +25,6 @@ def build_image(full_tag: str) -> str:
 def remove_image(full_tag: str):
     image = docker_client.images.get(full_tag)
     response = docker_api_client.remove_image(full_tag)
-    # print(response)
     return response
 
 def remove_ecr_image(tag: str, repo_name: str, account_id: str):
@@ -57,7 +56,6 @@ def register_image(tag: str, repo_name: str, account_id: str):
     ecr_login(account_id)
     docker_api_client.tag(full_tag, repo)
     response = docker_api_client.push(repo)
-    # print(response)
     return response
 
 #takes a single registry id and logs docker into the ECR Registry

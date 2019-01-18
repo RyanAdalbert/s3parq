@@ -17,7 +17,7 @@ def add(a, b):
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))
-def publish(env): # pragma: no cover
+def publish(env):
     if env == 'local':
         AWS_ACCOUNT_ID = "687531504312"
         repo = Repo('.')
@@ -28,7 +28,7 @@ def publish(env): # pragma: no cover
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))
-def tidy(env): # pragma: no cover
+def tidy(env):
     if env == 'local':
         AWS_ACCOUNT_ID = "687531504312"
         repo = Repo('.')
@@ -40,5 +40,5 @@ def tidy(env): # pragma: no cover
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))
-def run(env): # pragma: no cover
+def run(env):
     docker.build_branch_image()
