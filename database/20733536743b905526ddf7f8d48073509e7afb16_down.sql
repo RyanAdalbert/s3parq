@@ -1,5 +1,5 @@
 /*  DOWN!   */
-DROP TABLE IF EXISTS segments;
-DROP TABLE IF EXISTS brands;
-DROP TABLE IF EXISTS pharmaceutical_companies;
+DROP FUNCTION public.trigger_updated_at_timestamp CASCADE;
+DROP FUNCTION public.audit_events CASCADE;
+DROP FUNCTION public.delete_alt CASCADE;
 DROP SCHEMA auditing CASCADE;

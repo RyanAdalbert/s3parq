@@ -2,18 +2,30 @@
 
 COMMENT ON SCHEMA public IS 'This schema is for all pipeline configurations.';
 
-CREATE SCHEMA auditing AUTHORIZATION configurator;
+CREATE SCHEMA IF NOT EXISTS auditing AUTHORIZATION configurator;
 COMMENT ON SCHEMA auditing IS 'This schema is for recording changes to the rest of the database.';
+
+CREATE TABLE IF NOT EXISTS auditing.events (
+    id SERIAL,
+    table_name VARCHAR,
+    actor VARCHAR,
+    before_value JSONB,
+    after_value JSONB,
+    event_timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+-- no index on the audit table. keep writes cheap.
+-- no constraints, minimize audit risk.
+
 
 /* Triggers */
 -- PL for updated_at
-CREATE OR REPLACE FUNCTION trigger_updated_at_timestamp()
+CREATE OR REPLACE FUNCTION public.trigger_updated_at_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
-END;
-$$ language plpgsql;
+END
+$$ LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION public.audit_events()
 RETURNS TRIGGER AS $$
@@ -30,37 +42,67 @@ BEGIN
     VALUES (TG_TABLE_NAME, NEW.last_actor, to_jsonb(OLD), to_jsonb(NEW));
     RETURN NEW;
     
-    ELSIF TG_OP = 'DELETE'
+    ELSEIF TG_OP = 'DELETE'
     THEN
     INSERT INTO auditing.events (table_name, actor, before_value)
     VALUES (TG_TABLE_NAME, NEW.last_actor, to_jsonb(OLD));
     RETURN NEW;
-
-END;
-$$ language plpgsql;
+    END IF;
+END
+$$ LANGUAGE 'plpgsql';
 
 -- this does depend on every table using "id" - brittle, beware. 
 CREATE OR REPLACE FUNCTION public.delete_alt()
 RETURNS TRIGGER AS $$
 BEGIN 
-    UPDATE TG_TABLE_SCHEMA.TG_TABLE_NAME SET is_deleted = TRUE WHERE id = OLD.id;
+    UPDATE TG_TABLE_SCHEMA.TG_TABLE_NAME target SET is_deleted = TRUE WHERE target.id = OLD.id;
     RETURN NULL;
-END;
-$$ language plpgsql;
-
-CREATE TABLE events (
-    id SERIAL,
-    table_name VARCHAR,
-    actor VARCHAR,
-    before_value JSONB,
-    after_value JSONB,
-    event_timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-)
--- no index on the audit table. keep writes cheap.
--- no constraints, minimize audit risk.
+END
+$$ LANGUAGE 'plpgsql';
 
 
+/* Table Triggers */
 
+DO $$
+DECLARE
+    tables CURSOR FOR
+        SELECT 
+            tablename
+        FROM
+            pg_tables
+        WHERE 
+            tablename NOT LIKE 'pg_%' 
+        AND 
+            tablename NOT LIKE 'sql_%'
+        AND 
+            schemaname = 'public';
+BEGIN
+    FOR t IN tables LOOP
+        EXECUTE
+            '
+            DROP TRIGGER IF EXISTS ' || t.tablename || '_updated_at ON public.' || t.tablename || ';
+            CREATE TRIGGER ' || t.tablename || '_updated_at 
+                BEFORE UPDATE ON public.' || t.tablename ||'
+                FOR EACH ROW
+                EXECUTE PROCEDURE trigger_updated_at_timestamp();
+
+            DROP TRIGGER IF EXISTS ' || t.tablename || '_audit ON public.' || t.tablename || ';
+            CREATE TRIGGER ' || t.tablename || '_audit
+                BEFORE INSERT OR UPDATE OR DELETE ON public.' || t.tablename || '
+                FOR EACH ROW
+                EXECUTE PROCEDURE audit_events();
+
+            DROP TRIGGER IF EXISTS ' || t.tablename || '_delete_alt ON public.' || t.tablename || ';
+            CREATE TRIGGER ' || t.tablename || '_delete_alt
+                BEFORE DELETE ON public.' || t.tablename || '
+                FOR EACH ROW
+            EXECUTE PROCEDURE delete_alt();';
+    END LOOP;
+    RETURN;
+END
+$$
+                   
+            
 /*
 CREATE TRIGGER pharmaceutical_companies_updated_at 
     AFTER UPDATE ON pharmaceutical_companies
