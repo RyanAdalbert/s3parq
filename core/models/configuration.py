@@ -39,7 +39,7 @@ class ExtractConfiguration(Base):
     is_deleted = Column(BOOLEAN, nullable=False, server_default='0')
     created_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=func.now())
-    # let's add a trigger to this on the PG side instead of having the application drive it
+    #TODO: let's add a trigger to this on the PG side instead of having the application drive it
     updated_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=func.now())
     last_actor = Column(String)
@@ -58,7 +58,6 @@ class Transformation(Base):
     is_deleted = Column(BOOLEAN, nullable=False, server_default='0')
     created_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=func.now())
-    # let's add a trigger to this on the PG side instead of having the application drive it
     updated_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=func.now())
     last_actor = Column(String)
@@ -73,7 +72,6 @@ class TransformationTemplate(Base):
     is_deleted = Column(BOOLEAN)  # , nullable = False, server_default = '0')
     created_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=func.now())
-    # let's add a trigger to this on the PG side instead of having the application drive it
     updated_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=func.now())
     last_actor = Column(String)
