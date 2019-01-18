@@ -22,7 +22,7 @@ def test_cli_add():
 def test_generate_configuration_migration(cleanup_migration_files):
     runner = CliRunner()
     result = runner.invoke(cli.generate_configuration_migration)
-    assert result.output.strip().isnumeric()
+    assert isinstance(result.output,str)
     assert result.exit_code == 0
     
     ## cleanup if run locally

@@ -1,6 +1,6 @@
 import click
 from core.helpers.project_root import ProjectRoot
-import time
+import subprocess
 import os
  
 @click.group()
@@ -16,13 +16,13 @@ def add(a, b):
 
 @cli.command()
 def generate_configuration_migration():
-    ''' INTENT: creates paired 'up' and 'down' sql migration files
-        RETURNS: None
+    ''' This generates an empty migration named with the current commit hash.
+        It is far from a perfect way of aligning migrations with ORM code, but it's a spike in the ground. 
     '''
     path = ProjectRoot().get_path()
-    ts = str(time.time_ns())
+    git_hash = subprocess.check_output(['git','rev-parse','HEAD']).strip().decode()
     for suffix in ('up','down'):
-        filepath = path + os.path.sep + 'database' + os.path.sep + ts + '_' + suffix + '.sql'
+        filepath = path + os.path.sep + 'database' + os.path.sep + git_hash + '_' + suffix + '.sql'
         open(filepath, "w").close()
-    click.echo(ts)
-    return ts
+    click.echo(git_hash)
+    return git_hash
