@@ -12,7 +12,8 @@ We manage these configurations via a configuration application, which in turn st
 
 You use [SQLAlchemy Sessions](https://docs.sqlalchemy.org/en/rel_1_2/orm/tutorial.html#querying) to query that class.
 In development it can be useful to get the functionality without setting up and migrating a database, so we have a helper class that builds an in-memory sqlite instance and can populate mock data. 
-    import core.helpers.configuration_mocker as CMock
+    # using configurations
+    from core.helpers.configuration_mocker import ConfigurationMocker as CMock
     import core.models.configuration as config
     
     ## creates the mock db
@@ -21,8 +22,15 @@ In development it can be useful to get the functionality without setting up and 
 
     ## uses the config entity classes
     transform_template = config.TransformationTemplate
+
+    ## you can seed the db
+    mock.generate_mocks()
     
-    ## you can add entities as you need them
+    total = session.query(transform_template).count()
+    print(total)
+    ## 3
+
+    ## you can also add entities as you need them
     session.add(transform_template(name='great_new_transform_template'))
     session.commit()
 
@@ -30,9 +38,6 @@ In development it can be useful to get the functionality without setting up and 
     print(added.name)
     ## 'great_new_transform_template'
 
-    ## you can also seed the db
-    mock.generate_mocks()
-
-    total = session.query(transform_template).count()
+    new_total = session.query(transform_template).count()
     print(total)
     ## 4
