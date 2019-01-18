@@ -1,8 +1,6 @@
-from sqlalchemy import create_engine, Column, Integer, String, BOOLEAN, TIMESTAMP, text, ForeignKey, func
+from sqlalchemy import Column, Integer, String, BOOLEAN, TIMESTAMP, text, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-
-#engine = create_engine("postgresql+psycopg2://user:password@/dbname")
 
 Base = declarative_base()
 
@@ -79,6 +77,3 @@ class TransformationTemplate(Base):
     updated_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=func.now())
     last_actor = Column(String)
-
-
-
