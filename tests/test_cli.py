@@ -12,6 +12,7 @@ def cleanup_migration_files():
             os.remove(ProjectRoot().get_path() + os.path.sep + 'database' + os.path.sep + f)
     return cleanup
 
+
 def test_cli_add():
     runner = CliRunner()
     result = runner.invoke(cli.add, ["1", "2"])
@@ -28,4 +29,3 @@ def test_generate_configuration_migration(cleanup_migration_files):
     if __name__ == '__main__':
         cleanup_migration_files(result.output + '_up.sql')
         cleanup_migration_files(result.output + '_down.sql')
-    
