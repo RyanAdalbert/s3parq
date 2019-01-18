@@ -30,8 +30,10 @@ def remove_image(tag: str, account_id: str):
     ecr_login(account_id)
     image = docker_basic_client.images.get(full_tag)
     repo_digest = image.attrs['RepoDigests'][0]
+
     digest_sha = repo_digest.split("@")[-1]
 
+    # remove the image from ECR
     response = ecr_client.batch_delete_image(
         registryId=account_id,
         repositoryName=DOCKER_REPO,
@@ -42,6 +44,10 @@ def remove_image(tag: str, account_id: str):
             },
         ]
     )
+
+    # remove the local image
+    docker_client.remove_image(full_tag)
+    docker_client.remove_image(repo)
     print(response)
 
 
@@ -67,7 +73,7 @@ def ecr_login(registry_id: str):
         registry=registry_url,
         reauth=True
     )
-    print(docker_response)
+    # print(docker_response)
 
 def get_aws_repository(full_tag: str, account_id: str) -> str:
     return f"{account_id}.dkr.ecr.{AWS_REGION}.amazonaws.com/{full_tag}"
