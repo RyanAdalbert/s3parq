@@ -5,3 +5,4 @@ click
 boto3
 docker
 gitpython
+moto

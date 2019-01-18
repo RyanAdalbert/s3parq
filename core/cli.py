@@ -2,6 +2,8 @@ import click
 from git import Repo
 from core.helpers import docker
 
+DOCKER_REPO = 'ichain/core'
+
 @click.group()
 def cli(): # pragma: no cover
     pass
@@ -20,7 +22,8 @@ def publish(env):
         AWS_ACCOUNT_ID = "687531504312"
         repo = Repo('.')
         branch_name = repo.active_branch.name
-        full_tag = docker.build_image(branch_name)
+        full_tag = docker.build_image(f"{DOCKER_REPO}:{branch_name}")
+
         docker.register_image(full_tag, AWS_ACCOUNT_ID)
 
 @cli.command()
@@ -30,7 +33,10 @@ def tidy(env):
         AWS_ACCOUNT_ID = "687531504312"
         repo = Repo('.')
         branch_name = repo.active_branch.name
-        docker.remove_image(branch_name, AWS_ACCOUNT_ID)
+        full_tag = f'{DOCKER_REPO}:{branch_name}'
+
+        docker.remove_ecr_image(branch_name, DOCKER_REPO, AWS_ACCOUNT_ID)
+        docker.remove_image(full_tag)
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))

@@ -12,5 +12,6 @@ docker build -f $DIR/dockerfiles/python3-7.dockerfile . -t ichain/python:3.7
 docker run --rm -it \
   -e AWS_DEFAULT_REGION=us-east-1 \
   -v $DIR:/usr/src/app \
+  -v /var/run/docker.sock:/var/run/docker.sock \
   ichain/python:3.7 \
   bash -c "coverage run --source core /usr/local/bin/pytest tests  && coverage report"
