@@ -42,10 +42,10 @@ BEGIN
     VALUES (TG_TABLE_NAME, NEW.last_actor, to_jsonb(OLD), to_jsonb(NEW));
     RETURN NEW;
     
-    ELSEIF TG_OP = 'DELETE'
+    ELSIF TG_OP = 'DELETE'
     THEN
-    INSERT INTO auditing.events (table_name, actor, before_value)
-    VALUES (TG_TABLE_NAME, NEW.last_actor, to_jsonb(OLD));
+        INSERT INTO auditing.events (table_name, actor, before_value)
+        VALUES (TG_TABLE_NAME, NEW.last_actor, to_jsonb(OLD));
     RETURN NEW;
     END IF;
 END
@@ -55,7 +55,10 @@ $$ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION public.delete_alt()
 RETURNS TRIGGER AS $$
 BEGIN 
-    UPDATE TG_TABLE_SCHEMA.TG_TABLE_NAME target SET is_deleted = TRUE WHERE target.id = OLD.id;
+    EXECUTE
+    '
+        UPDATE ' || TG_TABLE_SCHEMA ||'.' || TG_TABLE_NAME || ' SET is_deleted = TRUE WHERE id = ' || OLD.id ||';';
+        
     RETURN NULL;
 END
 $$ LANGUAGE 'plpgsql';
@@ -88,12 +91,12 @@ BEGIN
 
             DROP TRIGGER IF EXISTS ' || t.tablename || '_audit ON public.' || t.tablename || ';
             CREATE TRIGGER ' || t.tablename || '_audit
-                BEFORE INSERT OR UPDATE OR DELETE ON public.' || t.tablename || '
+                AFTER INSERT OR UPDATE OR DELETE ON public.' || t.tablename || '
                 FOR EACH ROW
                 EXECUTE PROCEDURE audit_events();
 
-            DROP TRIGGER IF EXISTS ' || t.tablename || '_delete_alt ON public.' || t.tablename || ';
-            CREATE TRIGGER ' || t.tablename || '_delete_alt
+            DROP TRIGGER IF EXISTS z_' || t.tablename || '_delete_alt ON public.' || t.tablename || ';
+            CREATE TRIGGER z_' || t.tablename || '_delete_alt
                 BEFORE DELETE ON public.' || t.tablename || '
                 FOR EACH ROW
             EXECUTE PROCEDURE delete_alt();';
