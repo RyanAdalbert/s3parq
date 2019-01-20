@@ -1,4 +1,3 @@
-from sqlalchemy import create_engine
 import core.models.configuration as config
 import logging
 
@@ -9,7 +8,7 @@ class ConfigurationMocker:
     '''
 
     def __init__(self):
-        engine = create_engine('sqlite:///:memory:')
+        engine = config.GenEngine(env='dev', local=True).get_engine()
 
         # this instansiates the in-memory sqlite instance
         config.Base.metadata.create_all(engine)
