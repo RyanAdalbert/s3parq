@@ -42,3 +42,28 @@ In development it can be useful to get the functionality without setting up and 
     new_total = session.query(transform_template).count()
     print(total)
     ## 3
+
+However, this is _not_ the same thing as the production database environment - Sqlite does not support our PL Postgres functions, triggers etc. To get this full functionality in development you have 2 options:
+- point to a Development / UAT / Production configuration\_application instance:
+When you are making no changes to the config schema and just need to read, you can do this using the Secret module.
+
+- point to a local PG instance and run the migration suite:
+this will give you a full local build that you can then modify, create new migrations for etc. 
+
+### Migrations
+we use [alembic](https://pypi.org/project/alembic/) to manage migrations for the configuration application. This assumes you have:
+- a running PG instance at localhost:5432 
+- a database configuration\_application 
+- a pg user configurator with password configurator, who owns this database and the PUBLIC schema 
+
+Basic use is:
+    
+    ## apply all migrations and bring DB up to speed
+    >>>MAC: database YOU$ alembic upgrade head
+
+    ## generate a blank migration for PL stuff
+    >>>MAC: database YOU$ alembic revision -m "added default trigger"  
+ 
+    ## auto-generate a completed DDL migration based on the diff between your model and the DB
+    >>>MAC: database YOU$ alembic revision --autogenerate -m "added table hamburger_salad"
+    
