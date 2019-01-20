@@ -29,16 +29,16 @@ In development it can be useful to get the functionality without setting up and 
     
     total = session.query(transform_template).count()
     print(total)
-    ## 3
+    ## 2
 
     ## you can also add entities as you need them
     session.add(transform_template(name='great_new_transform_template'))
     session.commit()
 
-    added = session.query(transform_template).first()
+    added = session.query(transform_template).order_by(transform_template.id.desc()).first()
     print(added.name)
     ## 'great_new_transform_template'
 
     new_total = session.query(transform_template).count()
     print(total)
-    ## 4
+    ## 3
