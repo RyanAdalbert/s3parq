@@ -22,7 +22,7 @@ def test_mock_extract_configurations():
 
     # depends on hard-coded values in mocker
     q = session.query(ec).filter(ec.id == 2)
-    assert q[0].filesystem_path == 'banana_stand'
+    assert q[0].filesystem_path == 'banana_stand_data'
 
 
 def test_mock_transformation_relationships():

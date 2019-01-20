@@ -1,8 +1,8 @@
-"""init
+"""audit db and triggers
 
-Revision ID: 9df9a79a2998
-Revises: 
-Create Date: 2019-01-20 09:03:40.845091
+Revision ID: 1134cec79e78
+Revises: d8bfba24a470
+Create Date: 2019-01-20 17:57:27.820702
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9df9a79a2998'
-down_revision = None
+revision = '1134cec79e78'
+down_revision = 'd8bfba24a470'
 branch_labels = None
 depends_on = None
 
@@ -87,6 +87,8 @@ def upgrade():
                 AND 
                     tablename NOT LIKE 'sql_%%'
                 AND 
+                    tablename <> 'alembic_version'
+                AND 
                     schemaname = 'public';
         BEGIN
             FOR t IN tables LOOP
@@ -109,7 +111,7 @@ def upgrade():
         $$
         """
     )
-    
+
 
 def downgrade():
     conn = op.get_bind()
