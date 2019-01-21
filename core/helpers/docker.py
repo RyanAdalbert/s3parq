@@ -144,7 +144,6 @@ def register_job_definition(
                 'echo hello_world',
             ],
             'jobRoleArn': job_role_arn,
-            'privileged': True|False,
             'ulimits': ulimits,
         },
         retryStrategy={
