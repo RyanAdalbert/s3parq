@@ -12,7 +12,7 @@ class ConfigurationMocker:
     def __init__(self)-> None:
         # TODO: migrate to local postgres instance
         engine = create_engine('sqlite://')
-        #engine = config.GenEngine(env='dev', local=True).get_engine()
+        #engine = config.GenerateEngine(env='dev', local=True).get_engine()
 
         # this instansiates the in-memory sqlite instance
         config.Base.metadata.create_all(engine)

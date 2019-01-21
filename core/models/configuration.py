@@ -19,7 +19,7 @@ class Session():
         return self.session
 
 
-class GenEngine:
+class GenerateEngine:
     """ abstract defining connections here. Local assumes a psql instance on the metal. """
 
     def __init__(self, env: str, local: bool = False) -> None:
