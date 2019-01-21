@@ -2,5 +2,9 @@ awscli
 pytest
 python-coveralls
 click
+boto3
+docker
+gitpython
+moto
 sqlalchemy==1.2.16
 psycopg2
