@@ -1,8 +1,4 @@
 import click
-<<<<<<< HEAD
-from core.helpers.project_root import ProjectRoot
-import subprocess
-import os
 from git import Repo
 from core.helpers import docker
 
