@@ -51,9 +51,22 @@ def test_integration_docker():
     time_since_image_pushed = datetime.now(timezone.utc) - ecr_resp['imageDetails'][0]['imagePushedAt']
     assert timedelta(minutes=5) > time_since_image_pushed
 
-    # Clean up the image
-    core_docker.remove_ecr_image(TAG, REPO_NAME, AWS_ACCOUNT_ID)
-    core_docker.remove_image(full_tag)
+    # Register a job definition
 
-    with pytest.raises(ImageNotFound):
-        docker_client.images.get(full_tag)
+    rjd_resp = core_docker.register_job_definition(
+        "it_test_core",
+        ecr_tagged_image_name
+    )
+
+    container_overrides = core_docker.generate_it_test_container_overrides()
+
+    core_docker.launch_batch_job("it_test", "it_test_core", "core", container_overrides)
+
+    # Deregiser the job definition
+
+    # Clean up the image
+    # core_docker.remove_ecr_image(TAG, REPO_NAME, AWS_ACCOUNT_ID)
+    # core_docker.remove_image(full_tag)
+
+    # with pytest.raises(ImageNotFound):
+    #     docker_client.images.get(full_tag)
