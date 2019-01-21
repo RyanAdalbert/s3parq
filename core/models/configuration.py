@@ -1,6 +1,6 @@
 from sqlalchemy import engine, create_engine, Column, Integer, String, BOOLEAN, TIMESTAMP, text, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import session, sessionmaker, relationship
 
 Base = declarative_base()
 
@@ -15,7 +15,7 @@ class Session():
         s = sessionmaker(bind=engine)
         self.session = s()
 
-    def get_session(self):
+    def get_session(self) -> session.Session:
         return self.session
 
 

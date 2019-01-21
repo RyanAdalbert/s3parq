@@ -1,3 +1,4 @@
+from sqlalchemy.orm.session import Session
 from sqlalchemy import create_engine
 import core.models.configuration as config
 import logging
@@ -8,7 +9,7 @@ class ConfigurationMocker:
         optionally gives you a bunch of mocked data.
     '''
 
-    def __init__(self):
+    def __init__(self)-> None:
         # TODO: migrate to local postgres instance
         engine = create_engine('sqlite://')
         #engine = config.GenEngine(env='dev', local=True).get_engine()
@@ -19,10 +20,10 @@ class ConfigurationMocker:
         session = config.Session(engine)
         self.session = session.get_session()
 
-    def get_session(self):
+    def get_session(self) -> Session:
         return self.session
 
-    def generate_mocks(self):
+    def generate_mocks(self)-> None:
         self._mock_pharmaceutical_companies()
         self._mock_brands()
         self._mock_segments()
@@ -34,7 +35,7 @@ class ConfigurationMocker:
         self._mock_transformations()
         self._mock_extract_configurations()
 
-    def _mock_brands(self):
+    def _mock_brands(self)-> None:
         logging.debug('Generating brand mocks...')
         b = config.Brand
         self.session.add_all([
@@ -44,7 +45,7 @@ class ConfigurationMocker:
         self.session.commit()
         logging.debug('Done generating brand mocks.')
 
-    def _mock_extract_configurations(self):
+    def _mock_extract_configurations(self)-> None:
         logging.debug('Generating extract_configuation mocks...')
         ex = config.ExtractConfiguration
         self.session.add_all([
@@ -64,7 +65,7 @@ class ConfigurationMocker:
         self.session.commit()
         logging.debug('Done generating extract_configuration mocks.')
 
-    def _mock_pharmaceutical_companies(self):
+    def _mock_pharmaceutical_companies(self)-> None:
         logging.debug('Generating pharmaceutical company mocks...')
         p = config.PharmaceuticalCompany
         self.session.add_all([
@@ -73,7 +74,7 @@ class ConfigurationMocker:
         self.session.commit()
         logging.debug('Done generating pharmaceutical company mocks.')
 
-    def _mock_pipelines(self):
+    def _mock_pipelines(self)-> None:
         logging.debug('Generating pipeline mocks...')
         p = config.Pipeline
         self.session.add_all([
@@ -85,7 +86,7 @@ class ConfigurationMocker:
         self.session.commit()
         logging.debug('Done generating pipeline mocks.')
 
-    def _mock_pipeline_states(self):
+    def _mock_pipeline_states(self)-> None:
         logging.debug('Generating pipeline state mocks...')
         p = config.PipelineState
         self.session.add_all([
@@ -96,7 +97,7 @@ class ConfigurationMocker:
         self.session.commit()
         logging.debug('Done generating pipeline state mocks.')
 
-    def _mock_pipeline_state_types(self):
+    def _mock_pipeline_state_types(self)-> None:
         logging.debug('Generating pipeline state type mocks...')
         p = config.PipelineStateType
         self.session.add_all([
@@ -110,7 +111,7 @@ class ConfigurationMocker:
         self.session.commit()
         logging.debug('Done generating pipeline state type mocks.')
 
-    def _mock_pipeline_types(self):
+    def _mock_pipeline_types(self)-> None:
         logging.debug('Generating pipeline type mocks...')
         p = config.PipelineType
         self.session.add_all([
@@ -119,7 +120,7 @@ class ConfigurationMocker:
         self.session.commit()
         logging.debug('Done generating pipeline type mocks.')
 
-    def _mock_segments(self):
+    def _mock_segments(self)-> None:
         logging.debug('Generating segment mocks...')
         s = config.Segment
         self.session.add_all([
@@ -129,7 +130,7 @@ class ConfigurationMocker:
         self.session.commit()
         logging.debug('Done generating segment mocks.')
 
-    def _mock_transformations(self):
+    def _mock_transformations(self)-> None:
         logging.debug('Generating transformation mocks...')
         t = config.Transformation
         self.session.add_all([
@@ -143,7 +144,7 @@ class ConfigurationMocker:
         self.session.commit()
         logging.debug('Done generating transformation mocks.')
 
-    def _mock_transformation_templates(self):
+    def _mock_transformation_templates(self)-> None:
         logging.debug('Generating transformation_template mocks...')
         tt = config.TransformationTemplate
         self.session.add_all([
