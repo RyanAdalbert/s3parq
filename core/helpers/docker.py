@@ -111,7 +111,7 @@ def get_aws_repository(full_tag: str, account_id: str) -> str:
 def generate_it_test_container_overrides():
     overrides = {
         'command': [
-            "corecli --help",
+            "--help",
         ],
         'environment': [
             {
@@ -164,7 +164,7 @@ def deregister_job_definition_set(job_def_name: str):
     responses = []
     for job_def in job_defs:
         name = job_def['jobDefinitionName']
-        revision = job_dev['revision']
+        revision = job_def['revision']
         response = deregister_job_definition(f"{name}:{revision}")
         responses.append(response)
 
