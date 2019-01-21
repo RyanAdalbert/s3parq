@@ -10,7 +10,7 @@ def test_get_extract_configuration():
     # make dummy records
     ec = config.ExtractConfiguration
     t = config.Transformation
-    session.add(t(id=100,pipeline_state_id=1,transformation_template_id =1 ))
+    session.add(t(id=100, pipeline_state_id=1, transformation_template_id=1))
     session.commit()
 
     test_secret_names = []

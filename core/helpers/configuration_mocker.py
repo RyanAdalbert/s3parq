@@ -38,8 +38,9 @@ class ConfigurationMocker:
         logging.debug('Generating brand mocks...')
         b = config.Brand
         self.session.add_all([
-        b(id=1, name = "Teamocil", display_name = "Teamocil", pharmaceutical_company_id = 1),
-        b(id=2, name = "Cornballer", display_name = "Corn Baller", pharmaceutical_company_id = 2)])
+            b(id=1, name="Teamocil", display_name="Teamocil",
+              pharmaceutical_company_id=1),
+            b(id=2, name="Cornballer", display_name="Corn Baller", pharmaceutical_company_id=2)])
         self.session.commit()
         logging.debug('Done generating brand mocks.')
 
@@ -67,8 +68,8 @@ class ConfigurationMocker:
         logging.debug('Generating pharmaceutical company mocks...')
         p = config.PharmaceuticalCompany
         self.session.add_all([
-        p(id=1, display_name = "Natural Life Food Company", name = 'Nfoods'),
-        p(id=2, display_name = "Sitwell Home Construction", name = "Sitwell")])
+            p(id=1, display_name="Natural Life Food Company", name='Nfoods'),
+            p(id=2, display_name="Sitwell Home Construction", name="Sitwell")])
         self.session.commit()
         logging.debug('Done generating pharmaceutical company mocks.')
 
@@ -76,9 +77,11 @@ class ConfigurationMocker:
         logging.debug('Generating pipeline mocks...')
         p = config.Pipeline
         self.session.add_all([
-        p(id=1, name = "bluth_banana_regression", brand_id=2, pipeline_type_id =1, run_frequency= 'daily'),
-        p(id=2, name = "bluth_profitability", brand_id=2, pipeline_type_id =2, run_frequency= 'hourly'),
-        p(id=3, name = "temocil_profitablility", brand_id=1, pipeline_type_id=1, run_frequency='daily')])
+            p(id=1, name="bluth_banana_regression", brand_id=2,
+              pipeline_type_id=1, run_frequency='daily'),
+            p(id=2, name="bluth_profitability", brand_id=2,
+              pipeline_type_id=2, run_frequency='hourly'),
+            p(id=3, name="temocil_profitablility", brand_id=1, pipeline_type_id=1, run_frequency='daily')])
         self.session.commit()
         logging.debug('Done generating pipeline mocks.')
 
@@ -86,10 +89,10 @@ class ConfigurationMocker:
         logging.debug('Generating pipeline state mocks...')
         p = config.PipelineState
         self.session.add_all([
-        p(id=1, pipeline_state_type_id = 1, pipeline_id =1, graph_order=0),
-        p(id=2, pipeline_state_type_id = 2, pipeline_id =1, graph_order=1),
-        p(id=3, pipeline_state_type_id = 3, pipeline_id =1, graph_order=2),
-        p(id=4, pipeline_state_type_id = 1, pipeline_id =2, graph_order=0)])
+            p(id=1, pipeline_state_type_id=1, pipeline_id=1, graph_order=0),
+            p(id=2, pipeline_state_type_id=2, pipeline_id=1, graph_order=1),
+            p(id=3, pipeline_state_type_id=3, pipeline_id=1, graph_order=2),
+            p(id=4, pipeline_state_type_id=1, pipeline_id=2, graph_order=0)])
         self.session.commit()
         logging.debug('Done generating pipeline state mocks.')
 
@@ -97,23 +100,22 @@ class ConfigurationMocker:
         logging.debug('Generating pipeline state type mocks...')
         p = config.PipelineStateType
         self.session.add_all([
-        p(id=1, name = "Raw"),
-        p(id=2, name = "Ingest"),
-        p(id=3, name = "Master"),
-        p(id=4, name = "Enhance"),
-        p(id=5, name = "Enrich"),
-        p(id=6, name = "Metrics"),
-        p(id=7, name = "Dimensional")])
+            p(id=1, name="Raw"),
+            p(id=2, name="Ingest"),
+            p(id=3, name="Master"),
+            p(id=4, name="Enhance"),
+            p(id=5, name="Enrich"),
+            p(id=6, name="Metrics"),
+            p(id=7, name="Dimensional")])
         self.session.commit()
         logging.debug('Done generating pipeline state type mocks.')
-
 
     def _mock_pipeline_types(self):
         logging.debug('Generating pipeline type mocks...')
         p = config.PipelineType
         self.session.add_all([
-        p(id=1, name = "regression", segment_id = 1),
-        p(id=2, name = "profitability", segment_id = 2)])
+            p(id=1, name="regression", segment_id=1),
+            p(id=2, name="profitability", segment_id=2)])
         self.session.commit()
         logging.debug('Done generating pipeline type mocks.')
 
@@ -121,9 +123,9 @@ class ConfigurationMocker:
         logging.debug('Generating segment mocks...')
         s = config.Segment
         self.session.add_all([
-        s(id=1, name = "Patient"),
-        s(id=2, name = "Payer"),
-        s(id=3, name = "Distribution")])
+            s(id=1, name="Patient"),
+            s(id=2, name="Payer"),
+            s(id=3, name="Distribution")])
         self.session.commit()
         logging.debug('Done generating segment mocks.')
 
@@ -140,8 +142,6 @@ class ConfigurationMocker:
         ])
         self.session.commit()
         logging.debug('Done generating transformation mocks.')
-
-
 
     def _mock_transformation_templates(self):
         logging.debug('Generating transformation_template mocks...')
