@@ -1,5 +1,7 @@
 FROM python:3.7
 
+WORKDIR /usr/src/app
+
 # install docker client
 RUN apt-get update
 RUN apt-get install -y \
@@ -20,6 +22,11 @@ RUN apt-get update
 RUN apt-get install -y docker-ce 
 
 # install python requirements
-WORKDIR /usr/src/app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+
+# copy all of the source across
+COPY . ./
+RUN python setup.py install
+ENTRYPOINT ["corecli"]
+CMD []
