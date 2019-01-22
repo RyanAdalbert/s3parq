@@ -107,22 +107,6 @@ def get_aws_repository(full_tag: str, account_id: str) -> str:
 #     }
 #     return overrides
 
-# Generate a super basic container_overrides object for running the integration test
-def generate_it_test_container_overrides():
-    overrides = {
-        'command': [
-            "corecli --help",
-        ],
-        'environment': [
-            {
-                'name': 'AWS_DEFAULT_REGION',
-                'value': 'us-east-1'
-            },
-        ]
-    }
-    return overrides
-
-
 def register_job_definition(
     job_def_name: str,
     container_image_uri: str,
@@ -158,7 +142,7 @@ def register_job_definition(
             'attempts': 2
         },
         timeout={
-            'attemptDurationSeconds': 123
+            'attemptDurationSeconds': timeout
         }
     )
     return response

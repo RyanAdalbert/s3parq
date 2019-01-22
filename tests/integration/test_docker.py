@@ -15,6 +15,21 @@ ecr_client = boto3.client('ecr')
 
 AWS_ACCOUNT_ID = "687531504312"
 
+# Generate a super basic container_overrides object for running the integration test
+def generate_it_test_container_overrides():
+    overrides = {
+        'command': [
+            "corecli --help",
+        ],
+        'environment': [
+            {
+                'name': 'AWS_DEFAULT_REGION',
+                'value': 'us-east-1'
+            },
+        ]
+    }
+    return overrides
+
 # This test goes through the whole lifecycle of a docker container used for
 # development
 #   1. Build the image
@@ -75,7 +90,7 @@ def test_integration_docker():
     # job will fail because by the time Batch wants to run the container
     # its definition has already been removed.
     # CannotPullContainerError: API error (404): manifest for 687531504312.dkr.ecr.us-east-1.amazonaws.com/ichain/core:it_test not found
-    container_overrides = core_docker.generate_it_test_container_overrides()
+    container_overrides = generate_it_test_container_overrides()
     core_docker.launch_batch_job("it_test", "it_test_core", "core", container_overrides)
 
     #   6. Deregister Job Definiton
