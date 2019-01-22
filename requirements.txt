@@ -5,6 +5,6 @@ click
 boto3
 docker
 gitpython
-moto
+moto==1.3.7
 sqlalchemy==1.2.16
 psycopg2
