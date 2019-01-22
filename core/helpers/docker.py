@@ -111,7 +111,7 @@ def get_aws_repository(full_tag: str, account_id: str) -> str:
 def generate_it_test_container_overrides():
     overrides = {
         'command': [
-            "--help",
+            "corecli --help",
         ],
         'environment': [
             {
@@ -133,6 +133,8 @@ def register_job_definition(
     memory: int = 2048
 ):
 
+    # Note that the command will be overwritten with the
+    # container_overrides on launch.
     response = batch_client.register_job_definition(
         jobDefinitionName=job_def_name,
         type='container',
@@ -142,6 +144,12 @@ def register_job_definition(
             'memory': memory,
             'command': [
                 'echo hello_world',
+            ],
+            'environment': [
+                {
+                    'name': 'AWS_DEFAULT_REGION',
+                    'value': AWS_REGION
+                }
             ],
             'jobRoleArn': job_role_arn,
             'ulimits': ulimits,

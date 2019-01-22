@@ -8,5 +8,12 @@ echo $DIR
 # Build the python 3.7 image so the requirements are up to date
 docker build -f $DIR/dockerfiles/python3-7.dockerfile . -t ichain/python:3.7
 
-# Mount the entire repo and run the test
-docker run --rm -it -v $DIR:/usr/src/app ichain/python:3.7 bash -c "coverage run --source core /usr/local/bin/pytest tests  && coverage report && coveralls"
+# Mount the entire repo and run both integration and unit tests
+docker run --rm -it \
+  -e AWS_DEFAULT_REGION=us-east-1 \
+  -e AWS_ACCESS_KEY_ID=$(aws --profile default configure get aws_access_key_id) \
+  -e AWS_SECRET_ACCESS_KEY=$(aws --profile default configure get aws_secret_access_key) \
+  -v $DIR:/usr/src/app \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  ichain/python:3.7 \
+  bash -c "coverage run --source core /usr/local/bin/pytest tests  && coverage report && coveralls"
