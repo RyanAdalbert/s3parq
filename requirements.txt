@@ -7,7 +7,7 @@ boto3==1.9.63
 docker
 gitpython
 #TODO as soon as master is merged move this to a pinned version 2018-01-23
-git+git://github.com/spulec/moto
+git+git://github.com/IntegriChain1/moto
 sqlalchemy==1.2.16
 psycopg2==2.7.6.1
 alembic==1.0.6
