@@ -28,5 +28,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # copy all of the source across
 COPY . ./
 RUN python setup.py install
-ENTRYPOINT ["corecli"]
+ENTRYPOINT ["/bin/sh"]
 CMD []
