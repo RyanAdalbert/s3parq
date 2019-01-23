@@ -2,7 +2,7 @@ awscli
 pytest
 python-coveralls
 click
-boto3
+boto3==1.9.63
 docker
 gitpython
 moto==1.3.7

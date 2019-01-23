@@ -1,12 +1,20 @@
-import pytest
-from moto import mock_secretsmanager
+
 import boto3
+import moto 
+import pytest
+import os
 from core.secret import Secret
 import json
 
-@mock_secretsmanager
+@moto.mock_secretsmanager
 class Test:
     def setup(self):
+        #self.save_env = dict()
+        #self.AWS_VARS = ('AWS_ACCESS_KEY_ID','AWS_SECRET_ACCESS_KEY')
+        #for var in self.AWS_VARS:
+        #    self.save_env[var] = os.getenv(var)
+        #    os.environ[var] = 'fake'
+        
         secret_client = boto3.client('secretsmanager')
         ftp_secret_string = '{"user":"GOB_Bluth", "password":"S3@L_s@le", "host":"ftp://bluth.com", "port":"22", "mode":"active","method":"SFTP"}'
         mysql_secret_string = '{"user":"ic_db_user", "password":"uns3cur3", "host":"12345-host.aws.integrichain.net", "port":"3306", "database": "bluth", "rdbms":"mysql"}'
@@ -31,6 +39,10 @@ class Test:
                                     Description = 'Write connection for the production configuration database.',
                                     SecretString = psql_write_secret_string
                                  ) 
+
+    def teardown(self):
+        for var in self.AWS_VARS:
+            os.environ[var] = self.save_env[var]
 
     def test_get_secret_with_args(self):        
         self.setup()
