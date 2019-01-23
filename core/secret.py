@@ -3,7 +3,17 @@ import json
 
 
 class Secret:
-    
+    ''' Abstracts aws secretsmanager - values of the secret are callable attributes. ie:
+            secret = Secret(name='hamburger', env='dev', type_of='database', mode='read')
+            secret.password 
+            ## hot_dog
+        
+            secret.host
+            ##hamburger.sandwich.com
+        NOTE: if force_env is not set, the secret class will look for an "all" environment secret and return it
+        when the specified environment fails. ie if 'dev/FTP/hamburger/read' does not exist, but 'all/FTP/hamburger/read' does,
+        the values will be silently substituted. 
+    '''       
     def __init__(self, name: str = None, env: str = None, type_of: str = None, mode: str = None, identifier: str = None, force_env: bool = False) -> None:
         ''' get the secret from secrets manager based on args.
             ARGS:
