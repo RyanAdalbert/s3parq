@@ -1,3 +1,4 @@
+import moto
 import pytest
 import os
 from core.helpers.project_root import ProjectRoot
