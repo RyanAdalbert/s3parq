@@ -9,3 +9,4 @@ def test_cli_add():
     result = runner.invoke(cli.add, ["1", "2"])
     assert result.exit_code == 0
     assert result.output == '3\n\n'
+
