@@ -11,7 +11,7 @@ def run_transform(env: str, id: int, input_contract: str, output_contract: str) 
 
     #Then run the notebook
     output_s3_path = output_path(output_contract, name)
-    path = f"{root.path}/transforms/{name.replace('.','/')}.ipynb"
+    path = f"{root.path}/transforms/{name.replace('.', '/')}.ipynb"
     pm.execute_notebook(
        path,
        output_s3_path,

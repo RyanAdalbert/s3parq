@@ -5,7 +5,6 @@ Click==7.0
 boto3==1.9.83
 docker==3.7.0
 GitPython==2.1.11
-moto
 #TODO as soon as master is merged move this to a pinned version 2018-01-23
 git+git://github.com/IntegriChain1/moto
 sqlalchemy==1.2.16
