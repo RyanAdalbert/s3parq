@@ -4,7 +4,7 @@ import os
 from core.helpers.project_root import ProjectRoot
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 import core.models.configuration as config
-
+from core.helpers.s3_naming_helper import S3NamingHelper 
 
 def test_project_root_in_project():
     root = ProjectRoot()
@@ -45,3 +45,45 @@ def test_mock_transformation_relationships():
     assert len(secrets) == 3
 
     assert set(secrets) == set(['sitwell'])
+
+## S3 Naming Helper
+
+def test_validate_bucket_name():
+    helper = S3NamingHelper()
+
+    ## must be between 3-63 chars
+    response = helper.validate_bucket_name('ab')
+    assert not response[0], 'allowed bucket name that was too short'
+
+    response = helper.validate_bucket_name(''.join([str(x) for x in range(0,65)]))
+    assert not response[0], 'allowed bucket name that was too long'
+
+    ## lower case chars, numbers, periods, dashes
+    
+    response = helper.validate_bucket_name('_$Bucket')
+    assert not response[0], 'allowed bucket name with invalid chars'
+
+    ## cannot end with dash
+
+    response = helper.validate_bucket_name('bucket-')
+    assert not response[0], 'allowed bucket name with dash ending'
+
+    ## cannot consecutive periods
+    response = helper.validate_bucket_name('bucket..')
+    assert not response[0], 'allowed bucket name with double periods'
+
+    ## dashes next to periods
+    response = helper.validate_bucket_name('bucket-.')
+    assert not response[0], 'allowed bucket name with dash next to period'
+
+    ## char or number after period
+    response = helper.validate_bucket_name('bucket.')
+    assert not response[0], 'allowed bucket name without a letter or number after period'
+
+    ## char or number at start
+    response = helper.validate_bucket_name('_bucket')
+    assert not response[0], 'allowed bucket name without a letter or number to start'
+
+    ## valid 
+    response = helper.validate_bucket_name('bucket')
+    assert response[0], f'failed to validate valid name - message {response[1]}'
