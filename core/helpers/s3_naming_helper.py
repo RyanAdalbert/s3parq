@@ -2,8 +2,8 @@ import re
 
 class S3NamingHelper:
 
-    def validate_part(self,value, allow_prefix = True):
-        ''' INTENT: checks if a valid s3 part
+    def validate_part(self,value, allow_prefix: bool = True) -> tuple:
+        '''checks if a valid s3 part
             ARGS:
                 - value (str) the path or partial path in s3
                 - allow_prefix (bool) if false will only validate single parts
@@ -25,7 +25,7 @@ class S3NamingHelper:
         return tuple([True,None])               
     
         
-    def validate_bucket_name(self,bucket_name):
+    def validate_bucket_name(self,bucket_name: str) -> tuple:
         ''' INTENT: checks for a valid bucket name
             ARGS: 
                 - bucket_name (str) the bucket name to validate
@@ -37,7 +37,7 @@ class S3NamingHelper:
 
         ## lower case chars, numbers, periods, dashes
         elif not bucket_name.islower():
-            return tuple([False, 'bucket name cannot contain lower case characters'])
+            return tuple([False, 'bucket name cannot contain upper case characters'])
         
         elif not bool(re.match(r"^[a-z0-9\-\.]*$", bucket_name)):
             return tuple([False, 'bucket name can only contain lower case chars, numbers, dashes and periods'])
@@ -61,11 +61,10 @@ class S3NamingHelper:
         ## char or number at start
         elif not (bucket_name[0].isalpha() or bucket_name[0].isnumeric()):
             return tuple([False, 'bucket name must start with a number or letter'])  
-        
         else:
             return tuple([True,None])
 
-    def validate_s3_path(self,path):
+    def validate_s3_path(self,path: str )->tuple:
         ''' INTENT: validate a complete s3 path
             ARGS:
                 - path (str) the S3 path to validate
@@ -89,7 +88,7 @@ class S3NamingHelper:
         return tuple([True,path])
 
 
-    def _safe_chars(self):
+    def _safe_chars(self) -> list:
         safe = list(range(ord('a'),ord('z')+1))
         safe += list(range(ord('A'),ord('Z')+1))
         safe = [chr(x) for x in safe]
