@@ -25,7 +25,7 @@ def _contract():
     contract.set_env('dev')
     contract.set_parent('Merck')
     contract.set_child('Wonder_Drug')
-    contract.set_state('Ingest')
+    contract.set_state('ingest')
     contract.set_dataset('valid_dataset')       
     return contract
 
@@ -34,27 +34,27 @@ def test_dataset_only(_contract):
     contract = _contract
     path = contract.get_s3_path()
 
-    assert path == 's3://ichain-development/Master/Merck/Wonder_drug/Ingest/valid_dataset/', 'path was incorrectly built.'
+    assert path == 's3://ichain-development/master/merck/wonder_drug/ingest/valid_dataset/', 'path was incorrectly built.'
 
 def test_with_partitions(_contract):
     contract = _contract
     contract.set_partitions(['partition_1','partition_2'])
     path = contract.get_s3_path()
-    assert path == 's3://ichain-development/Master/Merck/Wonder_drug/Ingest/valid_dataset/partition_1/partition_2/', 'path was incorrectly built with partitions.'
+    assert path == 's3://ichain-development/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/', 'path was incorrectly built with partitions.'
 
 def test_with_file_name_with_partitions(_contract):
     contract = _contract
     contract.set_file_name('29980385023509.parquet')
     contract.set_partitions(['partition_1','partition_2'])
     path = contract.get_s3_path()
-    assert path == 's3://ichain-development/Master/Merck/Wonder_drug/Ingest/valid_dataset/partition_1/partition_2/29980385023509.parquet', 'path was incorrectly built with partitions.'
+    assert path == 's3://ichain-development/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/29980385023509.parquet', 'path was incorrectly built with partitions.'
     
 def test_file_name_no_partitions(_contract):
     contract = _contract
     contract.partitions = [] # hack to jump around the 0 len guard
     contract.set_file_name('29980385023509.parquet')
     path = contract.get_s3_path()
-    assert path == 's3://ichain-development/Master/Merck/Wonder_drug/Ingest/valid_dataset/29980385023509.parquet','path was incorrectly built without partitions and with file name.'
+    assert path == 's3://ichain-development/master/merck/wonder_drug/ingest/valid_dataset/29980385023509.parquet','path was incorrectly built without partitions and with file name.'
 
 def test_quick_set(_contract):
     contract = _contract
@@ -62,14 +62,14 @@ def test_quick_set(_contract):
                         env = 'dev',
                         parent = 'Merck',
                         child = 'Wonder_Drug',
-                        state = 'Ingest',
+                        state = 'ingest',
                         dataset = 'valid_dataset')
 
-    assert contract.get_branch() == 'Master', 'failed to set branch'
+    assert contract.get_branch() == 'master', 'failed to set branch'
     assert    contract.get_env() == 'ichain-development', 'failed to set env' 
-    assert    contract.get_parent() ==  'Merck', 'failed to set parent' 
-    assert    contract.get_child() == 'Wonder_drug', 'failed to set parent' 
-    assert    contract.get_state() == 'Ingest', 'failed to set parent' 
+    assert    contract.get_parent() ==  'merck', 'failed to set parent' 
+    assert    contract.get_child() == 'wonder_drug', 'failed to set parent' 
+    assert    contract.get_state() == 'ingest', 'failed to set parent' 
     assert    contract.get_dataset()== 'valid_dataset', 'failed to set parent'
 
     
@@ -77,8 +77,8 @@ def test_alias_brand():
     contract = Contract()
     brand = 'Merck'
     contract.set_brand(brand)
-    assert contract.get_brand() == brand, "brand alias not set"
-    assert contract.get_child() == brand, "brand does not alias to child"
+    assert contract.get_brand() == brand.lower(), "brand alias not set"
+    assert contract.get_child() == brand.lower(), "brand does not alias to child"
     
 
 
@@ -126,7 +126,7 @@ def _contract_type():
                         env = 'dev',
                         parent = 'Merck',
                         child = 'Wonder_Drug',
-                        state = 'Ingest'
+                        state = 'ingest'
                         )
     return contract
 
@@ -162,7 +162,7 @@ def test_previous_state(_contract):
     contract = _contract
     contract.set_state('ingest')
 
-    assert contract.get_previous_state() == 'Raw', 'previous state incorrect'
+    assert contract.get_previous_state() == 'raw', 'previous state incorrect'
 
 def test_previous_from_raw(_contract):
     contract = _contract
@@ -173,7 +173,7 @@ def test_previous_from_raw(_contract):
 def test_next_state(_contract):
     contract = _contract
     contract.set_state('ingest')
-    assert contract.get_next_state() ==  'Master', 'next state incorrect'
+    assert contract.get_next_state() ==  'master', 'next state incorrect'
 
 def test_next_state_from_dimensional(_contract):
     contract = _contract

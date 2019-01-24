@@ -20,7 +20,7 @@ class Contract:
             this is generally the customer (and it is aliased as such) but can be IntegriChain for internal sources,
             or another aggregator for future-proofing
         CHILD - The sub level source identifier, generally the brand (and is aliased as such) 
-        STATE - One of: Raw, Ingest, Master, Enhance, Enrich, Metrics 
+        STATE - One of: raw, ingest, master, enhance, Enrich, Metrics 
         DATASET - The name of the collection of data. In an RDBMS this would be a table or view
         PARTITION - for datasets, the partition is set in the prefix name  
         SUB-PARTITION - for datasets, the sub-partitions add additional partitioning with additional prefixes
@@ -29,8 +29,8 @@ class Contract:
     DEV = 'ichain-development'
     PROD = 'ichain-production'
     UAT = 'ichain-uat'
-    STATES = ['Raw', 'Ingest', 'Master', 'Enhance',
-              'Enrich', 'Metrics', 'Dimensional']
+    STATES = ['raw', 'ingest', 'master', 'enhance',
+              'enrich', 'metrics', 'dimensional']
 
     def __init__(self, **kwargs):
         ''' Set the initial vals to None.
@@ -107,17 +107,19 @@ class Contract:
             return self.STATES[cur + 1]
 
     def set_branch(self, branch: str)->None:
-        self.branch = self._part_formatter(branch)
+        self.branch = self._validate_part(branch)
 
     def set_parent(self, parent: str)->None:
-        self.parent = self._part_formatter(parent)
+        self.parent = self._validate_part(parent)
 
     def set_child(self, child: str)->None:
-        self.child = self._part_formatter(child)
+        self.child = self._validate_part(child)
 
     def set_state(self, state: str)->None:
-        if state.capitalize() in self.STATES:
-            self.state = state.capitalize()
+        if state in self.STATES:
+            self.state = state
+        else:
+            raise ValueError(f'{state} is not a valid state')
 
     def set_dataset(self, dataset: str)->None:
         # leave in natural case for datasets
@@ -208,6 +210,10 @@ class Contract:
         path += self.file_name
         return path
 
+    def publish_raw_file(self, local_file_path:str) ->None:
+        '''accepts a local path to a file, publishes it as-is to s3 as long as state == raw.'''
+        raise NotImplementedError
+
     # aliases
     def get_brand(self)->str:
         return self.get_child()
@@ -232,13 +238,10 @@ class Contract:
         self.set_env(env)
 
     # private
-    def _part_formatter(self, part: str)->str:
-        part = part.capitalize()
-        return self._validate_part(part)
 
     def _validate_part(self, part: str)->str:
-        val = s3Name().validate_part(part, allow_prefix=False)
+        val = s3Name().validate_part(part.lower(), allow_prefix=False)
         if val[0]:
-            return part
+            return part.lower()
         else:
             raise ValueError(val[1])
