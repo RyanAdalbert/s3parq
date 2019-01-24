@@ -10,3 +10,4 @@ sqlalchemy==1.2.16
 psycopg2==2.7.6.1
 alembic==1.0.6
 papermill==0.17.1
+jupyter==1.0.0

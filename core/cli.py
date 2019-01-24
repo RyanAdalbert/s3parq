@@ -1,6 +1,6 @@
 import click
 from git import Repo
-from core.helpers import docker
+from core.helpers import docker, notebook
 
 DOCKER_REPO = 'ichain/core'
 
@@ -40,5 +40,9 @@ def tidy(env):
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))
-def run(env):
-    docker.build_branch_image()
+@click.argument('id', type=int)
+@click.argument('input_contract', type=str)
+@click.argument('output_contract', type=str)
+def run(env, id, input_contract, output_contract):
+    notebook_url = notebook.run_transform(env, id, input_contract, output_contract)
+    print(notebook_url)
