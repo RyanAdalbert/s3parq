@@ -2,6 +2,7 @@ import logging
 from git import Repo
 from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
 
+
 class Contract:
     ''' The s3 contract is how we structure our data lake. 
         This contract defines the output structure of data into S3.
@@ -24,41 +25,40 @@ class Contract:
         PARTITION - for datasets, the partition is set in the prefix name  
         SUB-PARTITION - for datasets, the sub-partitions add additional partitioning with additional prefixes
         FILENAME - nondescript in the contract
-    '''    
+    '''
     DEV = 'ichain-development'
     PROD = 'ichain-production'
     UAT = 'ichain-uat'
-    STATES = ['Raw','Ingest','Master','Enhance','Enrich','Metrics','Dimensional']
+    STATES = ['Raw', 'Ingest', 'Master', 'Enhance',
+              'Enrich', 'Metrics', 'Dimensional']
 
     def __init__(self, **kwargs):
         ''' Set the initial vals to None.
             Default file name, dataset and partitions to empty (they are not required in a contract). 
             Does not support customer / brand aliases
         '''
-        attributes = ('branch','env','parent','child','state','dataset', 'file_name', 'partitions', 'partition_size')    
+        attributes = ('branch', 'env', 'parent', 'child', 'state',
+                      'dataset', 'file_name', 'partitions', 'partition_size')
 
         for attr in attributes:
             self.__dict__[attr] = None
 
-        ## defaults
+        # defaults
         self.file_name = str()
         self.partitions = []
         self.dataset = str()
-        self.partition_size = 100 ## partition size in mb
+        self.partition_size = 100  # partition size in mb
         self.contract_type = 'state'
 
-        ## set the attributes using the setter methods if they are in kwargs
+        # set the attributes using the setter methods if they are in kwargs
         for attr in attributes:
             if attr in kwargs:
-                setter = getattr(self,'set_' + attr)
+                setter = getattr(self, 'set_' + attr)
                 setter(kwargs[attr])
-
-
-
 
     def get_branch(self)->str:
         return self.branch
-       
+
     def get_parent(self)->str:
         return self.parent
 
@@ -73,16 +73,16 @@ class Contract:
 
     def get_dataset(self)->str:
         return self.dataset
-    
+
     def get_partitions(self)->str:
         return self.partitions
 
     def get_partition_size(self)->str:
         return self.partition_size
-    
+
     def get_file_name(self)->str:
         return self.file_name
-    
+
     def get_contract_type(self)->str:
         return self.contract_type
 
@@ -106,28 +106,28 @@ class Contract:
         else:
             return self.STATES[cur + 1]
 
-    def set_branch(self, branch:str)->None:
+    def set_branch(self, branch: str)->None:
         self.branch = self._part_formatter(branch)
 
-    def set_parent(self, parent:str)->None:
+    def set_parent(self, parent: str)->None:
         self.parent = self._part_formatter(parent)
-    
-    def set_child(self, child:str)->None:
+
+    def set_child(self, child: str)->None:
         self.child = self._part_formatter(child)
 
-    def set_state(self,state:str)->None:
+    def set_state(self, state: str)->None:
         if state.capitalize() in self.STATES:
             self.state = state.capitalize()
 
-    def set_dataset(self,dataset:str)->None:
-        ## leave in natural case for datasets
-        self.dataset = self._validate_part(dataset)             
+    def set_dataset(self, dataset: str)->None:
+        # leave in natural case for datasets
+        self.dataset = self._validate_part(dataset)
         self._set_contract_type()
 
-    def set_partition_size(self,size:int)->None:
+    def set_partition_size(self, size: int)->None:
         self.partition_size = size
-    
-    def set_partitions(self,partitions:list)->None:
+
+    def set_partitions(self, partitions: list)->None:
         ''' INTENT: sets the partitions for a contract
             ARGS:
                 - partitions (list) an ordered list of partition names.
@@ -144,28 +144,29 @@ class Contract:
         self.partitions = temp_partitions
         self._set_contract_type()
 
-    def set_file_name(self,file_name:str)->None:
+    def set_file_name(self, file_name: str)->None:
         self.file_name = self._validate_part(file_name)
         self._set_contract_type()
 
-    def set_env(self, env:str)->None:
+    def set_env(self, env: str)->None:
         env = env.lower()
-        if env in (self.DEV, 'dev','development'):
+        if env in (self.DEV, 'dev', 'development'):
             self.env = self.DEV
-        elif env in (self.PROD, 'prod','production'):
+        elif env in (self.PROD, 'prod', 'production'):
             self.env = self.PROD
         elif env in (self.UAT, 'uat'):
             self.env = self.UAT
         else:
             raise ValueError(f'{env} is not a valid environment.')
 
-        ## set branch default to the git branch.
-        ## if we need to override this, set the branch param first.
+        # set branch default to the git branch.
+        # if we need to override this, set the branch param first.
         if self.branch is None:
             try:
-                self.set_branch(Repo('.').active_branch.name) 
+                self.set_branch(Repo('.').active_branch.name)
             except:
-                raise ValueError('Your git branch name cannot be used as a contract branch path.')
+                raise ValueError(
+                    'Your git branch name cannot be used as a contract branch path.')
 
     def _set_contract_type(self)->None:
         ''' INTENT: sets what type of contract this is - file, partition, or dataset
@@ -187,33 +188,34 @@ class Contract:
             NOTE: requires all params to be set to at least the state level
         '''
         if not (self.env and
-                self.branch and 
-                self.parent and 
+                self.branch and
+                self.parent and
                 self.child and
                 self.state
                 ):
-            raise ValueError('get_s3_path() requires all contract params to be set.')
-        
+            raise ValueError(
+                'get_s3_path() requires all contract params to be set.')
+
         path = f's3://{self.env}/{self.branch}/{self.parent}/{self.child}/{self.state}/'
 
         if len(self.dataset) > 0:
             path += f'{self.dataset}/'
-          
-            ## no partitions without a data set
+
+            # no partitions without a data set
             for p in self.partitions:
                 path += f'{p}/'
-        
-        path += self.file_name
-        return path   
 
-    ## aliases
+        path += self.file_name
+        return path
+
+    # aliases
     def get_brand(self)->str:
         return self.get_child()
 
     def get_customer(self)->str:
         return self.get_parent()
 
-    def set_brand(self,val)->None:
+    def set_brand(self, val)->None:
         self.set_child(val)
 
     def set_customer(self)->None:
@@ -221,23 +223,22 @@ class Contract:
 
     def get_bucket(self)->str:
         return self.get_env()
-    
+
     def get_key(self)->str:
         ''' Removes the s3 domain and the environment prefix'''
         return '/'.join(self.get_s3_path()[5:].split('/')[1:])
 
-    def set_bucket(self,env:str)->None:
+    def set_bucket(self, env: str)->None:
         self.set_env(env)
 
-    ## private
-    def _part_formatter(self,part:str)->str:
+    # private
+    def _part_formatter(self, part: str)->str:
         part = part.capitalize()
         return self._validate_part(part)
-    
-    def _validate_part(self,part:str)->str:
-        val = s3Name().validate_part(part, allow_prefix = False)
+
+    def _validate_part(self, part: str)->str:
+        val = s3Name().validate_part(part, allow_prefix=False)
         if val[0]:
             return part
         else:
             raise ValueError(val[1])
-
