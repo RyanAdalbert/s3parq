@@ -42,25 +42,22 @@ def test_with_partitions(_contract):
     path = contract.get_s3_path()
     assert path == 's3://ichain-development/Master/Merck/Wonder_drug/Ingest/valid_dataset/partition_1/partition_2/', 'path was incorrectly built with partitions.'
 
-'''
-    ## with file_name
+def test_with_file_name_with_partitions(_contract):
+    contract = _contract
+    contract.set_file_name('29980385023509.parquet')
+    contract.set_partitions(['partition_1','partition_2'])
+    path = contract.get_s3_path()
+    assert path == 's3://ichain-development/Master/Merck/Wonder_drug/Ingest/valid_dataset/partition_1/partition_2/29980385023509.parquet', 'path was incorrectly built with partitions.'
+    
+def test_file_name_no_partitions(_contract):
+    contract = _contract
+    contract.partitions = [] # hack to jump around the 0 len guard
     contract.set_file_name('29980385023509.parquet')
     path = contract.get_s3_path()
-    assert    path, 
-                        's3://ichain-development/Master/Merck/Wonder_drug/Ingest/valid_dataset/partition_1/partition_2/29980385023509.parquet', 
-                        'path was incorrectly built with partitions.'
-                    )
-    
-    ## file_name, no partitions
-    contract.partitions = [] # hack to jump around the 0 len guard
+    assert path == 's3://ichain-development/Master/Merck/Wonder_drug/Ingest/valid_dataset/29980385023509.parquet','path was incorrectly built without partitions and with file name.'
 
-    path = contract.get_s3_path()
-    assert    path, 
-                        's3://ichain-development/Master/Merck/Wonder_drug/Ingest/valid_dataset/29980385023509.parquet', 
-                        'path was incorrectly built without partitions and with file name.'
-                    )
-
-def test_quick_set(self):
+def test_quick_set(_contract):
+    contract = _contract
     contract = Contract(branch = 'master',
                         env = 'dev',
                         parent = 'Merck',
@@ -68,96 +65,107 @@ def test_quick_set(self):
                         state = 'Ingest',
                         dataset = 'valid_dataset')
 
-    assert    contract.get_branch(), 'Master', 'failed to set branch') 
-    assert    contract.get_env(), 'ichain-development', 'failed to set env') 
-    assert    contract.get_parent(), 'Merck', 'failed to set parent') 
-    assert    contract.get_child(), 'Wonder_drug', 'failed to set parent') 
-    assert    contract.get_state(), 'Ingest', 'failed to set parent') 
-    assert    contract.get_dataset(), 'valid_dataset', 'failed to set parent') 
+    assert contract.get_branch() == 'Master', 'failed to set branch'
+    assert    contract.get_env() == 'ichain-development', 'failed to set env' 
+    assert    contract.get_parent() ==  'Merck', 'failed to set parent' 
+    assert    contract.get_child() == 'Wonder_drug', 'failed to set parent' 
+    assert    contract.get_state() == 'Ingest', 'failed to set parent' 
+    assert    contract.get_dataset()== 'valid_dataset', 'failed to set parent'
+
     
-def test_alias_brand(self):
+def test_alias_brand():
+    contract = Contract()
     brand = 'Merck'
     contract.set_brand(brand)
-    assert contract.get_brand(),
-                brand,
-                "brand alias not set")
-    assert contract.get_child(),
-                brand,
-                "brand does not alias to child")
+    assert contract.get_brand() == brand, "brand alias not set"
+    assert contract.get_child() == brand, "brand does not alias to child"
     
 
-def test_set_partitions(self):
-    partitions = ['date','segment']
-    bad_partitions = ['b@d$$%Partition','good_partition_name']
-    ## valid
-    contract.set_partitions(partitions)
-    assert contract.get_partitions(), partitions, "partitions not correctly set")
 
-    ## invalid
-    assertRaises(  ValueError,
-                        lambda: contract.set_partitions(bad_partitions))
-     
-def test_set_file_name(self):
+@pytest.fixture
+def _partitions():
+    p = dict()
+    p['good'] = ['date','segment']
+    p['bad'] = ['b@d$$%Partition','good_partition_name']
+    return p
+
+def test_valid_partitions(_partitions):
+    p = _partitions
+    contract = Contract()
+    contract.set_partitions(p['good'])
+    assert contract.get_partitions() ==  p['good'], "partitions not correctly set"
+
+def test_invalid_partitions(_partitions):
+    p = _partitions
+    contract = Contract()
+    with pytest.raises(ValueError):
+        contract.set_partitions(p['bad'])
+    
+@pytest.fixture
+def _file_names():
     good_file_name = '23598020358908325.parquet'
     bad_file_name = '@@$10-8953095830-.jpg'
+    return {'good':good_file_name, 'bad':bad_file_name}
     
-    ## valid 
-    contract.set_file_name(good_file_name)
-    assert    contract.get_file_name(),
-                        good_file_name,
-                        "file name was not set")
+    
+def test_set_valid_file_name(_file_names):
+    f = _file_names
+    contract = Contract()
+    contract.set_file_name(f['good'])
+    assert contract.get_file_name() == f['good'], "file name was not set"
 
-    ## invalid
-    assertRaises(  ValueError,
-                        lambda: contract.set_file_name(bad_file_name))
+def test_set_invalid_file_name(_file_names):
+    f = _file_names
+    contract = Contract()
+    with pytest.raises(ValueError):
+        contract.set_file_name(f['bad'])
 
-
-def test_get_contract_type(self):
+@pytest.fixture
+def _contract_type():
     contract = Contract(branch = 'master',
                         env = 'dev',
                         parent = 'Merck',
                         child = 'Wonder_Drug',
                         state = 'Ingest'
                         )
+    return contract
 
-    ## basic
-    assert    contract.get_contract_type(),
-                        'state',
-                        'returned wrong type for state contract')
-    
-    ## dataset
+def test_contract_type_state(_contract_type):
+    contract = _contract_type
+    assert contract.get_contract_type() == 'state','returned wrong type for state contract'
+
+def test_contract_type_dataset(_contract_type):
+    contract = _contract_type
     contract.set_dataset('test_set')
-    assert    contract.get_contract_type(),
-                        'dataset',
-                        'returned wrong type for dataset contract')
+    assert contract.get_contract_type() == 'dataset','returned wrong type for dataset contract'
 
-    ## partition
+def test_contract_type_partitions(_contract_type):
+    contract = _contract_type
     contract.set_partitions(['test_par'])
-    assert    contract.get_contract_type(),
-                        'partition',
-                        'returned wrong type for partition contract')
+    assert contract.get_contract_type() == 'partition','returned wrong type for partition contract'
 
-    ## file_name
+def test_contract_type_file(_contract_type):
+    contract = _contract_type
+    contract.set_partitions(['test_par'])
     contract.set_file_name('test_file.jpg')
-    assert    contract.get_contract_type(),
-                        'file',
-                        'returned wrong type for file contract')
+    assert contract.get_contract_type() == 'file','returned wrong type for file contract'
 
-    ## file_name no partition
+
+def test_contract_type_file_no_partition(_contract_type):
+    contract = _contract_type
     contract.partitions = []
-    assert    contract.get_contract_type(),
-                        'file',
-                        'returned wrong type for file contract without partition')
+    contract.set_file_name('test_file.jpg')
+    assert contract.get_contract_type() == 'file','returned wrong type for file contract without partition'
 
 
-def test_previous_state(self):
+def test_previous_state(_contract):
+    contract = _contract
     contract.set_state('ingest')
 
-    assert contract.get_previous_state(), 'Raw', 'previous state incorrect')
+    assert contract.get_previous_state() == 'Raw', 'previous state incorrect'
 
 
-def test_next_state(self):
+def test_next_state(_contract):
+    contract = _contract
     contract.set_state('ingest')
-
-    assert contract.get_next_state(), 'Master', 'previous state incorrect')
-'''
+    assert contract.get_next_state() ==  'Master', 'next state incorrect'
