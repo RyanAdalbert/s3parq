@@ -169,3 +169,10 @@ def test_next_state(_contract):
     contract = _contract
     contract.set_state('ingest')
     assert contract.get_next_state() ==  'Master', 'next state incorrect'
+
+
+def test_get_partition_size():
+    contract = Contract()
+    size = 1
+    contract.set_partition_size(size)
+    assert contract.get_partition_size() == size, 'partition size not correctly set'
