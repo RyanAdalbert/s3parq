@@ -56,47 +56,47 @@ class Contract:
 
 
 
-    def get_branch(self):
+    def get_branch(self)->str:
         return self.branch
        
-    def get_parent(self):
+    def get_parent(self)->str:
         return self.parent
 
-    def get_state(self):
+    def get_state(self)->str:
         return self.state
 
-    def get_child(self):
+    def get_child(self)->str:
         return self.child
 
-    def get_env(self):
+    def get_env(self)->str:
         return self.env
 
-    def get_dataset(self):
+    def get_dataset(self)->str:
         return self.dataset
     
-    def get_partitions(self):
+    def get_partitions(self)->str:
         return self.partitions
 
-    def get_partition_size(self):
+    def get_partition_size(self)->str:
         return self.partition_size
     
-    def get_file_name(self):
+    def get_file_name(self)->str:
         return self.file_name
     
-    def get_contract_type(self):
+    def get_contract_type(self)->str:
         return self.contract_type
 
-    def get_previous_state(self):
+    def get_previous_state(self)->str:
         ''' INTENT: returns the state before this contract state
             RETURNS: str state name
         '''
         cur = self.STATES.index(self.state)
-        if cur > 1:
+        if cur < 1:
             return None
         else:
             return self.STATES[cur - 1]
 
-    def get_next_state(self):
+    def get_next_state(self)->str:
         ''' INTENT: returns the state after this contract state
             RETURNS: str state name
         '''
@@ -106,28 +106,28 @@ class Contract:
         else:
             return self.STATES[cur + 1]
 
-    def set_branch(self, branch):
+    def set_branch(self, branch:str)->None:
         self.branch = self._part_formatter(branch)
 
-    def set_parent(self, parent):
+    def set_parent(self, parent:str)->None:
         self.parent = self._part_formatter(parent)
     
-    def set_child(self, child):
+    def set_child(self, child:str)->None:
         self.child = self._part_formatter(child)
 
-    def set_state(self,state):
+    def set_state(self,state:str)->None:
         if state.capitalize() in self.STATES:
             self.state = state.capitalize()
 
-    def set_dataset(self,dataset):
+    def set_dataset(self,dataset:str)->None:
         ## leave in natural case for datasets
         self.dataset = self._validate_part(dataset)             
         self._set_contract_type()
 
-    def set_partition_size(self,size):
+    def set_partition_size(self,size:int)->None:
         self.partition_size = size
     
-    def set_partitions(self,partitions):
+    def set_partitions(self,partitions:list)->None:
         ''' INTENT: sets the partitions for a contract
             ARGS:
                 - partitions (list) an ordered list of partition names.
@@ -144,11 +144,11 @@ class Contract:
         self.partitions = temp_partitions
         self._set_contract_type()
 
-    def set_file_name(self,file_name):
+    def set_file_name(self,file_name:str)->None:
         self.file_name = self._validate_part(file_name)
         self._set_contract_type()
 
-    def set_env(self, env):
+    def set_env(self, env:str)->None:
         env = env.lower()
         if env in (self.DEV, 'dev','development'):
             self.env = self.DEV
@@ -167,7 +167,7 @@ class Contract:
             except:
                 raise ValueError('Your git branch name cannot be used as a contract branch path.')
 
-    def _set_contract_type(self):
+    def _set_contract_type(self)->None:
         ''' INTENT: sets what type of contract this is - file, partition, or dataset
             RETURNS: None
         '''
@@ -181,7 +181,7 @@ class Contract:
             t = 'state'
         self.contract_type = t
 
-    def get_s3_path(self):
+    def get_s3_path(self)->str:
         ''' INTENT: builds the s3 path from the contract.
             RETURNS: string s3 path
             NOTE: requires all params to be set to at least the state level
@@ -206,44 +206,35 @@ class Contract:
         path += self.file_name
         return path   
 
-    ##TODO: move publish() in here (should write accept a pandas df and optional schema and write parquet to contract).
-    
-    def set_parquet_schema(self, schema):
-        ''' INTENT: sets the schema, a pyarrow parquet schema object.
-            RETURNS: None
-        '''
-        self.parquet_schema = schema
-
-
     ## aliases
-    def get_brand(self):
+    def get_brand(self)->str:
         return self.get_child()
 
-    def get_customer(self):
+    def get_customer(self)->str:
         return self.get_parent()
 
-    def set_brand(self,val):
+    def set_brand(self,val)->None:
         self.set_child(val)
 
-    def set_customer(self):
+    def set_customer(self)->None:
         self.set_brand(val)
 
-    def get_bucket(self):
+    def get_bucket(self)->str:
         return self.get_env()
     
-    def get_key(self):
+    def get_key(self)->str:
         ''' Removes the s3 domain and the environment prefix'''
         return '/'.join(self.get_s3_path()[5:].split('/')[1:])
 
-    def set_bucket(self,env):
+    def set_bucket(self,env:str)->None:
         self.set_env(env)
 
     ## private
-    def _part_formatter(self,part):
+    def _part_formatter(self,part:str)->str:
         part = part.capitalize()
         return self._validate_part(part)
     
-    def _validate_part(self,part):
+    def _validate_part(self,part:str)->str:
         val = s3Name().validate_part(part, allow_prefix = False)
         if val[0]:
             return part

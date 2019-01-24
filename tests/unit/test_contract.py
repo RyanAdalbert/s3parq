@@ -164,12 +164,21 @@ def test_previous_state(_contract):
 
     assert contract.get_previous_state() == 'Raw', 'previous state incorrect'
 
+def test_previous_from_raw(_contract):
+    contract = _contract
+    contract.set_state('raw')
+    assert contract.get_previous_state() == None, 'previous state for raw'
+
 
 def test_next_state(_contract):
     contract = _contract
     contract.set_state('ingest')
     assert contract.get_next_state() ==  'Master', 'next state incorrect'
 
+def test_next_state_from_dimensional(_contract):
+    contract = _contract
+    contract.set_state('dimensional')
+    assert contract.get_next_state() == None, 'next state for dimensinal'
 
 def test_get_partition_size():
     contract = Contract()
