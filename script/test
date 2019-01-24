@@ -16,4 +16,4 @@ docker run --rm -it \
   -v $DIR:/usr/src/app \
   -v /var/run/docker.sock:/var/run/docker.sock \
   ichain/python:3.7 \
-  bash -c "coverage run --source core /usr/local/bin/pytest tests/unit  && coverage report"
+  bash -c "coverage run --source core /usr/local/bin/pytest tests/unit && coverage report"

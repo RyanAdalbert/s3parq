@@ -66,4 +66,16 @@ Basic use is:
  
     ## auto-generate a completed DDL migration based on the diff between your model and the DB
     >>>MAC: database YOU$ alembic revision --autogenerate -m "added table hamburger_salad"
-    
+
+### Credentials
+login creds, host URLS, and other security-minded bits are managed by aws secretsmanager. To access these you can use the `Secret` class. 
+
+    from core.secret import Secret
+    s = Secret( name='hamburger',
+                type_of='FTP',
+                env='dev',
+                mode='read')
+    s.password
+    ## returns hamburger_password 
+
+Note that env should be passed from some environment-aware variable.    
