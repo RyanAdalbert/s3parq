@@ -1,6 +1,6 @@
 import papermill as pm
 from core.helpers import project_root
-from core import ENV_BUCKET
+from core.constants import ENV_BUCKET
 root = project_root.ProjectRoot()
 
 def run_transform(env: str, id: int, input_contract: str, output_contract: str) -> str:

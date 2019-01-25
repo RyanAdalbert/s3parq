@@ -2,7 +2,7 @@ import moto
 import boto3
 import pytest
 import tempfile
-from core import ENV_BUCKET
+from core.constants import ENV_BUCKET
 import os
 from io import TextIOWrapper
 from core.helpers import notebook

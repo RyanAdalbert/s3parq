@@ -1,7 +1,7 @@
 import logging
 from git import Repo
 from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
-from core import DEV_BUCKET, PROD_BUCKET, UAT_BUCKET
+from core.constants import DEV_BUCKET, PROD_BUCKET, UAT_BUCKET
 
 class Contract:
     ''' The s3 contract is how we structure our data lake. 

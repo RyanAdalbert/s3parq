@@ -3,7 +3,7 @@ ENVIRONMENT: dev
 ENV_BUCKET: ichain-development
 
 ## constants
-REPO_NAME: ichain/core
+DOCKER_REPO: ichain/core
 DEV_BUCKET: ichain-development
 PROD_BUCKET: ichain-production
 UAT_BUCKET: ichain-uat
