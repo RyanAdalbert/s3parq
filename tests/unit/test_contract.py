@@ -1,5 +1,10 @@
 import pytest
 from core.contract import Contract
+import boto3
+import tempfile
+from core.helpers.project_root import ProjectRoot
+import moto
+import os
 
 def test_set_env_valid():
     contract = Contract()
@@ -185,3 +190,45 @@ def test_get_partition_size():
     size = 1
     contract.set_partition_size(size)
     assert contract.get_partition_size() == size, 'partition size not correctly set'
+
+@moto.mock_s3
+def _s3_mock_setup():
+    s3_client = boto3.client('s3')
+    s3_client.create_bucket(Bucket='ichain-development')
+    
+    contract = Contract()
+    contract = Contract(branch = 'master',
+                        env = 'dev',
+                        parent = 'Merck',
+                        child = 'Wonder_Drug',
+                        state = 'raw'
+                        )
+    return contract
+
+def test_publish_raw_valid():
+    contract = _s3_mock_setup()
+
+    _file = tempfile.NamedTemporaryFile()
+    text = b"Here's some money. Go see a Star War"
+    _file.write(text)
+    _file.seek(0)
+    contract.publish_raw_file(_file.name)
+    _file.close()
+
+    key = f'master/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
+    s3_client = boto3.client('s3')
+    body = s3_client.get_object(Bucket='ichain-development', Key=key)['Body'].read()
+    assert body == text
+
+def test_publish_raw_invalid():
+    contract = _s3_mock_setup()
+    contract.set_state('enrich')
+
+    _file = tempfile.NamedTemporaryFile()
+    text = b"Here's some money. Go see a Star War"
+    _file.write(text)
+    _file.seek(0)
+        
+    with pytest.raises(ValueError):
+        contract.publish_raw_file(_file.name)
+    _file.close()

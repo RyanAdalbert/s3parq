@@ -1,3 +1,5 @@
+import boto3
+import os
 import logging
 from git import Repo
 from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
@@ -212,7 +214,18 @@ class Contract:
 
     def publish_raw_file(self, local_file_path:str) ->None:
         '''accepts a local path to a file, publishes it as-is to s3 as long as state == raw.'''
-        raise NotImplementedError
+        if self.get_state() != 'raw':
+            raise ValueError('publish_raw_file may only be used on raw contracts.')
+
+        s3_client = boto3.client('s3')
+        self.set_file_name(os.path.split(local_file_path)[1])
+        logging.info(f'reading from {local_file_path}')
+        logging.info(f'Writing to {self.get_s3_path()}..')
+
+        with open(local_file_path, 'rb') as file_data:
+           extra_args = {'source_modified_time' : str(float(os.stat(local_file_path).st_mtime))}
+           s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(), Key=self.get_key(), ExtraArgs={"Metadata": extra_args})
+
 
     # aliases
     def get_brand(self)->str:
