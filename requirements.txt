@@ -1,13 +1,14 @@
-awscli
-pytest
-pluggy
-python-coveralls
-click
-boto3==1.9.63
-docker
-gitpython
+awscli==1.16.93
+pytest==4.1.1
+python-coveralls==2.9.1
+Click==7.0
+boto3==1.9.83
+docker==3.7.0
+GitPython==2.1.11
 #TODO as soon as master is merged move this to a pinned version 2018-01-23
 git+git://github.com/IntegriChain1/moto
 sqlalchemy==1.2.16
 psycopg2==2.7.6.1
 alembic==1.0.6
+papermill==0.17.1
+jupyter==1.0.0
