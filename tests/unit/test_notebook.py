@@ -2,6 +2,7 @@ import moto
 import boto3
 import pytest
 import tempfile
+from core.constants import ENV_BUCKET
 import os
 from io import TextIOWrapper
 from core.helpers import notebook
@@ -10,18 +11,18 @@ from core.helpers import notebook
 class Test:
     def setup(self):
         s3_client = boto3.client('s3')
-        s3_client.create_bucket(Bucket="ichain-dev-gluepoc")
+        s3_client.create_bucket(Bucket=ENV_BUCKET)
 
     def test_output_path(self):
         self.setup()
         output_contract = "asdf/1234/merp"
         transformation_name = "shared.raw.extract"
         output_path = notebook.output_path(output_contract, transformation_name)
-        assert output_path == "s3://ichain-dev-gluepoc/notebooks/asdf/1234/merp/shared.raw.extract.ipynb"
+        assert output_path == f"s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/shared.raw.extract.ipynb"
 
     def test_output_url(self):
         self.setup()
-        output_path = "s3://ichain-dev-gluepoc/notebooks/asdf/1234/merp/shared.raw.extract.ipynb"
+        output_path = "s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/shared.raw.extract.ipynb"
         output_url = notebook.output_url(output_path)
         assert output_url == "http://notebook.integrichain.net/view/asdf/1234/merp/shared.raw.extract.ipynb"
 
@@ -29,7 +30,7 @@ class Test:
         self.setup()
         s3 = boto3.resource('s3')
 
-        bucket = "ichain-dev-gluepoc"
+        bucket = ENV_BUCKET
         key = "notebooks/dev/important_business/raw/extract/shared.raw.extract.ipynb"
         notebook_url = notebook.run_transform("dev", 2, "dev/important_business/raw/ftp", "dev/important_business/raw/extract")
 
