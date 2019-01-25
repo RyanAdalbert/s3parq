@@ -212,10 +212,11 @@ class Contract:
         path += self.file_name
         return path
 
-    def publish_raw_file(self, local_file_path:str) ->None:
+    def publish_raw_file(self, local_file_path: str) ->None:
         '''accepts a local path to a file, publishes it as-is to s3 as long as state == raw.'''
         if self.get_state() != 'raw':
-            raise ValueError('publish_raw_file may only be used on raw contracts.')
+            raise ValueError(
+                'publish_raw_file may only be used on raw contracts.')
 
         s3_client = boto3.client('s3')
         self.set_file_name(os.path.split(local_file_path)[1])
@@ -223,11 +224,13 @@ class Contract:
         logging.info(f'Writing to {self.get_s3_path()}..')
 
         with open(local_file_path, 'rb') as file_data:
-           extra_args = {'source_modified_time' : str(float(os.stat(local_file_path).st_mtime))}
-           s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(), Key=self.get_key(), ExtraArgs={"Metadata": extra_args})
-
+            extra_args = {'source_modified_time': str(
+                float(os.stat(local_file_path).st_mtime))}
+            s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
+            ), Key=self.get_key(), ExtraArgs={"Metadata": extra_args})
 
     # aliases
+
     def get_brand(self)->str:
         return self.get_child()
 
