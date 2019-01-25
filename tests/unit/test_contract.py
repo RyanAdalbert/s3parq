@@ -258,3 +258,20 @@ def test_publish_raw_invalid():
     with pytest.raises(ValueError):
         contract.publish_raw_file(_file.name)
     _file.close()
+
+def test_publish_raw_metadata():
+    contract = _s3_mock_setup()
+
+    _file = tempfile.NamedTemporaryFile()
+    text = b"Here's some money. Go see a Star War"
+    _file.write(text)
+    f_time = os.stat(_file.name).st_mtime
+    _file.seek(0)
+    contract.publish_raw_file(_file.name)
+    _file.close()
+
+    key = f'master/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
+    s3_client = boto3.client('s3')
+    meta = s3_client.get_object(
+        Bucket='ichain-development', Key=key)['Metadata']
+    assert meta['source_modified_time'] == str(f_time)
