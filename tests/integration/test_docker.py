@@ -8,12 +8,13 @@ from docker.models.images import Image
 from docker.errors import ImageNotFound
 from core.helpers import docker as core_docker
 from botocore.exceptions import ClientError
+from core import AWS_REGION, ENV_BUCKET, AWS_ACCOUNT
 
 docker_api_client = docker.APIClient(base_url='unix://var/run/docker.sock')
 docker_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 ecr_client = boto3.client('ecr')
 
-AWS_ACCOUNT_ID = "687531504312"
+AWS_ACCOUNT_ID = str(AWS_ACCOUNT)
 AWS_BATCH_TEST_JOB_QUEUE = "prod_core"
 
 # Generate a super basic container_overrides object for running the integration test
@@ -25,7 +26,7 @@ def generate_it_test_container_overrides():
         'environment': [
             {
                 'name': 'AWS_DEFAULT_REGION',
-                'value': 'us-east-1'
+                'value': AWS_REGION
             },
         ]
     }
@@ -43,7 +44,6 @@ def generate_it_test_container_overrides():
 #   8. Remove image from your machine
 
 def test_integration_docker():
-    REPO_NAME = "ichain/core"
     TAG = "it_test"
 
     #   1. Build the image
@@ -52,7 +52,7 @@ def test_integration_docker():
 
     #   2. Log into ECR
     with pytest.raises(ClientError):
-        core_docker.ecr_login("123456789012")
+        core_docker.ecr_login(AWS_ACCOUNT_ID)
     core_docker.ecr_login(AWS_ACCOUNT_ID)
 
     #   3. Push the image to ECR

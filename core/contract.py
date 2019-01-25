@@ -1,7 +1,7 @@
 import logging
 from git import Repo
 from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
-
+from core import DEV_BUCKET, PROD_BUCKET, UAT_BUCKET
 
 class Contract:
     ''' The s3 contract is how we structure our data lake. 
@@ -26,9 +26,9 @@ class Contract:
         SUB-PARTITION - for datasets, the sub-partitions add additional partitioning with additional prefixes
         FILENAME - nondescript in the contract
     '''
-    DEV = 'ichain-development'
-    PROD = 'ichain-production'
-    UAT = 'ichain-uat'
+    DEV = DEV_BUCKET
+    PROD = PROD_BUCKET
+    UAT = UAT_BUCKET
     STATES = ['raw', 'ingest', 'master', 'enhance',
               'enrich', 'metrics', 'dimensional']
 
