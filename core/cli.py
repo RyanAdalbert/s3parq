@@ -22,6 +22,7 @@ def publish(env):
         AWS_ACCOUNT_ID = "687531504312"
         repo = Repo('.')
         branch_name = repo.active_branch.name
+        print("Hang tight building this image can take a while...")
         full_tag = docker.build_image(f"{DOCKER_REPO}:{branch_name}")
 
         docker.register_image(branch_name, DOCKER_REPO, AWS_ACCOUNT_ID)
