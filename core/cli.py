@@ -25,6 +25,10 @@ def publish(env):
         full_tag = docker.build_image(f"{DOCKER_REPO}:{branch_name}")
 
         docker.register_image(branch_name, DOCKER_REPO, AWS_ACCOUNT_ID)
+        ecr_tagged_image_name = docker.get_aws_repository(full_tag, AWS_ACCOUNT_ID)
+        job_def_name = f"core_{branch_name}"
+        docker.register_job_definition(job_def_name, ecr_tagged_image_name)
+
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))
@@ -34,6 +38,10 @@ def tidy(env):
         repo = Repo('.')
         branch_name = repo.active_branch.name
         full_tag = f'{DOCKER_REPO}:{branch_name}'
+
+        #Remove batch job definition
+        job_def_name = f"core_{branch_name}"
+        docker.deregister_job_definition_set(job_def_name)
 
         docker.remove_ecr_image(branch_name, DOCKER_REPO, AWS_ACCOUNT_ID)
         docker.remove_image(full_tag)
