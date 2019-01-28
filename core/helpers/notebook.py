@@ -1,6 +1,10 @@
 import papermill as pm
 from core.helpers import project_root
 from core.constants import ENV_BUCKET
+from core.helpers import configuration_mocker
+from core.models import configuration
+from core import contract
+
 root = project_root.ProjectRoot()
 
 def run_transform(env: str, id: int, input_contract: str, output_contract: str) -> str:
@@ -29,3 +33,25 @@ def output_url(output_path: str) -> str:
     s3_prefix = "s3://{ENV_BUCKET}/notebooks"
     url_prefix = "http://notebook.integrichain.net/view"
     return output_path.replace(s3_prefix, url_prefix)
+
+def get_contract(env, state, branch, parent, child):
+    kontract = contract.Contract(env=env,
+                                 state=state,
+                                 branch=branch,
+                                 parent=parent,
+                                 child=child
+                                 )
+    return kontract
+
+def get_transform(transform_id):
+    config_mock = configuration_mocker.ConfigurationMocker()
+    config_mock.generate_mocks()
+
+    session = config_mock.get_session()
+
+    ec = configuration.ExtractConfiguration
+    t = configuration.Transformation
+
+    # Start querying the extract configs
+    transform = session.query(t).filter(t.id == transform_id).one()
+    return transform
