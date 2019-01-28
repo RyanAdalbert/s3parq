@@ -3,6 +3,9 @@ import os
 import logging
 from git import Repo
 from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
+import boto3
+from botocore.errorfactory import ClientError
+import botocore
 
 
 class Contract:
@@ -28,7 +31,7 @@ class Contract:
         SUB-PARTITION - for datasets, the sub-partitions add additional partitioning with additional prefixes
         FILENAME - nondescript in the contract
     '''
-    DEV = 'ichain-development'
+    DEV = 'ichain-dev-gluepoc'
     PROD = 'ichain-production'
     UAT = 'ichain-uat'
     STATES = ['raw', 'ingest', 'master', 'enhance',
@@ -228,6 +231,21 @@ class Contract:
                 float(os.stat(local_file_path).st_mtime))}
             s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
             ), Key=self.get_key(), ExtraArgs={"Metadata": extra_args})
+
+    def get_raw_file_metadata(self, local_file_path:str) ->None:
+        # If file exists, return its metadata
+        s3_client = boto3.client('s3')
+        
+        self.set_file_name(os.path.split(local_file_path)[1])
+        try:
+            return s3_client.head_object(Bucket=self.get_bucket(),Key=self.get_key())
+        except ClientError as e:
+            # If file does not exist, throw back since it needs to be moved anyways
+            #   Consider: cleaner handling?
+            if e.response['ResponseMetadata']['HTTPStatusCode'] == 404:
+                raise e
+            else:
+                raise e
 
     # aliases
 
