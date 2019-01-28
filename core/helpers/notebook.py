@@ -1,6 +1,6 @@
 import papermill as pm
 from core.helpers import project_root
-
+from core.constants import ENV_BUCKET
 root = project_root.ProjectRoot()
 
 def run_transform(env: str, id: int, input_contract: str, output_contract: str) -> str:
@@ -22,10 +22,10 @@ def run_transform(env: str, id: int, input_contract: str, output_contract: str) 
 
 # TODO: figure out how else we're going to separate the notebook 
 def output_path(output_contract: str, transformation_name: str) -> str:
-    s3_prefix = "s3://ichain-dev-gluepoc/notebooks"
+    s3_prefix = f"s3://{ENV_BUCKET}/notebooks"
     return f"{s3_prefix}/{output_contract}/{transformation_name}.ipynb"
 
 def output_url(output_path: str) -> str:
-    s3_prefix = "s3://ichain-dev-gluepoc/notebooks"
+    s3_prefix = "s3://{ENV_BUCKET}/notebooks"
     url_prefix = "http://notebook.integrichain.net/view"
     return output_path.replace(s3_prefix, url_prefix)

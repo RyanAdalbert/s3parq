@@ -1,8 +1,9 @@
 import click
 from git import Repo
 from core.helpers import docker, notebook
+from core.constants import DOCKER_REPO, AWS_ACCOUNT 
 
-DOCKER_REPO = 'ichain/core'
+
 
 from transforms.shared.raw import extract
 
@@ -32,7 +33,7 @@ def run_extract(env,manufacturer,brand,id):
 @click.argument('env', type=click.Choice(['local']))
 def publish(env):
     if env == 'local':
-        AWS_ACCOUNT_ID = "687531504312"
+        AWS_ACCOUNT_ID = AWS_ACCOUNT
         repo = Repo('.')
         branch_name = repo.active_branch.name
         print("Hang tight building this image can take a while...")
@@ -48,7 +49,7 @@ def publish(env):
 @click.argument('env', type=click.Choice(['local']))
 def tidy(env):
     if env == 'local':
-        AWS_ACCOUNT_ID = "687531504312"
+        AWS_ACCOUNT_ID = AWS_ACCOUNT
         repo = Repo('.')
         branch_name = repo.active_branch.name
         full_tag = f'{DOCKER_REPO}:{branch_name}'

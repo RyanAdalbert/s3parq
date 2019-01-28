@@ -1,0 +1,12 @@
+##TODO: env should ideally set these
+ENVIRONMENT: dev
+ENV_BUCKET: ichain-development
+
+## constants
+DOCKER_REPO: ichain/core
+DEV_BUCKET: ichain-development
+PROD_BUCKET: ichain-production
+UAT_BUCKET: ichain-uat
+AWS_ACCOUNT: 687531504312
+AWS_REGION: us-east-1
+

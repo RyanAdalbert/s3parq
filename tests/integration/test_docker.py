@@ -8,12 +8,12 @@ from docker.models.images import Image
 from docker.errors import ImageNotFound
 from core.helpers import docker as core_docker
 from botocore.exceptions import ClientError
+from core.constants import AWS_ACCOUNT, DOCKER_REPO
 
 docker_api_client = docker.APIClient(base_url='unix://var/run/docker.sock')
 docker_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 ecr_client = boto3.client('ecr')
 
-AWS_ACCOUNT_ID = "687531504312"
 AWS_BATCH_TEST_JOB_QUEUE = "prod_core"
 
 # Generate a super basic container_overrides object for running the integration test
@@ -43,29 +43,28 @@ def generate_it_test_container_overrides():
 #   8. Remove image from your machine
 
 def test_integration_docker():
-    REPO_NAME = "ichain/core"
     TAG = "it_test"
 
     #   1. Build the image
-    full_tag = core_docker.build_image(f"{REPO_NAME}:{TAG}")
+    full_tag = core_docker.build_image(f"{DOCKER_REPO}:{TAG}")
     test_image = docker_client.images.get(full_tag)
 
     #   2. Log into ECR
     with pytest.raises(ClientError):
         core_docker.ecr_login("123456789012")
-    core_docker.ecr_login(AWS_ACCOUNT_ID)
+    core_docker.ecr_login(AWS_ACCOUNT)
 
     #   3. Push the image to ECR
-    core_docker.register_image(TAG, REPO_NAME, AWS_ACCOUNT_ID)
-    ecr_tagged_image_name = core_docker.get_aws_repository(full_tag, AWS_ACCOUNT_ID)
+    core_docker.register_image(TAG, DOCKER_REPO, AWS_ACCOUNT)
+    ecr_tagged_image_name = core_docker.get_aws_repository(full_tag, AWS_ACCOUNT)
     test_ecr_image = docker_client.images.get(ecr_tagged_image_name)
     assert type(test_ecr_image) is Image
 
     repo_digest = test_ecr_image.attrs['RepoDigests'][0]
     digest_sha = repo_digest.split("@")[-1]
     ecr_resp = ecr_client.describe_images(
-        registryId=AWS_ACCOUNT_ID,
-        repositoryName=REPO_NAME,
+        registryId=AWS_ACCOUNT,
+        repositoryName=DOCKER_REPO,
         imageIds=[
             {
                 'imageDigest': digest_sha,
@@ -98,7 +97,7 @@ def test_integration_docker():
     core_docker.deregister_job_definition_set("it_test_core")
 
     #   7. Remove image from ECR
-    core_docker.remove_ecr_image(TAG, REPO_NAME, AWS_ACCOUNT_ID)
+    core_docker.remove_ecr_image(TAG, DOCKER_REPO, AWS_ACCOUNT)
 
     #   8. Remove image from your machine
     core_docker.remove_image(full_tag)
