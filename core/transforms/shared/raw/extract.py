@@ -26,7 +26,7 @@ class ExtractTransform():
 
             # Fetch secret from secret contract
             # TODO: Currently configs made for FTP only, FTP type passed in directly
-            source_secret = secret.Secret(name=config.secret_name,env=self.env,type_of="FTP",mode="write")
+            source_secret = secret.Secret(name=config.secret_name,env=self.env,type_of=config.secret_type_of,mode="write")
             
             # Get files from remote and start pushing to s3
             with tempfile.TemporaryDirectory() as tmp_dir:
@@ -34,7 +34,7 @@ class ExtractTransform():
                 self.push_to_s3(tmp_dir, self.output_contract)
                 
     
-    def push_to_s3(self, tmp_dir: str, output_contract: core.contract)-> None:
+    def push_to_s3(self, tmp_dir: str, output_contract: contract)-> None:
         """ For a local file dir, push the file to s3 if it is newer or does not exist."""
 
         # For each local file, see (by the set metadata) if it needs to be pushed to S3 by the constraints
@@ -42,14 +42,15 @@ class ExtractTransform():
             local_file_path = os.path.join(tmp_dir,local_file)
             local_file_modified_time = os.stat(os.path.join(tmp_dir,local_file)).st_mtime
 
-            if (self._file_needs_update(local_file_path,local_file_modified_time)):
+            if (self._file_needs_update(output_contract=output_contract,
+                                        local_file_path=local_file_path,
+                                        local_file_modified_time=local_file_modified_time
+                                        )):
                 output_contract.publish_raw_file(local_file_path)
 
-    def _file_needs_update(self,local_file_path,local_file_modified_time):
+    def _file_needs_update(self,output_contract: contract,local_file_path: str,local_file_modified_time: str)-> None:
         # Check if file needs to be pushed
         #   File is only considered to need to be pushed if it does not exist or has been modified since last push
-        output_contract = self.output_contract
-
         try:
             s3_last_modified = output_contract.get_raw_file_metadata(local_file_path)['Metadata']['source_modified_time']
             if (float(s3_last_modified) < float(local_file_modified_time)):
