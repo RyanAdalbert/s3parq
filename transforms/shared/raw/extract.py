@@ -47,7 +47,7 @@ class ExtractTransform():
 
         # Fetch secret from secret contract
         # TODO: Currently configs made for FTP only, FTP type passed in directly
-        source_secret = secret.Secret(name=self.config.secret_name,env=self.env,type_of="FTP",mode="write")
+        source_secret = secret.Secret(name=self.config.secret_name,env=self.env,type_of=self.config.secret_type_of,mode="write")
         
         # Get files from remote and start pushing to s3
         with tempfile.TemporaryDirectory() as tmp_dir:
