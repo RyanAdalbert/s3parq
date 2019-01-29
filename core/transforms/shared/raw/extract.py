@@ -6,16 +6,39 @@ import os
 import tempfile
 
 class ExtractTransform():
-    def __init__(self, env:str, transform: core.models.configuration.Transformation, output_contract: core.contract) -> None:
+    
+    def __init__(self, **kwargs) -> None:
         """ performs the extraction to a given output contract. 
-            ARGS:
-                - env one of "dev", "prod", "UAT"
+            valid kwargs:
+                - env one of "dev", "prod", "uat"
                 - transform a configuration contract instance
                 - output_contract a contract instance
         """
-        self.env = env
-        self.output_contract = output_contract
+        self.REQUIRED_PARAMS = ('env','output_contract','transform')
+        
+        for attr in self.REQUIRED_PARAMS:
+            self.__dict__[attr] = None
+
+        for attr in self.REQUIRED_PARAMS:
+            if attr in kwargs:
+                setter = getattr(self, 'set_' + attr)
+                setter(kwargs[attr])
+
+
+    def set_env(self,env:str)->None:
+        if env in ('dev','prod','uat'):
+            self.env = env
+        else:
+            raise ValueError(f'{env} is not a valid environment')
+    
+    def set_transform(self, transform: configuration.Transformation) -> None:
         self.transform = transform
+    
+    def set_output_contract(self, output_contract: contract) -> None:
+        self.output_contract = output_contract
+
+    
+
 
     def run(self):
         for config in self.transform.extract_configurations:
@@ -34,8 +57,9 @@ class ExtractTransform():
                 self.push_to_s3(tmp_dir, self.output_contract)
                 
     
-    def push_to_s3(self, tmp_dir: str, output_contract: core.contract)-> None:
+    def push_to_s3(self, tmp_dir: str, output_contract: contract)-> None:
         """ For a local file dir, push the file to s3 if it is newer or does not exist."""
+        self._validate_required_params()
 
         # For each local file, see (by the set metadata) if it needs to be pushed to S3 by the constraints
         for local_file in os.listdir(f"{tmp_dir}"):
@@ -58,3 +82,9 @@ class ExtractTransform():
                 return False
         except:
             return True
+
+    def _validate_required_params(self) -> bool: 
+        ''' Checks that all required params are set '''
+        for param in self.REQUIRED_PARAMS:
+            if param not in self.__dict__.keys():
+                raise ValueError(f'{param} is a required value not set for ExtractTransform.')

@@ -1,55 +1,40 @@
 import pytest
+from core.constants import DEV_BUCKET
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
-import core.models.configuation as C
+import core.models.configuration as C
 import core.contract as contract
 from core.transforms.shared.raw.extract import ExtractTransform
 import boto3
 import moto
 import time
+import tempfile
+import os
 
-'''
-@moto.mock_s3
-def setup_configs():
-    ENV = "dev"
-    mock = CMock()
-    mock.generate_mocks()
-    transform = C.Transformation()
-    session = mock.get_session()
-    t_target = session.query(transform).one()
-    return  t_target
-
-@moto.mock_s3
-def setup_contract():
-    ct = Contract(  env=ENV, 
-                    parent = ,
-                    child = ,
-                    branch = ,
-                    state = ,
-                 )    
-    return ct    
-
-
-
-    ex = ExtractTransform(ENV, t_target,  
-                            
-'''
 @moto.mock_s3
 def s3_setup():
     client = boto3.client('s3')
-    time = time.time()
-    file_name = 'sandwiches12345.txt'
-    BINARY_DATA = b'Gobias some coffee!'
-    CONTRACT_PATH = f'master/bluth/cornballer/raw/{file_name}'
+    n_time = time.time()
+    time_delta = 10000000
+    t_file = tempfile.NamedTemporaryFile()
+    t_file.write(b'Gobias some coffee!')
+    file_name = os.path.split(t_file.name)[1]
+    output_contract = contract.Contract(branch='master', parent='bluth', child='cornballer',state='raw',env='dev', file_name = file_name)
     client.create_bucket(Bucket= DEV_BUCKET)
-    client.put_object(Body=BINARY_DATA, Bucket=BUCKET, Key= CONTRACT_PATH, ExtraArgs={"Metadata":{"source_modified_time": str(time - 10000000)}})
-    return (file_name, time,)   
+    client.upload_file(Bucket=DEV_BUCKET, Filename= t_file.name, Key= output_contract.get_key(), ExtraArgs={"Metadata":{"source_modified_time": str(n_time - time_delta)}})
+    return (t_file, output_contract, time, time_delta)   
 
-
-def test_push_to_s3_new_file():
-    params = s3_setup()
-    
 
 def test_push_to_s3_updated_file():
+    params = s3_setup()
+    extract = ExtractTransform()
+    extract.push_to_s3(tmp_dir=os.path.dirname(params[0].name),
+                       output_contract=params[1])
+    client = boto3.client('s3')
+    s3_time = float(client.head_object(Bucket=DEV_BUCKET, Key=Contract.get_key())['Metadata']['source_modified_time'])
+    
+    assert os.stat(t_file.name).st_mtime == s3_time                    
+
+def test_push_to_s3_new_file():
     pass
 
 def test_push_to_s3_not_if_older():
