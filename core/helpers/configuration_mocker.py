@@ -50,17 +50,17 @@ class ConfigurationMocker:
         ex = config.ExtractConfiguration
         self.session.add_all([
             ex(id=1, transformation_id=2, filesystem_path='',
-               prefix='', secret_name='dev-sftp'),
+               prefix='', secret_name='dev-sftp', secret_type_of='FTP'),
             ex(id=2, transformation_id=2, filesystem_path='banana_stand_data',
-               prefix='gob', secret_name='dev-sftp'),
+               prefix='gob', secret_name='dev-sftp', secret_type_of='FTP'),
             ex(id=3, transformation_id=3, filesystem_path='sudden_valley_holdings',
-               prefix='', secret_name='dev-sftp'),
+               prefix='', secret_name='dev-sftp', secret_type_of='FTP'),
             ex(id=4, transformation_id=1, filesystem_path='/incoming',
-               prefix='', secret_name='dev-sftp'),
+               prefix='', secret_name='dev-sftp', secret_type_of='FTP'),
             ex(id=5, transformation_id=1, filesystem_path='/incoming',
-               prefix='test-extract-root-prefix', secret_name='dev-sftp'),
+               prefix='test-extract-root-prefix', secret_name='dev-sftp', secret_type_of='FTP'),
             ex(id=6, transformation_id=1, filesystem_path='/incoming/testing_extract',
-               prefix='', secret_name='dev-sftp')
+               prefix='', secret_name='dev-sftp', secret_type_of='FTP')
         ])
         self.session.commit()
         logging.debug('Done generating extract_configuration mocks.')
