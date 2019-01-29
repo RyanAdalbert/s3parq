@@ -3,6 +3,7 @@ from core.contract import Contract
 import boto3
 import tempfile
 from core.helpers.project_root import ProjectRoot
+from core.constants import DEV_BUCKET
 import moto
 import os
 
@@ -10,7 +11,7 @@ import os
 def test_set_env_valid():
     contract = Contract()
     contract.set_env('dev')
-    assert contract.env == 'ichain-development', 'failed to set dev environment'
+    assert contract.env == f'{DEV_BUCKET}', 'failed to set dev environment'
 
 
 def test_set_env_invalid():
@@ -42,14 +43,14 @@ def test_dataset_only(_contract):
     contract = _contract
     path = contract.get_s3_path()
 
-    assert path == 's3://ichain-development/master/merck/wonder_drug/ingest/valid_dataset/', 'path was incorrectly built.'
+    assert path == f's3://{DEV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/', 'path was incorrectly built.'
 
 
 def test_with_partitions(_contract):
     contract = _contract
     contract.set_partitions(['partition_1', 'partition_2'])
     path = contract.get_s3_path()
-    assert path == 's3://ichain-development/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/', 'path was incorrectly built with partitions.'
+    assert path == f's3://{DEV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/', 'path was incorrectly built with partitions.'
 
 
 def test_with_file_name_with_partitions(_contract):
@@ -57,7 +58,7 @@ def test_with_file_name_with_partitions(_contract):
     contract.set_file_name('29980385023509.parquet')
     contract.set_partitions(['partition_1', 'partition_2'])
     path = contract.get_s3_path()
-    assert path == 's3://ichain-development/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/29980385023509.parquet', 'path was incorrectly built with partitions.'
+    assert path == f's3://{DEV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/29980385023509.parquet', 'path was incorrectly built with partitions.'
 
 
 def test_file_name_no_partitions(_contract):
@@ -65,7 +66,7 @@ def test_file_name_no_partitions(_contract):
     contract.partitions = []  # hack to jump around the 0 len guard
     contract.set_file_name('29980385023509.parquet')
     path = contract.get_s3_path()
-    assert path == 's3://ichain-development/master/merck/wonder_drug/ingest/valid_dataset/29980385023509.parquet', 'path was incorrectly built without partitions and with file name.'
+    assert path == f's3://{DEV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/29980385023509.parquet', 'path was incorrectly built without partitions and with file name.'
 
 
 def test_quick_set(_contract):
@@ -78,7 +79,7 @@ def test_quick_set(_contract):
                         dataset='valid_dataset')
 
     assert contract.get_branch() == 'master', 'failed to set branch'
-    assert contract.get_env() == 'ichain-development', 'failed to set env'
+    assert contract.get_env() == f'{DEV_BUCKET}', 'failed to set env'
     assert contract.get_parent() == 'merck', 'failed to set parent'
     assert contract.get_child() == 'wonder_drug', 'failed to set parent'
     assert contract.get_state() == 'ingest', 'failed to set parent'
@@ -217,7 +218,7 @@ def test_get_partition_size():
 @moto.mock_s3
 def _s3_mock_setup():
     s3_client = boto3.client('s3')
-    s3_client.create_bucket(Bucket='ichain-development')
+    s3_client.create_bucket(Bucket=f'{DEV_BUCKET}')
 
     contract = Contract()
     contract = Contract(branch='master',
@@ -242,7 +243,7 @@ def test_publish_raw_valid():
     key = f'master/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
     s3_client = boto3.client('s3')
     body = s3_client.get_object(
-        Bucket='ichain-development', Key=key)['Body'].read()
+        Bucket=f'{DEV_BUCKET}', Key=key)['Body'].read()
     assert body == text
 
 
@@ -273,5 +274,5 @@ def test_publish_raw_metadata():
     key = f'master/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
     s3_client = boto3.client('s3')
     meta = s3_client.get_object(
-        Bucket='ichain-development', Key=key)['Metadata']
+        Bucket=f'{DEV_BUCKET}', Key=key)['Metadata']
     assert meta['source_modified_time'] == str(f_time)
