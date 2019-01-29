@@ -6,7 +6,13 @@ import os
 import tempfile
 
 class ExtractTransform():
-    def __init__(self, env:str, transform, output_contract):
+    def __init__(self, env:str, transform: core.models.configuration.Transformation, output_contract: core.contract) -> None:
+        """ performs the extraction to a given output contract. 
+            ARGS:
+                - env one of "dev", "prod", "UAT"
+                - transform a configuration contract instance
+                - output_contract a contract instance
+        """
         self.env = env
         self.output_contract = output_contract
         self.transform = transform
@@ -25,12 +31,11 @@ class ExtractTransform():
             # Get files from remote and start pushing to s3
             with tempfile.TemporaryDirectory() as tmp_dir:
                 file_mover.get_files(tmp_dir=tmp_dir,prefix=prefix,remote_path=remote_path,secret=source_secret)
-                self.push_to_s3(tmp_dir)
+                self.push_to_s3(tmp_dir, self.output_contract)
                 
     
-    def push_to_s3(self, tmp_dir):
-        # Get the transformation's output contract
-        oc = self.output_contract
+    def push_to_s3(self, tmp_dir: str, output_contract: core.contract)-> None:
+        """ For a local file dir, push the file to s3 if it is newer or does not exist."""
 
         # For each local file, see (by the set metadata) if it needs to be pushed to S3 by the constraints
         for local_file in os.listdir(f"{tmp_dir}"):
@@ -38,7 +43,7 @@ class ExtractTransform():
             local_file_modified_time = os.stat(os.path.join(tmp_dir,local_file)).st_mtime
 
             if (self._file_needs_update(local_file_path,local_file_modified_time)):
-                self.output_contract.publish_raw_file(local_file_path)
+                output_contract.publish_raw_file(local_file_path)
 
     def _file_needs_update(self,local_file_path,local_file_modified_time):
         # Check if file needs to be pushed
