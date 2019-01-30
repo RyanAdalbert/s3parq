@@ -8,8 +8,8 @@ import tempfile
 class ExtractTransform():
     
     def __init__(self, **kwargs) -> None:
-        """ performs the extraction to a given output contract. 
-            valid kwargs:
+        """ Performs the extraction to a given output contract. 
+            Valid kwargs:
                 - env one of "dev", "prod", "uat"
                 - transform a configuration contract instance
                 - output_contract a contract instance
@@ -37,8 +37,6 @@ class ExtractTransform():
     def set_output_contract(self, output_contract: contract) -> None:
         self.output_contract = output_contract
 
-    
-
 
     def run(self):
         for config in self.transform.extract_configurations:
@@ -46,17 +44,17 @@ class ExtractTransform():
             remote_path = config.filesystem_path
             prefix = config.prefix
             secret_name = config.secret_name
+            secret_type_of = config.secret_type_of
 
             # Fetch secret from secret contract
             # TODO: Currently configs made for FTP only, FTP type passed in directly
-            source_secret = secret.Secret(name=config.secret_name,env=self.env,type_of=config.secret_type_of,mode="write")
+            source_secret = secret.Secret(name=secret_name,env=self.env,type_of=secret_type_of,mode="write")
             
             # Get files from remote and start pushing to s3
             with tempfile.TemporaryDirectory() as tmp_dir:
                 file_mover.get_files(tmp_dir=tmp_dir,prefix=prefix,remote_path=remote_path,secret=source_secret)
                 self.push_to_s3(tmp_dir, self.output_contract)
                 
-    
     def push_to_s3(self, tmp_dir: str, output_contract: contract)-> None:
         """ For a local file dir, push the file to s3 if it is newer or does not exist."""
         self._validate_required_params()
@@ -73,8 +71,9 @@ class ExtractTransform():
                 output_contract.publish_raw_file(local_file_path)
 
     def _file_needs_update(self,output_contract: contract,local_file_path: str,local_file_modified_time: str)-> None:
-        # Check if file needs to be pushed
-        #   File is only considered to need to be pushed if it does not exist or has been modified since last push
+        """ Check if file needs to be pushed
+            File is only considered to need to be pushed if it does not exist or has been modified since last push
+        """
         try:
             s3_last_modified = output_contract.get_raw_file_metadata(local_file_path)['Metadata']['source_modified_time']
             if (float(s3_last_modified) < float(local_file_modified_time)):

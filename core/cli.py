@@ -5,8 +5,6 @@ from core.constants import DOCKER_REPO, AWS_ACCOUNT
 
 
 
-from transforms.shared.raw import extract
-
 @click.group()
 def cli(): # pragma: no cover
     pass
@@ -17,16 +15,6 @@ def cli(): # pragma: no cover
 def add(a, b):
     click.echo(print(a + b))
     return a + b
-
-@cli.command()
-@click.argument('env',type=click.Choice(['dev']))
-@click.argument('manufacturer', type=str)
-@click.argument('brand', type=str)
-@click.argument('id', type=int)
-def run_extract(env,manufacturer,brand,id):
-    repo = Repo('.')
-    branch_name = repo.active_branch.name
-    extract.test_run_extract_transform(env=env,transform_id=id, branch=branch_name, manufacturer=manufacturer, brand=brand)
 
 
 @cli.command()
