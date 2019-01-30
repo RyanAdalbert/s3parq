@@ -3,7 +3,6 @@ ENVIRONMENT: dev
 ENV_BUCKET: ichain-development
 
 ## constants
-HAMBURGER: True
 DOCKER_REPO: ichain/core
 DEV_BUCKET: ichain-dev-gluepoc
 PROD_BUCKET: ichain-production
