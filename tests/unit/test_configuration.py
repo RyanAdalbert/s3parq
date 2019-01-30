@@ -17,6 +17,7 @@ def test_get_extract_configuration():
     for x in range(0, 3):
         sname = f'test_secret_{x}'
         session.add(ec(transformation_id=100,
+                       secret_type_of="FTP",
                        secret_name=sname))
         test_secret_names.append(sname)
 

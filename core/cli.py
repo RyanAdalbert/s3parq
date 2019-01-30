@@ -16,6 +16,7 @@ def add(a, b):
     click.echo(print(a + b))
     return a + b
 
+
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))
 def publish(env):

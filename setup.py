@@ -9,7 +9,7 @@ import setuptools
 from distutils.extension import Extension
 
 PACKAGE_NAME = 'core'
-MINIMUM_PYTHON_VERSION = '3.7'
+MINIMUM_PYTHON_VERSION = '3.6'
 
 
 def check_python_version():

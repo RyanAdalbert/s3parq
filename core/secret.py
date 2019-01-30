@@ -1,6 +1,6 @@
 import boto3
 import json
-
+import logging
 
 class Secret:
     ''' Abstracts aws secretsmanager - values of the secret are callable attributes. ie:
@@ -53,6 +53,7 @@ class Secret:
 
     def _get_secret(self, identifier: str, force_env: bool) -> str:
         # first look to see if the explicit secret exists
+        print(f"Secret identifier: {identifier}")
         try:
             raw_secret = self.client.get_secret_value(SecretId=identifier)
         except Exception as e:

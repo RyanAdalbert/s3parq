@@ -1,10 +1,12 @@
 import moto
 import pytest
+from unittest.mock import patch
 import os
 from core.helpers.project_root import ProjectRoot
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 import core.models.configuration as config
 from core.helpers.s3_naming_helper import S3NamingHelper 
+from core.helpers.file_mover import FileMover, FileDestination
 
 def test_project_root_in_project():
     root = ProjectRoot()
@@ -44,7 +46,7 @@ def test_mock_transformation_relationships():
 
     assert len(secrets) == 3
 
-    assert set(secrets) == set(['sitwell'])
+    assert set(secrets) == set(['dev-sftp'])
 
 ## S3 Naming Helper
 
@@ -114,3 +116,37 @@ def test_validate_s3_path():
 
     response = helper.validate_s3_path('s3://bucket/path/all/good')
     assert response[0], f'disallowed good s3 path'
+
+
+class secret_mock():
+    def __init__(self):
+        self.user = 'test_user'
+        self.password = 'test_password'
+        self.host = 'test_host'
+        self.port = 'test_port'
+        self.mode = 'test_mode'
+
+@patch('paramiko.Transport')
+@patch('paramiko.SFTPClient.from_transport')
+def test_filemover_paramiko(paramiko_trans,paramiko_sftp):
+    sm = secret_mock()
+    
+    with FileMover(sm) as fm:
+        assert paramiko_trans.called
+        assert paramiko_sftp.called
+    
+@patch('paramiko.Transport')
+@patch('paramiko.SFTPClient')
+def test_get_file_type(paramiko_trans,paramiko_sftp):
+    sm = secret_mock()
+    fm = FileMover(sm)
+    test_file = "test_file_name"
+
+    fd = [FileDestination(regex=".*", file_type="all")]
+    ft = fm.get_file_type(test_file, fd)
+    assert ft, "all"
+
+    fd = [FileDestination(regex="n^", file_type="none")]
+    ft = fm.get_file_type(test_file, fd)
+    assert ft, "dont_move"
+

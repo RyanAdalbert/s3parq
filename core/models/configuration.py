@@ -80,6 +80,7 @@ class ExtractConfiguration(UniversalWithPrimary, Base):
         'transformations.id'), nullable=False)
     filesystem_path = Column(String)
     prefix = Column(String)
+    secret_type_of = Column(String, nullable=False)
     secret_name = Column(String, nullable=False)
     transformation = relationship(
         "Transformation", back_populates='extract_configurations')
