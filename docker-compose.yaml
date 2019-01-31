@@ -12,7 +12,6 @@ services:
           dockerfile: ./dockerfiles/core.dockerfile
           context: .
         image: ichain/core
-        restart: always
         depends_on:
             - airflowpg
         environment:

@@ -11,7 +11,7 @@ def run_transform(env: str, id: int, input_contract: str, output_contract: str) 
     # First you would look up the ID and get the name of the transform so you
     # know what notebook to run. Once the core transform code has been finalized and
     # you can reach out to a db to pull the name this hard-coding will be replaced.
-    name = "shared.raw.extract"
+    name = "shared.test.hello_world"
 
     #Then run the notebook
     output_s3_path = output_path(output_contract, name)
