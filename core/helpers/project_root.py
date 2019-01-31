@@ -17,7 +17,7 @@ class ProjectRoot:
         if os.path.isfile(os.path.abspath(os.path.normpath(path + os.path.sep + 'setup.py'))):
             return path
         elif path == '/':
-            return False
+            raise Exception("Cant't find setup.py.")
 
         else:
             return self.find_setup_file(os.path.split(os.path.abspath(os.path.normpath(f)))[0])

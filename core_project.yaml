@@ -4,7 +4,7 @@ ENV_BUCKET: ichain-development
 
 ## constants
 DOCKER_REPO: ichain/core
-DEV_BUCKET: ichain-dev-gluepoc
+DEV_BUCKET: ichain-dev
 PROD_BUCKET: ichain-production
 UAT_BUCKET: ichain-uat
 AWS_ACCOUNT: 687531504312

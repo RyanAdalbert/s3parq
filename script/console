@@ -1,22 +1,30 @@
 #!/bin/sh
 
-. script/script_setup
-echo $DIR
+# . script/script_setup
+# echo $DIR
 
-# Build the python 3.7 image so the requirements are up to date
-docker build -f $DIR/dockerfiles/python3-7.dockerfile . -t ichain/python:3.7
+# # Build the python 3.7 image so the requirements are up to date
+# docker build -f $DIR/dockerfiles/core.dockerfile . -t ichain/core
 
-# Kind of a big commmand that:
-#  mounts the repo to /usr/src/app
-#  mounts your home directory to /host/home
-#  sets up AWS credentials
-docker run --rm -it \
-  -v $DIR:/usr/src/app \
-  -v $HOME:/host/home \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -e AWS_DEFAULT_REGION=us-east-1 \
-  -v $HOME:/root \
-  -e AWS_ACCESS_KEY_ID=$(aws --profile default configure get aws_access_key_id) \
-  -e AWS_SECRET_ACCESS_KEY=$(aws --profile default configure get aws_secret_access_key) \
-  ichain/python:3.7 \
-  /bin/bash
+# # Kind of a big commmand that:
+# #  mounts the repo to /usr/src/app
+# #  mounts your home directory to /host/home
+# #  sets up AWS credentials
+# docker run --rm -it \
+#   -v $DIR:/usr/src/app \
+#   -v $HOME:/host/home \
+#   -v /var/run/docker.sock:/var/run/docker.sock \
+#   -e AWS_DEFAULT_REGION=us-east-1 \
+#   -v $HOME:/root \
+#   -e AWS_ACCESS_KEY_ID=$(aws --profile default configure get aws_access_key_id) \
+#   -e AWS_SECRET_ACCESS_KEY=$(aws --profile default configure get aws_secret_access_key) \
+#   ichain/core \
+#   /bin/bash
+
+docker-compose stop;
+docker-compose build;
+AWS_ACCESS_KEY_ID=$(aws --profile default configure get aws_access_key_id) \
+  AWS_SECRET_ACCESS_KEY=$(aws --profile default configure get aws_secret_access_key) \
+  docker-compose up -d;
+
+docker-compose run --rm console

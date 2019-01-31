@@ -19,7 +19,8 @@ def run_transform(env: str, id: int, input_contract: str, output_contract: str) 
     pm.execute_notebook(
        path,
        output_s3_path,
-       parameters = dict(id=id, input_contract=input_contract, output_contract=output_contract, env=env)
+       parameters = dict(id=id, input_contract=input_contract, output_contract=output_contract, env=env),
+       cwd=root.get_path()
     )
 
     return output_url(output_s3_path)

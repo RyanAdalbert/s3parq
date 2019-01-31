@@ -5,8 +5,7 @@ echo $DIR
 
 # Run the python test suite
 
-# Build the python 3.7 image so the requirements are up to date
-docker build -f $DIR/dockerfiles/python3-7.dockerfile . -t ichain/python:3.7
+docker build -f $DIR/dockerfiles/core.dockerfile . -t ichain/core
 
 # Mount the entire repo and run both integration and unit tests
 docker run --rm -it \
@@ -15,5 +14,5 @@ docker run --rm -it \
   -e AWS_SECRET_ACCESS_KEY=$(aws --profile default configure get aws_secret_access_key) \
   -v $DIR:/usr/src/app \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  ichain/python:3.7 \
+  ichain/core \
   bash -c "coverage run --source core /usr/local/bin/pytest tests/unit tests/integration && coverage report && coveralls"
