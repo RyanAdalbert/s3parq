@@ -14,7 +14,7 @@ docker_api_client = docker.APIClient(base_url='unix://var/run/docker.sock')
 docker_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 ecr_client = boto3.client('ecr')
 
-AWS_BATCH_TEST_JOB_QUEUE = "prod_core"
+AWS_BATCH_TEST_JOB_QUEUE = "core"
 
 # Generate a super basic container_overrides object for running the integration test
 def generate_it_test_container_overrides():
@@ -81,7 +81,8 @@ def test_integration_docker():
     #   4. Register a Job Definition on Batch
     rjd_resp = core_docker.register_job_definition(
         "it_test_core",
-        ecr_tagged_image_name
+        ecr_tagged_image_name,
+        job_role_arn=f"arn:aws:iam::{AWS_ACCOUNT}:role/ecs-tasks"
     )
 
     #   5. Launch a Job on Batch

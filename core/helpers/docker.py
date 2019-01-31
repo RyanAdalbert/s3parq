@@ -110,7 +110,7 @@ def get_aws_repository(full_tag: str, account_id: str) -> str:
 def register_job_definition(
     job_def_name: str,
     container_image_uri: str,
-    job_role_arn: str = "arn:aws:iam::687531504312:role/ecs-tasks",
+    job_role_arn: str = "arn:aws:iam::265991248033:role/ecs-tasks",
     ulimits: list = [],
     timeout: int = 7200,
     vcpus: int = 2,

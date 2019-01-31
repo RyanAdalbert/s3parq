@@ -88,15 +88,15 @@ COPY ./requirements.txt $core_location/requirements.txt
 WORKDIR $core_location
 RUN pip install -r requirements.txt
 
-COPY . $core_location
-RUN python setup.py install
 ENV PYTHONPATH=/usr/local/lib/python3.6/site-packages:$core_location
-
 COPY dockerfiles/entrypoints/airflow.sh /airflow-entrypoint.sh
 COPY dockerfiles/configs/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
 COPY dockerfiles/configs/jupyter.py /notebook/jupyter_notebook_config.py
 COPY dockerfiles/entrypoints/notebook.sh /notebook-entrypoint.sh
 RUN chown -R airflow: ${AIRFLOW_HOME}
+
+COPY . $core_location
+RUN python setup.py install
 
 EXPOSE 8080 5555 8793
 
