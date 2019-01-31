@@ -1,4 +1,4 @@
-from sqlalchemy import engine, create_engine, Column, Integer, String, BOOLEAN, TIMESTAMP, text, ForeignKey, func
+from sqlalchemy import engine, create_engine, Column, Integer, String, Boolean, TIMESTAMP, text, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import session, sessionmaker, relationship
 
@@ -99,6 +99,7 @@ class Pipeline(UniversalWithPrimary, Base):
     pipeline_type_id = Column(Integer, ForeignKey(
         'pipeline_types.id'), nullable=False)
     pipeline_type = relationship("PipelineType")
+    is_active = Column(Boolean, nullable=False, default= True)
     brand_id = Column(Integer, ForeignKey('brands.id'), nullable=False)
     brand = relationship("Brand", back_populates="pipelines")
     run_frequency = Column(String)
