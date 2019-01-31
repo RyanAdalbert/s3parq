@@ -79,3 +79,6 @@ login creds, host URLS, and other security-minded bits are managed by aws secret
     ## returns hamburger_password 
 
 Note that env should be passed from some environment-aware variable.    
+
+### Corebot
+Corebot is another CLI interface. This is meant to be the "client" part to our "server" part, allowing a separate interface for what people should be calling vs. what processes should be calling. This should only be the entry point, with the guts of the processes still living in a component in standard core.
