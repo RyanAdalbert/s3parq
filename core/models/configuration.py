@@ -114,7 +114,7 @@ class PipelineState(UniversalWithPrimary, Base):
     pipeline_id = Column(Integer, ForeignKey('pipelines.id'), nullable=False)
     pipeline = relationship("Pipeline", back_populates="pipeline_states")
     graph_order = Column(Integer, nullable=False)
-
+    transformations = relationship("Transformation")
 
 class PipelineStateType(UniversalWithPrimary, Base):
     __tablename__ = 'pipeline_state_types'
@@ -141,7 +141,7 @@ class Transformation(UniversalWithPrimary, Base):
     transformation_template = relationship("TransformationTemplate")
     pipeline_state_id = Column(Integer,  ForeignKey(
         'pipeline_states.id'), nullable=False)
-    pipeline_state = relationship("PipelineState")
+    pipeline_state = relationship("PipelineState", back_populates='transformations')
     graph_order = Column(Integer, nullable=False, server_default=text('0'))
     extract_configurations = relationship(
         "ExtractConfiguration", order_by=ExtractConfiguration.id, back_populates='transformation')

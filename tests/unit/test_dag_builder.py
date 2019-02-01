@@ -5,12 +5,6 @@ from core.models.configuration import Pipeline
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 import core.airflow.dagbuilder.dag_builder as dag_builder
 
-class PipelineMock:
-    def __init__(self,**kwargs)->None:
-        for arg in kwargs.keys():
-            self.__dict__[arg] = kwargs[arg]
-
-
 @patch('core.airflow.dagbuilder.dag_builder.SessionHelper.get_session', autospec=True )
 class Test:
 
@@ -44,10 +38,10 @@ class Test:
         assert False == min([x.is_active for x in pipelines])
 
     def test_create_dags_builds_all_dags(self, helper_session):
-        pipeline_mocks = [ PipelineMock(name="pipe1",
+        pipeline_mocks = [ MagicMock(name="pipe1",
                             id=12,
                             run_frequency="daily"),
-                          PipelineMock(name="pipe2",
+                          MagicMock(name="pipe2",
                           id=24,
                           run_frequency="daily")]
                               
@@ -56,6 +50,17 @@ class Test:
         
         assert all(isinstance(x, DAG) for x in dags)
 
-    def test_build_dag_tasks(self, helper_session):
-        pass
-
+    def test_build_dag_tasks_builds_tasks(self, helper_session):
+        transformations = [ MagicMock(  id=100,
+                                        transformation_template_id=100,
+                                        pipeline_state_id=2,
+                                        graph_order=0),
+                            MagicMock(  id=100,
+                                        transformation_template_id=100,
+                                        pipeline_state_id=2,
+                                        graph_order=1)]
+        
+        dbuilder = dag_builder.DagBuilder()
+        dags = dbuilder._build_tasks(pipeline, dag)
+        
+        assert all(isinstance(x, DAG) for x in dags)

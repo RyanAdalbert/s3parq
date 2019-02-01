@@ -45,4 +45,5 @@ class DagBuilder:
             pipelines = session.query(Pipeline)
         return pipelines
 
-    def _build_task(self, d   
+    def _build_tasks(self, pipeline: Pipeline, dag: airflow.DAG)->None:
+        pass   
