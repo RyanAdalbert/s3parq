@@ -7,11 +7,10 @@ from core import contract
 
 root = project_root.ProjectRoot()
 
-def run_transform(env: str, id: int, input_contract: str, output_contract: str) -> str:
+def run_transform(env: str, id: int, input_contract: str, output_contract: str, name: str ="shared.raw.extract") -> str:
     # First you would look up the ID and get the name of the transform so you
     # know what notebook to run. Once the core transform code has been finalized and
     # you can reach out to a db to pull the name this hard-coding will be replaced.
-    name = "shared.raw.extract"
 
     #Then run the notebook
     output_s3_path = output_path(output_contract, name)
@@ -19,7 +18,8 @@ def run_transform(env: str, id: int, input_contract: str, output_contract: str) 
     pm.execute_notebook(
        path,
        output_s3_path,
-       parameters = dict(id=id, input_contract=input_contract, output_contract=output_contract, env=env)
+       parameters = dict(id=id, input_contract=input_contract, output_contract=output_contract, env=env),
+       cwd=root.get_path()
     )
 
     return output_url(output_s3_path)

@@ -6,7 +6,7 @@ TRY_LOOP="20"
 : "${REDIS_PORT:="6379"}"
 : "${REDIS_PASSWORD:=""}"
 
-: "${DB_TYPE:="mysql"}"
+# : "${DB_TYPE:="mysql"}"
 if [ "$DB_TYPE" = "mysql" ];then
 : "${MYSQL_HOST:="uat-core-airflow.cbptgzgybgnp.us-east-1.rds.amazonaws.com"}"
 : "${MYSQL_PORT:="3306"}"
@@ -14,7 +14,7 @@ if [ "$DB_TYPE" = "mysql" ];then
 : "${MYSQL_PASSWORD:="!a14fl0w!"}"
 : "${MYSQL_DB:="airflow"}"
 else
-: "${POSTGRES_HOST:="postgres"}"
+: "${POSTGRES_HOST:="airflowpg"}"
 : "${POSTGRES_PORT:="5432"}"
 : "${POSTGRES_USER:="airflow"}"
 : "${POSTGRES_PASSWORD:="airflow"}"
@@ -40,10 +40,11 @@ then
   AIRFLOW__CORE__LOAD_EXAMPLES=False
 fi
 
+# This now gets taken care of in the dockerfile
 # Install custom python package if requirements.txt is present
-if [ -e "/requirements.txt" ]; then
-    $(which pip) install --user -r /requirements.txt
-fi
+# if [ -e "/requirements.txt" ]; then
+#     $(which pip) install --user -r /requirements.txt
+# fi
 
 if [ -n "$REDIS_PASSWORD" ]; then
     REDIS_PREFIX=:${REDIS_PASSWORD}@

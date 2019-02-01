@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. script/script_setup
+echo $DIR
+
+docker-compose stop;
+docker-compose build;
+docker-compose up -d;
+
+docker-compose run --rm console
