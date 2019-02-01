@@ -10,4 +10,4 @@ docker-compose build console;
 
 # Mount the entire repo and run only the unit tests
 docker-compose run --rm console \
-  bash -c "coverage run --source core /usr/local/bin/pytest tests/unit && coverage report"
+  bash -c "coverage run --source core /usr/local/bin/pytest tests/unit tests/integration && coverage report"
