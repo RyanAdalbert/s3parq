@@ -18,6 +18,7 @@ RUN add-apt-repository \
    stable"
 RUN apt-get update
 RUN apt-get install -y docker-ce 
+ENV SLUGIFY_USES_TEXT_UNIDECODE=yes
 
 # install python requirements
 WORKDIR /usr/src/app
