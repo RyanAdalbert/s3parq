@@ -13,7 +13,7 @@ def test_project_root_in_project():
     assert isinstance(root.__str__(), str)
 
 
-def test_project_root_not_in_project():
+def test_project_root_not_in_project(monkeypatch):
     with monkeypatch.context() as m:
         m.chdir('/')
         with pytest.raises(Exception):
