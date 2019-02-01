@@ -48,8 +48,10 @@ services:
             - $HOME:/host/home
             - .:/host/project
             - /var/run/docker.sock:/var/run/docker.sock
+        # If you want to change the port mappings, just change you
+        # host port, but leave the container port as 8888
         ports:
-            - "8888:8888"
+            - "8081:8888"
         working_dir: /host
         command: /notebook-entrypoint.sh
 
