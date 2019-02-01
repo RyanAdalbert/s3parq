@@ -37,11 +37,16 @@ class Test:
         ## make sure there is at least one inactive
         assert False == min([x.is_active for x in pipelines])
 
-    def test_create_dags_builds_all_dags(self, helper_session):
-        helper_session.return_value = self.setup()
-        
+    def test_create_dags_builds_all_dags(self):
+        pipeline_mocks = [{ name: "pipe1",
+                            id: 12,
+                            run_frequency : 'daily'},
+                          { name: 'pipe2',
+                            id : 24
+                            run_frequency : 'daily'}]
+                              
         dbuilder = dag_builder.DagBuilder()
-        dags = dbuilder._create_dags()
+        dags = dbuilder._create_dags(pipeline_mocks)
         
         assert all(isinstance(x, DAG) for x in dags)
         

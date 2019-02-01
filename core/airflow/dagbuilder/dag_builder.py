@@ -16,14 +16,17 @@ class DagBuilder:
     "retries": 1,
     "retry_delay": timedelta(minutes=5)
     }
-  
-    def __init__(self):
-        self.__pipelines = self._get_pipelines()
-        self.__dags = self._create_dags()
 
-    def _create_dags(self):
+    def do_build_dags(self)->None:
+        """Integrates all the components of getting dags."""
+        self.__pipelines = self._get_pipelines()
+        self.__dags = self._create_dags(self.__pipelines)
+
+    def _create_dags(self, pipelines: list)-> list:
+        """ creates a dag for each pipeline
+            RETURNS a list of airflow dag objects"""
         dags = []
-        for index, pipe in enumerate(self.__pipelines):
+        for index, pipe in enumerate(pipelines):
             dags.append(DAG(pipe.name, default_args = self.DEFAULT_ARGS, schedule_interval=f'@{pipe.run_frequency}'))
         return dags                     
 
@@ -42,4 +45,4 @@ class DagBuilder:
             pipelines = session.query(Pipeline)
         return pipelines
 
-
+    
