@@ -3,6 +3,7 @@ import docker
 import base64
 import os
 from core.constants import AWS_ACCOUNT, AWS_REGION
+from core.helpers.project_root import ProjectRoot
 
 
 class CoreDocker:
