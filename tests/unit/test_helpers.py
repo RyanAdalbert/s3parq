@@ -14,11 +14,11 @@ def test_project_root_in_project():
 
 
 def test_project_root_not_in_project():
-    os.chdir('/')
-
-    with pytest.raises(Exception):
-        root = ProjectRoot()
-        root.get_path()
+    with monkeypatch.context() as m:
+        m.chdir('/')
+        with pytest.raises(Exception):
+            root = ProjectRoot()
+            root.get_path()
 
 def test_mock_extract_configurations():
     db = CMock()
