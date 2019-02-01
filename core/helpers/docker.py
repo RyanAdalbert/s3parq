@@ -1,13 +1,16 @@
 import boto3
 import docker
 import base64
+import os
 from core.constants import AWS_ACCOUNT, AWS_REGION
 
 
 class CoreDocker:
 
     def __init__(self):
-        self.CORE_DOCKERFILE_LOCATION = f'{ProjectRoot().get_path()}/dockerfiles/core.dockerfile'
+        self.CORE_DOCKERFILE_LOCATION = os.path.join(ProjectRoot().get_path(),
+                                                            'dockerfiles',
+                                                            'core.dockerfile')
         batch_client = boto3.client('batch')
 
     def _build_docker_api_client(self) -> docker.APIClient:
