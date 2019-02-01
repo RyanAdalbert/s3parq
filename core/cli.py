@@ -58,3 +58,25 @@ def run(env, id, input_contract, output_contract):
     notebook_url = notebook.run_transform(env, id, input_contract, output_contract)
     print("See your notebook output at:")
     print(notebook_url)
+
+
+    # A function similar to this needs to live in the Transaction job class
+    # of wherever we're actually defining what needs to run.
+    # def generate_transaction_job_container_overrides(transaction_id: str, input_contract: str, output_contract: str, env: str):
+    #     overrides = {
+    #         'command': [
+    #             "corebot run_transaction",
+    #             f"--id={transaction_id}",
+    #             f"--input_contract={input_contract}",
+    #             f"--output_contract={output_contract}",
+    #             f"--env={env}",
+    #             "--executer=batch"
+    #         ],
+    #         'environment': [
+    #             {
+    #                 'name': 'AWS_DEFAULT_REGION',
+    #                 'value': 'us-east-1'
+    #             },
+    #         ]
+    #     }
+    #     return overrides

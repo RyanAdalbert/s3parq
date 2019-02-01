@@ -215,11 +215,12 @@ def test_get_partition_size():
     assert contract.get_partition_size() == size, 'partition size not correctly set'
 
 
-@moto.mock_s3
 def _s3_mock_setup():
     s3_client = boto3.client('s3')
     s3_client.create_bucket(Bucket=f'{DEV_BUCKET}')
+    return s3_client
 
+def _contract_setup():
     contract = Contract()
     contract = Contract(branch='master',
                         env='dev',
@@ -229,10 +230,11 @@ def _s3_mock_setup():
                         )
     return contract
 
-
+@moto.mock_s3()
 def test_publish_raw_valid():
-    contract = _s3_mock_setup()
-
+    client = _s3_mock_setup()
+    contract = _contract_setup()
+    #_s3_mock_setup()
     _file = tempfile.NamedTemporaryFile()
     text = b"Here's some money. Go see a Star War"
     _file.write(text)
@@ -246,9 +248,10 @@ def test_publish_raw_valid():
         Bucket=f'{DEV_BUCKET}', Key=key)['Body'].read()
     assert body == text
 
-
+@moto.mock_s3()
 def test_publish_raw_invalid():
-    contract = _s3_mock_setup()
+    client = _s3_mock_setup()
+    contract = _contract_setup()
     contract.set_state('enrich')
 
     _file = tempfile.NamedTemporaryFile()
@@ -260,8 +263,10 @@ def test_publish_raw_invalid():
         contract.publish_raw_file(_file.name)
     _file.close()
 
+@moto.mock_s3()
 def test_publish_raw_metadata():
-    contract = _s3_mock_setup()
+    client = _s3_mock_setup()
+    contract = _contract_setup()
 
     _file = tempfile.NamedTemporaryFile()
     text = b"Here's some money. Go see a Star War"
