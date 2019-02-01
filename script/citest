@@ -1,13 +1,18 @@
 #!/bin/sh
 
-. script/script_setup
-echo $DIR
 
-# Run the python test suite
+# Setup environment for prod
+AWS_ACCESS_KEY_ID=$(aws --profile dev configure get aws_access_key_id)
+AWS_SECRET_ACCESS_KEY=$(aws --profile dev configure get aws_secret_access_key)
+AWS_BATCH_TEST_JOB_QUEUE=core
+AWS_ACCOUNT=687531504312
 
 # Build the core image so the requirements are up to date
 docker-compose build console;
 
 # Mount the entire repo and run only the unit tests
-docker-compose run --rm console \
-  bash -c "coverage run --source core /usr/local/bin/pytest tests/unit tests/integration && coverage report && coveralls"
+docker-compose run --rm \
+  -e AWS_BATCH_TEST_JOB_QUEUE=$AWS_BATCH_TEST_JOB_QUEUE \
+  -e AWS_ACCOUNT=$AWS_ACCOUNT \
+  console \
+  bash -c "coverage run --source core /usr/local/bin/pytest tests/integration tests/unit && coverage report && coveralls"
