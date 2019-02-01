@@ -45,4 +45,4 @@ class DagBuilder:
             pipelines = session.query(Pipeline)
         return pipelines
 
-    
+    def _build_task(self, d   

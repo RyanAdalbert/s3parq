@@ -5,6 +5,12 @@ from core.models.configuration import Pipeline
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 import core.airflow.dagbuilder.dag_builder as dag_builder
 
+class PipelineMock:
+    def __init__(self,**kwargs)->None:
+        for arg in kwargs.keys():
+            self.__dict__[arg] = kwargs[arg]
+
+
 @patch('core.airflow.dagbuilder.dag_builder.SessionHelper.get_session', autospec=True )
 class Test:
 
@@ -37,20 +43,18 @@ class Test:
         ## make sure there is at least one inactive
         assert False == min([x.is_active for x in pipelines])
 
-    def test_create_dags_builds_all_dags(self):
-        pipeline_mocks = [{ name: "pipe1",
-                            id: 12,
-                            run_frequency : 'daily'},
-                          { name: 'pipe2',
-                            id : 24
-                            run_frequency : 'daily'}]
+    def test_create_dags_builds_all_dags(self, helper_session):
+        pipeline_mocks = [ PipelineMock(name="pipe1",
+                            id=12,
+                            run_frequency="daily"),
+                          PipelineMock(name="pipe2",
+                          id=24,
+                          run_frequency="daily")]
                               
         dbuilder = dag_builder.DagBuilder()
         dags = dbuilder._create_dags(pipeline_mocks)
         
         assert all(isinstance(x, DAG) for x in dags)
-        
-
 
     def test_build_dag_tasks(self, helper_session):
         pass
