@@ -1,6 +1,5 @@
 import boto3
 import docker
-import os
 import base64
 from core.constants import AWS_ACCOUNT, AWS_REGION
 
