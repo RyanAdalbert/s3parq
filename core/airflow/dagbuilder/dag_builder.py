@@ -24,10 +24,13 @@ class DagBuilder:
 
     def _create_dags(self, pipelines: list)-> list:
         """ creates a dag for each pipeline
-            RETURNS a list of airflow dag objects"""
+            RETURNS a list of tuples, each containing:
+                - the original pipeline object
+                - the matching DAG for that pipeline"""
         dags = []
-        for index, pipe in enumerate(pipelines):
-            dags.append(DAG(pipe.name, default_args = self.DEFAULT_ARGS, schedule_interval=f'@{pipe.run_frequency}'))
+        for pipe in pipelines:
+            
+            dags.append((pipe, DAG(pipe.name, default_args = self.DEFAULT_ARGS, schedule_interval=f'@{pipe.run_frequency}'),))
         return dags                     
 
 
@@ -46,4 +49,6 @@ class DagBuilder:
         return pipelines
 
     def _build_tasks(self, pipeline: Pipeline, dag: airflow.DAG)->None:
+        for p_state in Pipeline.pipeline_states:
+            for transformation in 
         pass   
