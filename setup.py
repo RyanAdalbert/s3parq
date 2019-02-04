@@ -55,6 +55,7 @@ setuptools.setup(
 
     entry_points={'console_scripts': [
         'corecli = core.cli:cli',
+        'corebot = corebot.cli:cli'
     ]},
 
     packages=setuptools.find_packages(),
