@@ -2,10 +2,10 @@
 
 
 # Setup environment for prod
-AWS_ACCESS_KEY_ID=$(aws --profile dev configure get aws_access_key_id)
-AWS_SECRET_ACCESS_KEY=$(aws --profile dev configure get aws_secret_access_key)
-AWS_BATCH_TEST_JOB_QUEUE=core
-AWS_ACCOUNT=687531504312
+AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id)
+AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key)
+AWS_BATCH_TEST_JOB_QUEUE=prod_core
+AWS_ACCOUNT="687531504312"
 
 # Build the core image so the requirements are up to date
 docker-compose build console;
