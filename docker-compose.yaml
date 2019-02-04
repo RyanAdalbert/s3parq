@@ -1,0 +1,72 @@
+version: '3'
+services:
+    airflowpg:
+        image: postgres:9.6
+        environment:
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+
+    airflow:
+        build:
+          dockerfile: ./dockerfiles/core.dockerfile
+          context: .
+        image: ichain/core
+        depends_on:
+            - airflowpg
+        environment:
+            - INITDB=y
+            - AWS_DEFAULT_REGION=us-east-1
+            - AWS_ACCESS_KEY_ID
+            - AWS_SECRET_ACCESS_KEY
+        volumes:
+            - ./dags:/root/airflow/dags
+            - .:/usr/src/app
+            - $HOME:/root
+            - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+            - "8080:8080"
+        command: /airflow-entrypoint.sh webserver
+        healthcheck:
+            test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+            interval: 30s
+            timeout: 30s
+            retries: 3
+
+    notebook:
+        build:
+          dockerfile: ./dockerfiles/core.dockerfile
+          context: .
+        image: ichain/core
+        environment:
+            - AWS_DEFAULT_REGION=us-east-1
+            - AWS_ACCESS_KEY_ID
+            - AWS_SECRET_ACCESS_KEY
+        volumes:
+            - .:/usr/src/app
+            - $HOME:/root
+            - $HOME:/host/home
+            - .:/host/project
+            - /var/run/docker.sock:/var/run/docker.sock
+        # If you want to change the port mappings, just change you
+        # host port, but leave the container port as 8888
+        ports:
+            - "8081:8888"
+        working_dir: /host
+        command: /notebook-entrypoint.sh
+
+    console:
+        build:
+          dockerfile: ./dockerfiles/core.dockerfile
+          context: .
+        image: ichain/core
+        environment:
+            - AWS_DEFAULT_REGION=us-east-1
+            - AWS_ACCESS_KEY_ID
+            - AWS_SECRET_ACCESS_KEY
+        volumes:
+            - .:/usr/src/app
+            - $HOME:/root
+            - /var/run/docker.sock:/var/run/docker.sock
+        working_dir: /usr/src/app
+        command: /bin/bash
