@@ -2,7 +2,7 @@ from airflow import DAG
 from core.models.configuration import Pipeline
 from core.helpers.session_helper import SessionHelper
 from datetime import datetime, timedelta
-
+from core.airflow.dagbuilder.task_orchestrator import TaskOrchestrator
 
 class DagBuilder:
 

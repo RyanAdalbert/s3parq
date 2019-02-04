@@ -43,8 +43,9 @@ class Test:
         helper_session.return_value = self.setup()
         dbuilder = dag_builder.DagBuilder()
         dbuilder.do_build_dags()
-        dbuilder = 
+        
 
+        assert all(isinstance(x,DAG) for x in dbuilder.dags)
     '''
     def test_create_dags_builds_all_dags(self, helper_session):
         pipeline_mocks = [ MagicMock(name="pipe1",
