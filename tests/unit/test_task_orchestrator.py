@@ -43,7 +43,7 @@ class Test:
         transformations = session.query(Transformation).filter(Transformation.pipeline_state_id==1)
         
         to = TaskOrchestrator()
-        ordered_groups = to._order_tasks_within_group(transformations)        
+        ordered_groups = to._order_transformations_within_group(transformations)        
         assert len(ordered_groups) == 3
         
         for x in range(0,3):

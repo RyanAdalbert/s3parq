@@ -12,11 +12,11 @@ from core.constants import AWS_ACCOUNT, DOCKER_REPO
 
 class Test:
 
-    def __init__(self):
+    def setup(self):
         self.docker_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
         self.ecr_client = boto3.client('ecr')
         self.core_docker = CoreDocker()
-        self.AWS_BATCH_TEST_JOB_QUEUE = "prod_core"
+        self.AWS_BATCH_TEST_JOB_QUEUE = "core"
 
     # Generate a super basic container_overrides object for running the integration test
     def generate_it_test_container_overrides(self):
@@ -45,6 +45,7 @@ class Test:
     #   8. Remove image from your machine
 
     def test_integration_docker(self):
+        self.setup()
         TAG = "it_test"
 
         #   1. Build the image
@@ -53,8 +54,8 @@ class Test:
 
         #   2. Log into ECR
         with pytest.raises(ClientError):
-            self.core_docker.ecr_login("123456789012")
-        self.core_docker.ecr_login(AWS_ACCOUNT)
+            self.core_docker._ecr_login("123456789012")
+        self.core_docker._ecr_login(AWS_ACCOUNT)
 
         #   3. Push the image to ECR
         self.core_docker.register_image(TAG, DOCKER_REPO, AWS_ACCOUNT)
@@ -92,7 +93,7 @@ class Test:
         # job will fail because by the time Batch wants to run the container
         # its definition has already been removed.
         # CannotPullContainerError: API error (404): manifest for 687531504312.dkr.ecr.us-east-1.amazonaws.com/ichain/core:it_test not found
-        container_overrides = generate_it_test_container_overrides()
+        container_overrides = self.generate_it_test_container_overrides()
         self.core_docker.launch_batch_job("it_test", "it_test_core", self.AWS_BATCH_TEST_JOB_QUEUE, container_overrides)
 
         #   6. Deregister Job Definiton

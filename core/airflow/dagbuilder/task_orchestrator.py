@@ -53,11 +53,11 @@ class TaskOrchestrator:
         list_cursor = 0          
         for t in transformations:
             if t.graph_order == graph_cursor:
-                ordered_task_groups[list_cursor].add(t)
+                ordered_transformation_groups[list_cursor].add(t)
             else:
                 list_cursor =+1
                 graph_cursor = t.graph_order
-                ordered_task_groups.append({t})
+                ordered_transformation_groups.append({t})
         return ordered_transformation_groups                       
 
     def _apply_deps_to_ordered_tasks(self, tasks:list)->list:
