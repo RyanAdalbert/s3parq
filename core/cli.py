@@ -48,13 +48,3 @@ def tidy(env):
 
         docker.remove_ecr_image(branch_name, DOCKER_REPO, AWS_ACCOUNT_ID)
         docker.remove_image(full_tag)
-
-@cli.command()
-@click.argument('env', type=click.Choice(['local']))
-@click.argument('id', type=int)
-@click.argument('input_contract', type=str)
-@click.argument('output_contract', type=str)
-def run(env, id, input_contract, output_contract):
-    notebook_url = notebook.run_transform(env, id, input_contract, output_contract)
-    print("See your notebook output at:")
-    print(notebook_url)
