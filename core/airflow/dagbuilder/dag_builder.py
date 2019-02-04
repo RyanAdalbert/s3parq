@@ -16,13 +16,25 @@ class DagBuilder:
     "retries": 1,
     "retry_delay": timedelta(minutes=5)
     }
-
+       
     def do_build_dags(self)->None:
-        """Integrates all the components of getting dags."""
-        self.__pipelines = self._get_pipelines()
-        self.__dags = self._create_dags(self.__pipelines)
+        """Integrates all the components of getting dags, setting task deps etc."""
+        self._pipelines = self._get_pipelines()
+        sets = self._create_dag_sets(self._pipelines)
+        for pipeline, dag in sets:
+            tasks = self._get_prepped_tasks(pipeline)
+            self._apply_dag_to_tasks(dag, tasks)
+            self._dags.append(dag)
 
-    def _create_dags(self, pipelines: list)-> list:
+    @property
+    def dags(self)->list:
+        return self._dags
+
+    @dags.setter
+    def dags(self,dags)->None:
+        self._dags = dags        
+
+    def _create_dag_sets(self, pipelines: list)-> list:
         """ creates a dag for each pipeline
             RETURNS a list of tuples, each containing:
                 - the original pipeline object
@@ -48,7 +60,15 @@ class DagBuilder:
             pipelines = session.query(Pipeline)
         return pipelines
 
-    def _build_tasks(self, pipeline: Pipeline, dag: airflow.DAG)->None:
-        for p_state in Pipeline.pipeline_states:
-            for transformation in 
-        pass   
+    def _get_prepped_tasks(self, pipeline: Pipeline)-> tuple:
+        """returns a tuple of tasks with deps already applied."""
+        to = TaskOrchestrator(pipeline)
+        to.do_orchestrate()
+        return to.tasks
+
+    def _apply_dag_to_tasks(self, dag:DAG, tasks: tuple)->tuple:
+        """returns a tuple of tasks with the dag applied."""
+        for task in tasks:
+            task.dag = dag
+        return tasks
+
