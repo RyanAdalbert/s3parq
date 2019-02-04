@@ -38,6 +38,13 @@ class Test:
         ## make sure there is at least one inactive
         assert False == min([x.is_active for x in pipelines])
 
+
+    def test_do_build_dags(self, helper_session):
+        helper_session.return_value = self.setup()
+        dbuilder = dag_builder.DagBuilder()
+        dbuilder.do_build_dags()
+        dbuilder = 
+
     '''
     def test_create_dags_builds_all_dags(self, helper_session):
         pipeline_mocks = [ MagicMock(name="pipe1",
