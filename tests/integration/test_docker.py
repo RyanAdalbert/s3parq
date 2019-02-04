@@ -1,4 +1,3 @@
-import moto
 import pytest
 import docker
 import boto3
