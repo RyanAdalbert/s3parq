@@ -1,6 +1,6 @@
 from core.models.configuration import Pipeline
 from operator import attrgetter
-from core.airflow.plugins import TransformOperator
+from core.airflow.plugins.transform_operator import TransformOperator
 
 
 class TaskOrchestrator:
