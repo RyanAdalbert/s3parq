@@ -61,7 +61,7 @@ class TaskOrchestrator:
                 ordered_transformation_groups.append({t})
         return ordered_transformation_groups                       
 
-    def _apply_deps_to_ordered_tasks(self, tasks:list)->list:
+    def _apply_deps_to_ordered_tasks(self, task_groups:list)->list:
         """ takes an ordered list of sets and assigns deps to each set for all tasks in the previous set.
             Example: 
                 -if ordered_task_sets is: 
@@ -69,6 +69,12 @@ class TaskOrchestrator:
                 this will return a tuple (task_1, task_2, task_3...) where task_1 and task_2 have no upstream, task_3 and task_4 have both task_1 and task_2 as their upstreams, and task_5 will have both task_3 and task_4 as its upstream. 
             RETURNS: tuple of tasks with deps applied
         """  
-        pass
-
-    
+        prepaired_tasks = []
+        group_ids =[]
+        for index,task_group in enumerate(task_groups):
+            group_ids.append([x.task_id for x in task_group])
+            if len(group_ids) > 1:
+                for task in task_group:
+                    task.set_upstream(group_ids[index -1])
+                    prepaired_tasks.append(task)
+        return tuple(prepaired_tasks)    
