@@ -1,9 +1,7 @@
 from sqlalchemy.orm.session import Session
 from sqlalchemy import create_engine
-from core.logging import get_logger
 import core.models.configuration as config
 from core.logging import LoggerMixin
-import logging
 
 
 class ConfigurationMocker(LoggerMixin):
