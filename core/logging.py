@@ -4,19 +4,21 @@ import logging
 import yaml
 
 core_logging_setup = False
+from core.helpers.project_root import ProjectRoot
+from core.constants import LOGGING_CONFIG
 
 
-def __setup_logging(default_path='logging.yaml', default_level=logging.INFO, env_key='LOGGING_CONFIG'):
+def __setup_logging():
     """Setup logging configuration.
     """
-    path = default_path
-    value = os.getenv(env_key, None)
-    if value:
-        path = value
-    if os.path.exists(path):
-        with open(path, 'rt') as f:
+    config_file = os.path.join(ProjectRoot().get_path(), 'config', LOGGING_CONFIG)
+
+    if os.path.exists(config_file):
+        with open(config_file, 'rt') as f:
             config = yaml.safe_load(f.read())
         logging.config.dictConfig(config)
+    else:
+        raise FileNotFoundError(f"Logging configuration file does not exist at {config_file}")
 
     global core_logging_setup
     core_logging_setup = True
