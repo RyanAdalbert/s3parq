@@ -54,6 +54,5 @@ class LoggerMixin(object):
                 self.__module__,
                 self.__class__.__name__
             ])
-        self.__logger = get_logger(name)
-
+            self.__logger = get_logger(name)
         return self.__logger
