@@ -1,20 +1,11 @@
 #!/bin/sh
 
-
-# Setup environment for prod
-AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id)
-AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key)
-AWS_BATCH_TEST_JOB_QUEUE=prod_core
-AWS_ACCOUNT="687531504312"
-
-# Build the core image so the requirements are up to date
-docker-compose build console;
-
-# Mount the entire repo and run only the unit tests
-docker-compose run --rm \
-  -e AWS_BATCH_TEST_JOB_QUEUE=$AWS_BATCH_TEST_JOB_QUEUE \
-  -e AWS_ACCOUNT=$AWS_ACCOUNT \
-  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-  console \
+docker build -t ichain/core:citest -f ./dockerfiles/core.dockerfile .;
+docker run --rm -it \
+  -e AWS_DEFAULT_REGION="us-east-1" \
+  -e AWS_BATCH_TEST_JOB_QUEUE="prod_core" \
+  -e AWS_ACCOUNT="687531504312" \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -w /usr/src/app \
+  ichain/core:citest \
   bash -c "coverage run --source core /usr/local/bin/pytest tests/integration tests/unit && coverage report && coveralls"
