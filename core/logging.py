@@ -10,6 +10,8 @@ from core.constants import LOGGING_CONFIG
 
 def __setup_logging():
     """Setup logging configuration.
+
+    This method is automatically invoked by get_logger, and shouldn't need to be called directly.
     """
     config_file = os.path.join(ProjectRoot().get_path(), 'config', LOGGING_CONFIG)
 
@@ -24,7 +26,7 @@ def __setup_logging():
     core_logging_setup = True
 
 
-def get_logger(name):
+def get_logger(name: str) -> logging.Logger:
     if core_logging_setup is False:
         __setup_logging()
     return logging.getLogger(name)
@@ -37,7 +39,9 @@ class LoggerMixin(object):
 
     ```
     class Foo(LoggerMixin):
-
+        def bar(self):
+            self.logger.debug("Log this debug message")
+`   ```
     """
 
     __logger = None
