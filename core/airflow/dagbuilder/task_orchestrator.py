@@ -26,19 +26,20 @@ class TaskOrchestrator:
         raise ValueError('TaskOrchestrator.tasks must not be set directly.')
    
     def do_orchestrate(self)->None:
-        if not self.pipeline:
+        if not self._pipeline:
             raise ValueError("TaskOrchestrator cannot run do_orchstrate without a pipeline set.")
 
         all_pipeline_tasks = []
-        for state in pipeline.pipeline_states:  
-            transformations = self._order_transformations_within_group(state)
+        for state in self._pipeline.pipeline_states:  
+            transformations = self._order_transformations_within_group(state.transformations)
             
             all_transforms = []
             for transformation_group in transformations:
+                converted_set = set()
                 for transform in transformation_group:
-                    all_transforms =+ TransformOperator(transform.id)
-                all_transforms.append({all_transforms})
-            all_pipeline_tasks =+ all_transforms               
+                    converted_set.add(TransformOperator(transform.id))
+                all_transforms.append(converted_set)
+            all_pipeline_tasks.append(all_transforms)               
          
         self._tasks = self._apply_deps_to_ordered_tasks(all_pipeline_tasks)    
         
