@@ -14,5 +14,7 @@ docker-compose build console;
 docker-compose run --rm \
   -e AWS_BATCH_TEST_JOB_QUEUE=$AWS_BATCH_TEST_JOB_QUEUE \
   -e AWS_ACCOUNT=$AWS_ACCOUNT \
+  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
   console \
   bash -c "coverage run --source core /usr/local/bin/pytest tests/integration tests/unit && coverage report && coveralls"
