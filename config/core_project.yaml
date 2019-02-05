@@ -9,4 +9,4 @@ PROD_BUCKET: ichain-production
 UAT_BUCKET: ichain-uat
 AWS_ACCOUNT: "265991248033"
 AWS_REGION: us-east-1
-
+LOGGING_CONFIG: logging.yaml

@@ -5,8 +5,10 @@ from git import Repo
 from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
 
 from core.constants import DEV_BUCKET, PROD_BUCKET, UAT_BUCKET
+from core.logging import LoggerMixin
 
-class Contract:
+
+class Contract(LoggerMixin):
     ''' The s3 contract is how we structure our data lake. 
         This contract defines the output structure of data into S3.
         *--------------------------------------------------------------------------------------------------------------------*
@@ -221,8 +223,7 @@ class Contract:
 
         s3_client = boto3.client('s3')
         self.set_file_name(os.path.split(local_file_path)[1])
-        logging.info(f'reading from {local_file_path}')
-        logging.info(f'Writing to {self.get_s3_path()}..')
+        self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()}.')
 
         with open(local_file_path, 'rb') as file_data:
             extra_args = {'source_modified_time': str(
