@@ -9,6 +9,7 @@ node {
     }
     stage('Test') {
         echo "Testing..."
+        echo "User is $USER"
         sh "script/ci_test"
     }
     stage ('Deploy') {
