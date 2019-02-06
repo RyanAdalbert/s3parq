@@ -28,5 +28,6 @@ node {
     }
         if (env.DEPLOYMENT_ENVIRONMENT != 'no_deploy') {
             echo "Trying to deploy to ${env.DEPLOYMENT_ENVIRONMENT}."
+        }
     }
 }
