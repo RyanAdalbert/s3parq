@@ -8,7 +8,7 @@ node {
         echo "Building..."
     }
     stage('Test') {
-        echo "Testing... again"
+        echo "Testing..."
         sh "script/ci_test"
     }
     stage ('Deploy') {
