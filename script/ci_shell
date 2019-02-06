@@ -2,7 +2,7 @@
 
 COMMAND=$1
 
-docker run --rm -it \
+docker run --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -w /usr/src/app \
   ichain/core:ci \
