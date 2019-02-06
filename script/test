@@ -3,8 +3,6 @@
 . script/script_setup
 echo $DIR
 
-# Run the python test suite
-
 # Build the core image so the requirements are up to date
 docker-compose build console;
 

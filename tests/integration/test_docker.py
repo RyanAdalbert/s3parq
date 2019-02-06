@@ -1,4 +1,3 @@
-import moto
 import pytest
 import docker
 import boto3
@@ -8,7 +7,7 @@ from docker.models.images import Image
 from docker.errors import ImageNotFound
 from core.helpers.docker import CoreDocker
 from botocore.exceptions import ClientError
-from core.constants import AWS_ACCOUNT, DOCKER_REPO
+from core.constants import AWS_ACCOUNT, DOCKER_REPO, AWS_BATCH_TEST_JOB_QUEUE
 
 class Test:
 
@@ -16,7 +15,7 @@ class Test:
         self.docker_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
         self.ecr_client = boto3.client('ecr')
         self.core_docker = CoreDocker()
-        self.AWS_BATCH_TEST_JOB_QUEUE = "core"
+        self.AWS_BATCH_TEST_JOB_QUEUE = AWS_BATCH_TEST_JOB_QUEUE
 
     # Generate a super basic container_overrides object for running the integration test
     def generate_it_test_container_overrides(self):
