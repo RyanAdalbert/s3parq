@@ -6,19 +6,21 @@ from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 import core.airflow.dagbuilder.dag_builder as dag_builder
 
 
-@patch('core.airflow.dagbuilder.dag_builder.SessionHelper.get_session', autospec=True )
+@patch('core.airflow.dagbuilder.dag_builder.SessionHelper.session', autospec=True )
 class Test:
 
     def setup(self):
         mock_config = CMock()
         mock_config.generate_mocks()
-        return mock_config.get_session()
+        return mock_config.session
 
     def test_get_active_pipelines(self, helper_session):
         helper_session.return_value = self.setup()
 
         dbuilder = dag_builder.DagBuilder()
         pipelines = dbuilder._get_pipelines()
+
+        assert len(pipelines) > 0
 
         ## make sure we get a list of Pipelines back
         assert all(isinstance(x, Pipeline) for x in pipelines)

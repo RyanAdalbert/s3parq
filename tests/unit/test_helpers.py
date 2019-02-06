@@ -1,12 +1,16 @@
 import pytest
 from unittest.mock import patch
 import os
+from sqlalchemy.orm.session import Session
 from core.helpers.project_root import ProjectRoot
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 import core.models.configuration as config
 from core.helpers.s3_naming_helper import S3NamingHelper 
 from core.helpers.file_mover import FileMover, FileDestination
+from core.helpers.session_helper import SessionHelper
 
+
+## Project Root Helper
 def test_project_root_in_project():
     root = ProjectRoot()
     assert isinstance(root.get_path(), str)
@@ -19,6 +23,8 @@ def test_project_root_not_in_project(monkeypatch):
         with pytest.raises(Exception):
             root = ProjectRoot()
             root.get_path()
+
+## Configuration Mocker
 
 def test_mock_extract_configurations():
     db = CMock()
@@ -47,6 +53,14 @@ def test_mock_transformation_relationships():
     assert len(secrets) == 3
 
     assert set(secrets) == set(['dev-sftp'])
+
+## Session Helper
+@patch('core.constants.ENVIRONMENT')
+def test_session_helper_dev(ENV):
+    ENV.return_value = "dev"
+    session = SessionHelper()
+    assert isinstance(session.session, Session)
+
 
 ## S3 Naming Helper
 

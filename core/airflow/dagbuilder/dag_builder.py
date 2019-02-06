@@ -56,7 +56,7 @@ class DagBuilder:
                 - only_active: if true ignore inactive pipelines
             RETURNS list of core.model.Pipeline objects
         """
-        session = SessionHelper().get_session()
+        session = SessionHelper().session
 
         if only_active:
             pipelines = session.query(Pipeline).filter(Pipeline.is_active)
