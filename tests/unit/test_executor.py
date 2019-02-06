@@ -6,4 +6,5 @@ def test_execute():
 
     global_dag_count = sum([isinstance(x, DAG) for x in globals()])
     
+    raise ValueError(globals())
     assert global_dag_count > 0
