@@ -4,9 +4,9 @@ import base64
 import os
 from core.constants import AWS_ACCOUNT, AWS_REGION
 from core.helpers.project_root import ProjectRoot
+from core.logging import LoggerMixin
 
-
-class CoreDocker:
+class CoreDocker(LoggerMixin):
 
     def __init__(self):
         self.p_root = ProjectRoot().get_path()

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+
+rm core_debug.log;
+
+docker build -t ichain/core:citest -f ./dockerfiles/core.dockerfile .;
+docker run --rm -it \
+  -e AWS_DEFAULT_REGION="us-east-1" \
+  -e AWS_BATCH_TEST_JOB_QUEUE="prod_core" \
+  -e AWS_ACCOUNT="687531504312" \
+  -e LOGGING_CONFIG="debug_logging.yaml" \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v $DIR:/usr/src/app \
+  -w /usr/src/app \
+  ichain/core:citest \
+  bash -c "coverage run --source core /usr/local/bin/pytest tests/integration && coverage report"

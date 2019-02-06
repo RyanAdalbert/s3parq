@@ -7,8 +7,8 @@ echo $DIR
 docker-compose build console;
 
 # Mount the entire repo and run only the unit tests
-AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+# AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+# AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
 docker-compose run \
   --rm \
   console \
