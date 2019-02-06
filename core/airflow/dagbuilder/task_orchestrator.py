@@ -87,15 +87,18 @@ class TaskOrchestrator:
             return spacer
         
         prepaired_tasks = []
+        spacers = []
         for index,task_group in enumerate(task_groups):
             if index > 0:
                 spacer = make_spacer(index,dag)
                 for task in task_group:
                     task.set_upstream(spacer)
+                    task.set_downstream(spacers[-1])
                     prepaired_tasks.append(task)
             else:
                 for task in task_group:
                     spacer = make_spacer(0,dag)
-                    task.set_downstream(spacer)
+                    task.set_upstream(spacer)
                     prepaired_tasks.append(task)
+                    spacers.append(spacer)
         return tuple(prepaired_tasks)    
