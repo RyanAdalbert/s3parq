@@ -13,3 +13,6 @@ AWS_ACCOUNT: "265991248033"
 AWS_REGION: us-east-1
 AWS_BATCH_TEST_JOB_QUEUE: core
 LOGGING_CONFIG: logging.yaml
+
+## if ProjectRoot can't find setup.py, it will look here before dying
+DOCKER_CONTAINER_ROOT: /usr/src/app
