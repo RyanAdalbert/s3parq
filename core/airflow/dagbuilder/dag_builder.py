@@ -6,24 +6,27 @@ from core.airflow.dagbuilder.task_orchestrator import TaskOrchestrator
 
 class DagBuilder:
 
-    DEFAULT_ARGS = {
-    "owner": "integriChain",
-    "depends_on_past": False,
-    "start_date": datetime(2000, 1, 1),
-    "email": ["engineering@integrichain.com"],
-    "email_on_failure": False,
-    "email_on_retry": False,
-    "retries": 1,
-    "retry_delay": timedelta(minutes=5)
-    }
+
        
     def do_build_dags(self)->None:
         """Integrates all the components of getting dags, setting task deps etc."""
+
+        self.DEFAULT_ARGS = {
+        "owner": "integriChain",
+        "depends_on_past": False,
+        "start_date": datetime(2000, 1, 1),
+        "email": ["engineering@integrichain.com"],
+        "email_on_failure": False,
+        "email_on_retry": False,
+        "retries": 1,
+        "retry_delay": timedelta(minutes=5)
+        }
+        self._dags = []
         self._pipelines = self._get_pipelines()
         sets = self._create_dag_sets(self._pipelines)
         for pipeline, dag in sets:
-            tasks = self._get_prepped_tasks(pipeline)
-            self._apply_dag_to_tasks(dag, tasks)
+            tasks = self._get_prepped_tasks(pipeline, dag)
+            #self._apply_dag_to_tasks(dag, tasks)
             self._dags.append(dag)
 
     @property
@@ -42,7 +45,10 @@ class DagBuilder:
         dags = []
         for pipe in pipelines:
             
-            dags.append((pipe, DAG(pipe.name, default_args = self.DEFAULT_ARGS, schedule_interval=f'@{pipe.run_frequency}'),))
+            dags.append((pipe, DAG( pipe.name, 
+                                    default_args = self.DEFAULT_ARGS,
+                                    start_date=datetime(2000, 1, 1), 
+                                    schedule_interval=f'@{pipe.run_frequency}'),))
         return dags                     
 
 
@@ -60,9 +66,9 @@ class DagBuilder:
             pipelines = session.query(Pipeline)
         return pipelines
 
-    def _get_prepped_tasks(self, pipeline: Pipeline)-> tuple:
+    def _get_prepped_tasks(self, pipeline: Pipeline, dag: DAG)-> tuple:
         """returns a tuple of tasks with deps already applied."""
-        to = TaskOrchestrator(pipeline)
+        to = TaskOrchestrator(pipeline, dag)
         to.do_orchestrate()
         return to.tasks
 

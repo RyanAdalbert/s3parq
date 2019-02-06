@@ -1,5 +1,8 @@
 import pytest
 from core.airflow.dagbuilder.task_orchestrator import TaskOrchestrator
+from core.airflow.plugins.transform_operator import TransformOperator
+from airflow import DAG
+from datetime import datetime
 from core.models.configuration import PharmaceuticalCompany, Brand, Pipeline, PipelineType, Segment, PipelineState, PipelineStateType, TransformationTemplate, Transformation
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 from sqlalchemy import or_
@@ -51,17 +54,20 @@ class Test:
                 assert t.graph_order == x, f"graph order incorrect for set number {x}"
 
     
-    ## TODO: patch transform operator here
     def test_assign_deps_to_ordered_groups(self):
-        session = self.setup_in_state_transforms()
         n = Names()
-        ordered_transforms = [  set(session.query(Transformation).filter(or_(Transformation.id==1, Transformation.id==2))), 
-                                set(session.query(Transformation).filter(or_(Transformation.id==3, Transformation.id==4))),
-                                set(session.query(Transformation).filter(Transformation.id==4))]
-        to = TaskOrchestrator()
-        dep_assigned_tasks = to._apply_deps_to_ordered_tasks(ordered_transforms)        
+        dag = DAG("test_dag", start_date = datetime(2000, 6, 1), schedule_interval="@daily")
+        ordered_transform_operators = [ {TransformOperator(1), TransformOperator(2)},
+                                        {TransformOperator(3), TransformOperator(4)},
+                                        {TransformOperator(5)}]
+        for s in ordered_transform_operators:
+            for o in s:
+                o.dag = dag
 
-        task_id_format = f'{n.pname}_{n.pstname}_{n.tname}_'
+        to = TaskOrchestrator()
+        
+        dep_assigned_tasks = to._apply_deps_to_ordered_tasks(ordered_transform_operators, dag)        
+        ##TODO: need assertions here! 
                 
         pass
         #for task in dep_assigned_tasks:
