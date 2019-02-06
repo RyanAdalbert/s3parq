@@ -8,8 +8,8 @@ node {
         echo "Building..."
     }
     stage('Test') {
-        sh "script/citest"
         echo "Testing..."
+        sh "script/citest"
     }
     stage ('Deploy') {
         echo "We are currently working on branch: ${env.BRANCH_NAME}"
