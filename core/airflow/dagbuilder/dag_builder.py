@@ -59,14 +59,10 @@ class DagBuilder:
         session = SessionHelper().session
 
         if only_active:
-            pipeline_generator = session.query(Pipeline).filter(Pipeline.is_active)
+            pipelines = session.query(Pipeline).filter(Pipeline.is_active)
         else:
-            pipeline_generator = session.query(Pipeline)
+            pipelines = session.query(Pipeline)
         
-        pipelines = []        
-
-        with pipeline_generator as pipe:
-            pipelines.append(pipe)
         return pipelines
 
     def _get_prepped_tasks(self, pipeline: Pipeline, dag: DAG)-> tuple:

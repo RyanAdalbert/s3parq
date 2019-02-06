@@ -14,24 +14,28 @@ class Test:
         mock_config.generate_mocks()
         return mock_config.get_session()
 
-    def test_get_active_pipelines(self, helper_session):
+    def test_get_active_pipelines(self , helper_session):
         
-        helper_session.return_value.session.return_value = self.setup()
-
+        type(helper_session.return_value).session = PropertyMock(return_value=self.setup())
         dbuilder = dag_builder.DagBuilder()
         pipelines = dbuilder._get_pipelines()
+            
+        p = helper_session().session
+      
+        p = p.query(Pipeline)
 
-        assert len(pipelines) > 0
-
+        pipes=[]
+        for pipe in pipelines:
+            pipes.append(pipe)
+        assert len(pipes) > 0
         ## make sure we get a list of Pipelines back
         assert all(isinstance(x, Pipeline) for x in pipelines)
         
         ## make sure they are all active
         assert all(x.is_active for x in pipelines)
-        
-    def test_get_all_pipelines(self, helper_session):
-        helper_session.return_value.session.return_value = self.setup()
 
+    def test_get_all_pipelines(self , helper_session):
+        type(helper_session.return_value).session = PropertyMock(return_value=self.setup())
         dbuilder = dag_builder.DagBuilder()
         pipelines = dbuilder._get_pipelines(only_active=False)
             
@@ -43,9 +47,8 @@ class Test:
 
 
     def test_do_build_dags(self, helper_session):
-        helper_session.return_value = self.setup()
+        type(helper_session.return_value).session = PropertyMock(return_value=self.setup())
         dbuilder = dag_builder.DagBuilder()
         dbuilder.do_build_dags()
 
         assert all(isinstance(x,DAG) for x in dbuilder.dags)
-
