@@ -6,7 +6,6 @@ from core.airflow.dagbuilder.task_orchestrator import TaskOrchestrator
 
 class DagBuilder:
 
-
        
     def do_build_dags(self)->None:
         """Integrates all the components of getting dags, setting task deps etc."""
@@ -26,7 +25,6 @@ class DagBuilder:
         sets = self._create_dag_sets(self._pipelines)
         for pipeline, dag in sets:
             tasks = self._get_prepped_tasks(pipeline, dag)
-            #self._apply_dag_to_tasks(dag, tasks)
             self._dags.append(dag)
 
     @property
@@ -67,14 +65,10 @@ class DagBuilder:
         return pipelines
 
     def _get_prepped_tasks(self, pipeline: Pipeline, dag: DAG)-> tuple:
-        """returns a tuple of tasks with deps already applied."""
+        """returns a tuple of tasks with deps and dag already applied."""
         to = TaskOrchestrator(pipeline, dag)
         to.do_orchestrate()
         return to.tasks
 
-    def _apply_dag_to_tasks(self, dag:DAG, tasks: tuple)->tuple:
-        """returns a tuple of tasks with the dag applied."""
-        for task in tasks:
-            task.dag = dag
-        return tasks
+
 

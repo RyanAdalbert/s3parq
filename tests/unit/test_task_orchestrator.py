@@ -75,62 +75,18 @@ class Test:
 
 
     def test_do_orchestrate(self):
-        pass
-
-    '''
-
-
-
-    def test_build_dag_tasks_builds_tasks(self, helper_session):
-        transformations = [ MagicMock(  id=100,
-                                        transformation_template_id=100,
-                                        pipeline_state_id=2,
-                                        graph_order=0),
-                            MagicMock(  id=100,
-                                        transformation_template_id=100,
-                                        pipeline_state_id=2,
-                                        graph_order=1)]
-        
-        dbuilder = dag_builder.DagBuilder()
-        tasks = dbuilder._build_tasks(pipeline, dag)
-
-        assert all(isinstance(x, TransformationOperator for x in tasks))
-
-    def test_
-        
-    
-
-        assert all(isinstance(x, DAG) for x in dags)
-
-    def test_orchestrator_deps_inside_state(self):
         session = self.setup_mock()
+        to = TaskOrchestrator()
+        pipe = session.query(Pipeline).one()
+        to.pipeline = pipe
 
-        pipeline = session.query(Pipeline).first()
-        to = TaskOrchestrator(Pipeline)
-        tasks = to.tasks        
+        to.do_orchestrate()
         
-        ## test downstreams
-        graph_0_downstream = []
-        graph_1_downstream = []
-        graph_2_downstream = []
-        task_id_format = f'{n.pname}_{n.pstname}_{n.tname}_'
-            
-        ## make sure we get 5 tasks back
-        assert len(tasks) == 5, f"Expected 5 tasks, got {len(tasks)} back."
-
-        for t in tasks:
-            if t.task_id == task_id_format+'1' or t.task_id == task_id_format+'2': 
-                for d in t.downstream_list:
-                    graph_0_downstream.append(d.task_id)
-                assert set(graph_0_downstream) == set(3,4)
-            elif t.task_id == task_id_format+'3' or t.task_id == task_id_format+'4':
-                for d in t.downstream_list:
-                    graph_1_downstream.append(d.task_id)
-                assert set(graph_1_downstream) == set(5)
-            elif t.task_id == task_id_format+'5':
-                for d in t.downstream_list:
-                    graph_2_downstream.append(d.task_id)
-                assert set(graph_2_downstream) == set()
-            else:
-                pytest.fail('Task name is improperly formatted')
-       '''
+        tasks = []
+        for state in pipe.pipeline_states:
+            for transform in state.transformations:
+                tasks.append(transform)
+        
+        ## same number of tasks
+        assert len(to.tasks) == len(tasks)        
+        

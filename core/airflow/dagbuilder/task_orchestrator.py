@@ -40,9 +40,6 @@ class TaskOrchestrator:
         if not self._pipeline:
             raise ValueError("TaskOrchestrator cannot run do_orchstrate without a pipeline set.")
 
-        if not self._dag:
-            raise ValueError("TaskOrchestrator cannot run do_orchestrate without a dag set.")
-
         all_pipeline_tasks = []
         for state in self._pipeline.pipeline_states:  
             transformations = self._order_transformations_within_group(state.transformations)
