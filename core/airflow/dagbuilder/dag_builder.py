@@ -30,7 +30,7 @@ class DagBuilder(LoggerMixin):
         for pipeline, dag in sets:
             tasks = self._get_prepped_tasks(pipeline, dag)
             self._dags.append(dag)
-
+        self.logger.info(f"Done with run. {len(self._dags)} dags built.")
     @property
     def dags(self)->list:
         return self._dags
