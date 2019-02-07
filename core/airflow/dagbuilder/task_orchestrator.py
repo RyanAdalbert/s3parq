@@ -49,9 +49,8 @@ class TaskOrchestrator:
                 converted_set = set()
                 for transform in transformation_group:
                     to = TransformOperator(transform.id)
-                    to.dag = self._dag
                     converted_set.add(to)
-                all_transforms.append(converted_set)
+                all_transforms.append(tuple([state.pipeline_state_type.name, converted_set]))
             all_pipeline_tasks +=  all_transforms               
         self._tasks = self._apply_deps_to_ordered_tasks(all_pipeline_tasks, self._dag)    
         
@@ -81,24 +80,44 @@ class TaskOrchestrator:
                 this will return a tuple (task_1, task_2, task_3...) where task_1 and task_2 have no upstream, task_3 and task_4 have both task_1 and task_2 as their upstreams, and task_5 will have both task_3 and task_4 as its upstream. 
             RETURNS: tuple of tasks with deps applied
         """  
-        def make_spacer(id:int, dag:DAG)->DummyOperator:
-            spacer = DummyOperator(task_id=f"grouping_task_{index}")
-            spacer.dag=dag
+
+
+        spacers =[] 
+
+        def make_spacer(id:int, state_name:str, dag:DAG)->DummyOperator:
+            """ look for an existing spacer. return it. if not, make it and return that."""
+            spacer_format = f"{state_name}_group_step_{id}"
+            if len(spacers) > 0:
+                for spacer in spacers:
+                    if spacer.task_id == spacer_format:
+                        return spacer
+            spacer = DummyOperator(task_id=spacer_format)
+            spacer.dag=dag  
+            spacer.depends_on_past = True
+    
             return spacer
-        
+
+
+        ## first make the spacer operators
+        for index, packed_task_group in enumerate(task_groups):
+            state_name = packed_task_group[0]
+            spacer = make_spacer(index,state_name,dag)
+            spacers.append(spacer)
+
         prepaired_tasks = []
-        spacers = []
-        for index,task_group in enumerate(task_groups):
-            if index > 0:
-                spacer = make_spacer(index,dag)
-                for task in task_group:
-                    task.set_upstream(spacer)
-                    task.set_downstream(spacers[-1])
-                    prepaired_tasks.append(task)
-            else:
-                for task in task_group:
-                    spacer = make_spacer(0,dag)
-                    task.set_upstream(spacer)
-                    prepaired_tasks.append(task)
-                    spacers.append(spacer)
+        
+        ## now set up/downstreams to the tasks and spacers
+        for index, packed_task_group in enumerate(task_groups):
+            task_group = packed_task_group[1]
+                
+            for task in task_group:
+                task.dag = dag
+                task.depends_on_past = True
+                spacers[index] >> task 
+                if index < len(spacers) -1:
+                    task >> spacers[index +1] 
+                prepaired_tasks.append(task)
+        
+        prepaired_tasks += spacers
+
         return tuple(prepaired_tasks)    

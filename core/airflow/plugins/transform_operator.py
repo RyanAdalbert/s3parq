@@ -7,7 +7,7 @@ class TransformOperator(BashOperator):
     
     def __init__(self,id:int)->None:
         super().__init__(   bash_command='ls', 
-                            task_id=f'super_task_{id}',
+                            task_id=f'super_fancy_task_{id}',
                                                     
                         )
                
