@@ -3,7 +3,7 @@
 . script/script_setup
 echo $DIR
 
-docker build -t ichain/core:it -f ./dockerfiles/core.dockerfile .;
+docker build -t ichain/core:test -f ./dockerfiles/core.dockerfile .;
 
 # Mount the entire repo and run only the unit tests
 AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
@@ -13,5 +13,5 @@ docker run --rm \
   -e AWS_SECRET_ACCESS_KEY \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -w /usr/src/app \
-  ichain/core:it \
-  bash -c "coverage run --source core /usr/local/bin/pytest tests/integration && coverage run -a --source core /usr/local/bin/pytest tests/unit && coverage report && coveralls"
+  ichain/core:test \
+  bash -c "coverage run --source core /usr/local/bin/pytest tests/integration && coverage run -a --source core /usr/local/bin/pytest tests/unit && coverage report"
