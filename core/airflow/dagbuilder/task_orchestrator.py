@@ -113,7 +113,7 @@ class TaskOrchestrator(LoggerMixin):
             spacer = make_spacer(index,state_name,dag)
             spacers.append(spacer)
 
-        self.logger.debug("Created {len(spacers)} spacer tasks.")
+        self.logger.debug(f"Created {len(spacers)} spacer tasks.")
         prepaired_tasks = []
         
         ## now set up/downstreams to the tasks and spacers
@@ -126,7 +126,7 @@ class TaskOrchestrator(LoggerMixin):
                 self.logger.debug(f"Set downstream on {spacers[index].task_id} to {task.task_id}.") 
                 spacers[index] >> task 
                 if index < len(spacers) -1:
-                    self.logger.debug(f"Set downstream on {task.task_id} to {spacers[index + 1]}.")
+                    self.logger.debug(f"Set downstream on {task.task_id} to {spacers[index + 1].task_id}.")
                     task >> spacers[index +1] 
                 prepaired_tasks.append(task)
         
