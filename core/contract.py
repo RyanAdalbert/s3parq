@@ -168,11 +168,14 @@ class Contract(LoggerMixin):
 
         # set branch default to the git branch.
         # if we need to override this, set the branch param first.
-        branch_name = Repo('.').active_branch.name
         if self.branch is None:
             try:
+                branch_name = Repo('.').active_branch.name
                 self.set_branch(branch_name)
             except:
+                try:
+                    branch_name = os.environ['BRANCH_NAME']
+                    self.set_branch(branch_name)
                 raise ValueError(
                     f'Your git branch name {branch_name} cannot be used as a contract branch path.')
 
