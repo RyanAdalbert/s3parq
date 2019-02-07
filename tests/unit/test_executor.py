@@ -2,9 +2,11 @@ import pytest
 from airflow import DAG
 
 def test_execute():
+    global_dag_count = 0
     import core.airflow.dags.executor as executor
-
-    global_dag_count = sum([isinstance(x, DAG) for x in globals()])
+    for obj in dir(executor):
+        if isinstance(DAG, type(getattr(executor, obj))):
+            global_dag_count +=1   
     
-    raise ValueError(globals())
+    
     assert global_dag_count > 0
