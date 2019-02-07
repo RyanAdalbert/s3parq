@@ -170,10 +170,11 @@ class Contract(LoggerMixin):
         # if we need to override this, set the branch param first.
         if self.branch is None:
             try:
-                self.set_branch(Repo('.').active_branch.name)
+                branch_name = Repo('.').active_branch.name
+                self.set_branch(branch_name)
             except:
                 raise ValueError(
-                    'Your git branch name cannot be used as a contract branch path.')
+                    f'Your git branch name {branch_name} cannot be used as a contract branch path.')
 
     def _set_contract_type(self)->None:
         ''' INTENT: sets what type of contract this is - file, partition, or dataset
