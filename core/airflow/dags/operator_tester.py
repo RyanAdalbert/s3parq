@@ -1,5 +1,6 @@
 from core.constants import ENVIRONMENT
 from airflow import DAG
+from datetime import timedelta, datetime
 from airflow.operators.dummy_operator import DummyOperator
 ### Import the operator you want to test here! ###
 
@@ -19,7 +20,7 @@ if ENVIRONMENT == "dev":
     dag = DAG('development_dag_for_testing_operator', default_args = DEFAULT_ARGS, schedule_interval = None)
 
 
-kickoff_task = DummyOperator("task_that_does_nothing", dag = dag)
+kickoff_task = DummyOperator(task_id = "task_that_does_nothing", dag = dag)
 
 ### your task with your operator goes here! 
 ## my_task = MyOperator(task_id = <something>, dag = dag)
