@@ -5,6 +5,7 @@ from core.constants import DOCKER_REPO, AWS_ACCOUNT, DEV_AWS_ACCOUNT
 from core.helpers.docker import CoreDocker
 from docker.errors import ImageNotFound
 from core.logging import get_logger
+import os
 
 logger = get_logger(__name__)
 
