@@ -20,9 +20,18 @@ def test_project_root_in_project():
 def test_project_root_not_in_project(monkeypatch):
     with monkeypatch.context() as m:
         m.chdir('/')
+
+    ## this feels icky. But project root needs the docker path for special cases, so we bake it in here.
+    docker_special_path ='/usr/src/app' 
+    if os.path.isfile(f'{docker_special_path}/setup.py'):
+        root = ProjectRoot()
+        assert root.get_path() == docker_special_path
+    else:    
         with pytest.raises(Exception):
             root = ProjectRoot()
             root.get_path()
+
+    
 
 ## Configuration Mocker
 

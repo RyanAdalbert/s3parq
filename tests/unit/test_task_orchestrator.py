@@ -66,7 +66,7 @@ class Test:
 
         to = TaskOrchestrator()
         
-        dep_assigned_tasks = to._apply_deps_to_ordered_tasks(ordered_transform_operators, dag)        
+        dep_assigned_tasks = to._apply_deps_to_ordered_tasks(tuple(["raw",ordered_transform_operators]), dag)        
         ##TODO: need assertions here! 
                 
         pass

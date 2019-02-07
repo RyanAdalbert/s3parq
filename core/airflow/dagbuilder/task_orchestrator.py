@@ -73,7 +73,7 @@ class TaskOrchestrator:
         return ordered_transformation_groups                       
 
     def _apply_deps_to_ordered_tasks(self, task_groups:list, dag:DAG)->tuple:
-        """ takes an ordered list of sets and assigns deps to each set for all tasks in the previous set.
+        """ takes an ordered list of tuples. each tuple is (state_name, {set_of_operator_tasks}). Assigns deps to each set for all tasks in the previous set.
             Example: 
                 -if ordered_task_sets is: 
                     [{task_1,task2}, {task_3,task_4}, {task_5}]

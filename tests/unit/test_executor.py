@@ -1,6 +1,8 @@
 import pytest
 from airflow import DAG
 
+
+## make sure executor is populated with DAG objects
 def test_execute():
     global_dag_count = 0
     import core.airflow.dags.executor as executor
