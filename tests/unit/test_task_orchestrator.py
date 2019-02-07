@@ -41,7 +41,7 @@ class Test:
         return session
 
 
-    def test_order_tasks_within_group(self):
+    def test_order_transformations_within_group(self):
         session = self.setup_in_state_transforms()
         transformations = session.query(Transformation).filter(Transformation.pipeline_state_id==1)
         
@@ -54,39 +54,41 @@ class Test:
                 assert t.graph_order == x, f"graph order incorrect for set number {x}"
 
     
-    def test_assign_deps_to_ordered_groups(self):
+    def test_assign_deps_to_ordered_tasks(self):
         n = Names()
         dag = DAG("test_dag", start_date = datetime(2000, 6, 1), schedule_interval="@daily")
-        ordered_transform_operators = [ {TransformOperator(1), TransformOperator(2)},
-                                        {TransformOperator(3), TransformOperator(4)},
-                                        {TransformOperator(5)}]
-        for s in ordered_transform_operators:
-            for o in s:
-                o.dag = dag
-
+        ordered_transform_operators = [ tuple(["raw", {TransformOperator(1), TransformOperator(2)}]),
+                                        tuple(["ingest",{TransformOperator(3), TransformOperator(4)}]),
+                                        tuple(["ingest",{TransformOperator(5)}])]
         to = TaskOrchestrator()
         
-        dep_assigned_tasks = to._apply_deps_to_ordered_tasks(tuple(["raw",ordered_transform_operators]), dag)        
-        ##TODO: need assertions here! 
-                
-        pass
-        #for task in dep_assigned_tasks:
+        dep_assigned_tasks = to._apply_deps_to_ordered_tasks(ordered_transform_operators, dag)        
+        
+        ## make sure groupings are created
+        raw_group_step_0_exists = False
 
-
+        ## make sure downstreams set
+        for task in dep_assigned_tasks:
+            if task.task_id == "raw_group_step_0":
+                raw_group_step_0_exists = True
+                assert len(task.downstream_list) == 2
+        
+        assert raw_group_step_0_exists
+        
 
     def test_do_orchestrate(self):
-        session = self.setup_mock()
+        session = self.setup_in_state_transforms()
         to = TaskOrchestrator()
-        pipe = session.query(Pipeline).one()
+        pipe = session.query(Pipeline).filter(Pipeline.id==1).one()
+        dag = DAG("test_dag", start_date = datetime(2000, 6, 1), schedule_interval="@daily")
+        to.dag = dag
         to.pipeline = pipe
 
         to.do_orchestrate()
-        
         tasks = []
         for state in pipe.pipeline_states:
             for transform in state.transformations:
                 tasks.append(transform)
         
-        ## same number of tasks
-        assert len(to.tasks) == len(tasks)        
-        
+        ## same number of tasks: in the case of id==1, we get 3 extra tasks that are state grouping tasks
+        assert len(to.tasks) == len(tasks) +3        
