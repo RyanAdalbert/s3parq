@@ -26,7 +26,14 @@ def publish(env):
     if env == 'local':
         AWS_ACCOUNT_ID = DEV_AWS_ACCOUNT
         repo = Repo('.')
-        branch_name = repo.active_branch.name
+
+        # Jenkins doesn't have an active branch name via git as it
+        # checks things out via commit hash, so fall back to the
+        # envirnment variable that Jenkins uses in that case.
+        try:
+            branch_name = repo.active_branch.name
+        except:
+            branch_name = os.environ['BRANCH_NAME']
         core_docker = CoreDocker()
         logger.info(f"Building image {DOCKER_REPO}:{branch_name} from current branch {branch_name}")
         full_tag = core_docker.build_image(f"{DOCKER_REPO}:{branch_name}")
@@ -57,7 +64,15 @@ def tidy(env):
     if env == 'local':
         AWS_ACCOUNT_ID = DEV_AWS_ACCOUNT
         repo = Repo('.')
-        branch_name = repo.active_branch.name
+
+        # Jenkins doesn't have an active branch name via git as it
+        # checks things out via commit hash, so fall back to the
+        # envirnment variable that Jenkins uses in that case.
+        try:
+            branch_name = repo.active_branch.name
+        except:
+            branch_name = os.environ['BRANCH_NAME']
+
         full_tag = f'{DOCKER_REPO}:{branch_name}'
         job_def_name = f"core_{branch_name}"
 
