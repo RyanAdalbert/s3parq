@@ -1,0 +1,3 @@
+#!/bin/sh
+
+docker-compose exec notebook bash -c "cd core && bash";
