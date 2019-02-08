@@ -20,7 +20,7 @@ services:
             - AWS_ACCESS_KEY_ID
             - AWS_SECRET_ACCESS_KEY
         volumes:
-            - ./core/airflow/dags:/root/airflow/dags
+            - ./dags:/root/airflow/dags
             - .:/usr/src/app
             - $HOME:/root
             - /var/run/docker.sock:/var/run/docker.sock
