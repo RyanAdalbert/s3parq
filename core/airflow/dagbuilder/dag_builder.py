@@ -52,7 +52,7 @@ class DagBuilder(LoggerMixin):
             dags.append((pipe, DAG(pipe.name,
                                    default_args=self.DEFAULT_ARGS,
                                    # airflow may no longer support start_date in default_args
-                                   start_date=datetime(2000, 1, 1),
+                                   start_date=self.DEFAULT_ARGS['start_date'],
                                    schedule_interval=f'@{pipe.run_frequency}'),))
             self.logger.debug("Done creating DAGs.")
         return dags
