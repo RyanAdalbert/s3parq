@@ -2,8 +2,6 @@ import os
 import yaml
 from .helpers.project_root import ProjectRoot
 
-
-
 def reset_constants():
     ''' sets (or resets) constants based on hierarchy of 
         1) current envars that begin with ICHAIN_
