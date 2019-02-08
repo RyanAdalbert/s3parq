@@ -52,3 +52,10 @@ services:
             - "8081:8888"
         working_dir: /host
         command: /notebook-entrypoint.sh
+
+    configurationpg:
+        image: postgres:9.6
+        environment:
+            - POSTGRES_USER=configurator
+            - POSTGRES_PASSWORD=configurator
+            - POSTGRES_DB=configuration_application
