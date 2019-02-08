@@ -5,7 +5,6 @@ from airflow import DAG
 from datetime import datetime
 from core.models.configuration import PharmaceuticalCompany, Brand, Pipeline, PipelineType, Segment, PipelineState, PipelineStateType, TransformationTemplate, Transformation
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
-from sqlalchemy import or_
 
 
 class Names:
@@ -35,7 +34,6 @@ class Test:
 
     def setup_in_state_transforms(self):
         session = self.setup_mock()
-        n = Names()
         # Now for the in-state transforms
         session.add(Transformation(id=1, graph_order=0,
                                    transformation_template_id=1, pipeline_state_id=1))
@@ -65,7 +63,6 @@ class Test:
                 assert t.graph_order == x, f"graph order incorrect for set number {x}"
 
     def test_assign_deps_to_ordered_tasks(self):
-        n = Names()
         dag = DAG("test_dag", start_date=datetime(
             2000, 6, 1), schedule_interval="@daily")
         ordered_transform_operators = [tuple(["raw", {TransformOperator(1), TransformOperator(2)}]),

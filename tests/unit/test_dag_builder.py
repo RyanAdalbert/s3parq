@@ -45,7 +45,7 @@ class Test:
         assert all(isinstance(x, Pipeline) for x in pipelines)
 
         # make sure there is at least one inactive
-        assert False == min([x.is_active for x in pipelines])
+        assert min([x.is_active for x in pipelines]) is False
 
     def test_do_build_dags(self, helper_session):
         type(helper_session.return_value).session = PropertyMock(

@@ -1,5 +1,4 @@
 import pytest
-import os
 import core.constants as c
 
 

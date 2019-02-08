@@ -2,7 +2,6 @@ import boto3
 import pytest
 from core.secret import Secret
 import moto
-import json
 
 
 @moto.mock_secretsmanager
@@ -13,7 +12,7 @@ class Test:
         mysql_secret_string = '{"user":"ic_db_user", "password":"uns3cur3", "host":"12345-host.aws.integrichain.net", "port":"3306", "database": "bluth", "rdbms":"mysql"}'
         psql_read_secret_string = '{"user":"ic_db_user2", "password":"uns3cur3", "host":"22222-host.aws.integrichain.net", "port":"5432", "database": "configuration_application", "rdbms":"postgres", "schema":"public", "role":"public"}'
         psql_write_secret_string = '{"user":"ic_db_user2", "password":"uns3cur3", "host":"22222-host.aws.integrichain.net", "port":"5432", "database": "configuration_application", "rdbms":"postgres", "schema":"public", "role":"configurator"}'
-        resp = secret_client.create_secret(Name='all/FTP/bluth/read',
+        secret_client.create_secret(Name='all/FTP/bluth/read',
                                            Description='FTP connection for bluth source data.',
                                            SecretString=ftp_secret_string
                                            )
@@ -58,7 +57,7 @@ class Test:
                         type_of='database',
                         mode='write')
 
-        assert secret.schema == None
+        assert secret.schema is None
 
     def test_env_sub(self):
         self.setup()

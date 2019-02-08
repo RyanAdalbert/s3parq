@@ -90,7 +90,7 @@ def test_file_needs_update_needs_update():
     extract = ExtractTransform()
     check_update = extract._file_needs_update(
         params[2], params[0].name, os.stat(params[0].name).st_mtime)
-    assert check_update == True
+    assert check_update is True
 
 
 @moto.mock_s3
@@ -98,7 +98,7 @@ def test_file_needs_update_doesnt_need_update():
     params = s3_setup()
     extract = ExtractTransform()
     check_update = extract._file_needs_update(params[2], params[1].name, 0)
-    assert check_update == False
+    assert check_update is False
 
 
 @moto.mock_s3
@@ -109,7 +109,7 @@ def test_file_needs_update_doesnt_exist():
     t_file.write(b'Gobias some coffee!')
     check_update = extract._file_needs_update(
         params[2], t_file, os.stat(t_file.name).st_mtime)
-    assert check_update == True
+    assert check_update is True
 
 
 def test_extract_validate_params_bad():
