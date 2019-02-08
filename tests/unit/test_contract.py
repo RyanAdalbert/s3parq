@@ -220,6 +220,7 @@ def _s3_mock_setup():
     s3_client.create_bucket(Bucket=f'{DEV_BUCKET}')
     return s3_client
 
+
 def _contract_setup():
     contract = Contract()
     contract = Contract(branch='master',
@@ -230,11 +231,12 @@ def _contract_setup():
                         )
     return contract
 
+
 @moto.mock_s3()
 def test_publish_raw_valid():
     client = _s3_mock_setup()
     contract = _contract_setup()
-    #_s3_mock_setup()
+    # _s3_mock_setup()
     _file = tempfile.NamedTemporaryFile()
     text = b"Here's some money. Go see a Star War"
     _file.write(text)
@@ -247,6 +249,7 @@ def test_publish_raw_valid():
     body = s3_client.get_object(
         Bucket=f'{DEV_BUCKET}', Key=key)['Body'].read()
     assert body == text
+
 
 @moto.mock_s3()
 def test_publish_raw_invalid():
@@ -262,6 +265,7 @@ def test_publish_raw_invalid():
     with pytest.raises(ValueError):
         contract.publish_raw_file(_file.name)
     _file.close()
+
 
 @moto.mock_s3()
 def test_publish_raw_metadata():

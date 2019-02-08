@@ -7,6 +7,7 @@ import os
 from io import TextIOWrapper
 from core.helpers import notebook
 
+
 @moto.mock_s3
 class Test:
     def setup(self):
@@ -17,7 +18,8 @@ class Test:
         self.setup()
         output_contract = "asdf/1234/merp"
         transformation_name = "shared.raw.extract"
-        output_path = notebook.output_path(output_contract, transformation_name)
+        output_path = notebook.output_path(
+            output_contract, transformation_name)
         assert output_path == f"s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/shared.raw.extract.ipynb"
 
     def test_output_url(self):
@@ -32,7 +34,8 @@ class Test:
 
         bucket = ENV_BUCKET
         key = "notebooks/dev/important_business/raw/extract/shared.test.hello_world.ipynb"
-        notebook_url = notebook.run_transform("dev", 2, "dev/important_business/raw/ftp", "dev/important_business/raw/extract", name="shared.test.hello_world")
+        notebook_url = notebook.run_transform(
+            "dev", 2, "dev/important_business/raw/ftp", "dev/important_business/raw/extract", name="shared.test.hello_world")
 
         with tempfile.TemporaryDirectory() as tmpdirname:
             test_file_location = os.path.join(tmpdirname, 'test.ipynb')
