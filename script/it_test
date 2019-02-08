@@ -3,11 +3,15 @@
 . script/script_setup
 echo $DIR
 
-# Run the python test suite
-
-# Build the core image so the requirements are up to date
-docker-compose build console;
+docker build -t ichain/core:test -f ./dockerfiles/core.dockerfile .;
 
 # Mount the entire repo and run only the unit tests
-docker-compose run --rm console \
-  bash -c "coverage run --source core /usr/local/bin/pytest tests/integration tests/unit && coverage report"
+AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+docker run --rm \
+  -e AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -w /usr/src/app \
+  ichain/core:test \
+  bash -c "coverage run --source core /usr/local/bin/pytest tests/integration && coverage run -a --source core /usr/local/bin/pytest tests/unit && coverage report"

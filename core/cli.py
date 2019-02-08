@@ -1,9 +1,13 @@
 import click
 from git import Repo
-from core.helpers import docker, notebook
-from core.constants import DOCKER_REPO, AWS_ACCOUNT 
+from core.helpers import notebook
+from core.constants import DOCKER_REPO, AWS_ACCOUNT, DEV_AWS_ACCOUNT
+from core.helpers.docker import CoreDocker
+from docker.errors import ImageNotFound
+from core.logging import get_logger
+import os
 
-
+logger = get_logger(__name__)
 
 @click.group()
 def cli(): # pragma: no cover
@@ -18,36 +22,73 @@ def add(a, b):
 
 
 @cli.command()
-@click.argument('env', type=click.Choice(['local']))
+@click.argument('env', type=click.Choice(['local', 'dev']))
 def publish(env):
     if env == 'local':
-        AWS_ACCOUNT_ID = AWS_ACCOUNT
+        AWS_ACCOUNT_ID = DEV_AWS_ACCOUNT
+        repo = Repo('.')
+
+        # Jenkins doesn't have an active branch name via git as it
+        # checks things out via commit hash, so fall back to the
+        # envirnment variable that Jenkins uses in that case.
+        try:
+            branch_name = repo.active_branch.name
+        except:
+            branch_name = os.environ['BRANCH_NAME']
+        core_docker = CoreDocker()
+        logger.info(f"Building image {DOCKER_REPO}:{branch_name} from current branch {branch_name}")
+        full_tag = core_docker.build_image(f"{DOCKER_REPO}:{branch_name}")
+
+        core_docker.register_image(branch_name, DOCKER_REPO, AWS_ACCOUNT_ID)
+        ecr_tagged_image_name = core_docker.get_aws_repository(full_tag, AWS_ACCOUNT_ID)
+        job_def_name = f"core_{branch_name}"
+        logger.info(f"Registering AWS Batch job definition {job_def_name} that depends on ECR Image {ecr_tagged_image_name}.")
+        core_docker.register_job_definition(job_def_name, ecr_tagged_image_name)
+    if env == 'dev':
+        AWS_ACCOUNT_ID = DEV_AWS_ACCOUNT
         repo = Repo('.')
         branch_name = repo.active_branch.name
-        print("Hang tight building this image can take a while...")
-        full_tag = docker.build_image(f"{DOCKER_REPO}:{branch_name}")
+        core_docker = CoreDocker()
+        logger.info(f"Building image {DOCKER_REPO}:latest from current branch {branch_name}")
+        full_tag = core_docker.build_image(f"{DOCKER_REPO}:latest")
 
-        docker.register_image(branch_name, DOCKER_REPO, AWS_ACCOUNT_ID)
-        ecr_tagged_image_name = docker.get_aws_repository(full_tag, AWS_ACCOUNT_ID)
-        job_def_name = f"core_{branch_name}"
-        docker.register_job_definition(job_def_name, ecr_tagged_image_name)
+        core_docker.register_image('latest', DOCKER_REPO, AWS_ACCOUNT_ID)
+        ecr_tagged_image_name = core_docker.get_aws_repository(full_tag, AWS_ACCOUNT_ID)
+        job_def_name = "core"
+        logger.info(f"Registering AWS Batch job definition {job_def_name} that depends on ECR Image {ecr_tagged_image_name}.")
+        core_docker.register_job_definition(job_def_name, ecr_tagged_image_name)
 
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))
 def tidy(env):
     if env == 'local':
-        AWS_ACCOUNT_ID = AWS_ACCOUNT
+        AWS_ACCOUNT_ID = DEV_AWS_ACCOUNT
         repo = Repo('.')
-        branch_name = repo.active_branch.name
+
+        # Jenkins doesn't have an active branch name via git as it
+        # checks things out via commit hash, so fall back to the
+        # envirnment variable that Jenkins uses in that case.
+        try:
+            branch_name = repo.active_branch.name
+        except:
+            branch_name = os.environ['BRANCH_NAME']
+
         full_tag = f'{DOCKER_REPO}:{branch_name}'
+        job_def_name = f"core_{branch_name}"
 
         #Remove batch job definition
-        job_def_name = f"core_{branch_name}"
-        docker.deregister_job_definition_set(job_def_name)
+        core_docker = CoreDocker()
+        logger.info(f"Deregistering all revisions of {job_def_name}")
+        core_docker.deregister_job_definition_set(job_def_name)
+        try:
+            logger.info(f"Removing all revisions of {job_def_name} from account {AWS_ACCOUNT_ID}")
+            core_docker.remove_ecr_image(branch_name, DOCKER_REPO, AWS_ACCOUNT_ID)
+            logger.info(f"Removing local image {full_tag}")
+            core_docker.remove_image(full_tag)
+        except ImageNotFound:
+            logger.warn(f"Nothing to remove. Image {full_tag} not found.")
 
-        docker.remove_ecr_image(branch_name, DOCKER_REPO, AWS_ACCOUNT_ID)
-        docker.remove_image(full_tag)
 
 @cli.command()
 @click.argument('env', type=click.Choice(['local']))
@@ -56,27 +97,4 @@ def tidy(env):
 @click.argument('output_contract', type=str)
 def run(env, id, input_contract, output_contract):
     notebook_url = notebook.run_transform(env, id, input_contract, output_contract)
-    print("See your notebook output at:")
-    print(notebook_url)
-
-
-    # A function similar to this needs to live in the Transaction job class
-    # of wherever we're actually defining what needs to run.
-    # def generate_transaction_job_container_overrides(transaction_id: str, input_contract: str, output_contract: str, env: str):
-    #     overrides = {
-    #         'command': [
-    #             "corebot run_transaction",
-    #             f"--id={transaction_id}",
-    #             f"--input_contract={input_contract}",
-    #             f"--output_contract={output_contract}",
-    #             f"--env={env}",
-    #             "--executer=batch"
-    #         ],
-    #         'environment': [
-    #             {
-    #                 'name': 'AWS_DEFAULT_REGION',
-    #                 'value': 'us-east-1'
-    #             },
-    #         ]
-    #     }
-    #     return overrides
+    logger.info(f"Running notebook see output at {notebook_url}")

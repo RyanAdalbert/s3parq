@@ -5,6 +5,9 @@ echo $DIR
 
 docker-compose stop;
 docker-compose build;
+
+AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
 docker-compose up -d;
 
-docker-compose run --rm console
+script/dev_shell
