@@ -105,3 +105,12 @@ Note that env should be passed from some environment-aware variable.
 
 ### Corebot
 Corebot is another CLI interface. This is meant to be the "client" part to our "server" part, allowing a separate interface for what people should be calling vs. what processes should be calling. This should only be the entry point, with the guts of the processes still living in a component in standard core.
+
+
+## Pipeline Runs: an Airflow Story
+
+### Overview
+We use airflow to orchestrate our pipeline runs. The structure is only a single step hierarchy, with *Pipeline* == *DAG* and *Transformation* == *Task*. We do not use subdags. 
+To keep things logically simple we do not manifest the pipeline state (raw, ingest etc) in the hierarchy; however we respect the grouping of tasks by those states, ie raw tasks will always run before ingest tasks etc. 
+This is how we manage the transform DAG within a pipeline: 
+
