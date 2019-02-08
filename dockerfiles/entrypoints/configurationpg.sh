@@ -2,4 +2,4 @@
 
 cd ./database
 
-alembic upgrade
+alembic upgrade head
