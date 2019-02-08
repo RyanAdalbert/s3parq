@@ -1,5 +1,38 @@
 #!/bin/sh
 
+LOG=
+LINE=
+
+while [ -n "$1" ]; do 
+ 
+    case "$1" in
+ 
+    -h) echo '
+          _       __________________  _________ _______  _______ _________ _______  _ 
+|\     /|( (    /|\__   __/\__   __/  \__   __/(  ____ \(  ____ \\\__   __/( ___ _ \( )
+| )   ( ||  \  ( |   ) (      ) (        ) (   | (    \/| (    \/   ) (   | (    \/| |
+| |   | ||   \ | |   | |      | |        | |   | (__    | (_____    | |   | (_____ | |
+| |   | || (\ \) |   | |      | |        | |   |  __)   (_____  )   | |   (_____  )| |
+| |   | || | \   |   | |      | |        | |   | (            ) |   | |         ) |(_)
+| (___) || )  \  |___) (___   | |        | |   | (____/\/\____) |   | |   /\____) | _ 
+(_______)|/    )_)\_______/   )_(        )_(   (_______/\_______)   )_(   \_______)(_)
+                                    
+test yo stuff! options:\n-log\tprints stdout during py.test runs (this includes debug logs).\n-line\tadds the coverage missed lines to the coverage report.\n' 
+        exit 0 ;;
+ 
+    -log) LOG="-s" ;;
+ 
+    -line) LINE="-m" ;;
+ 
+    *) echo "Option $1 not recognized. try '-h' for help." 
+       exit 0 ;; 
+ 
+    esac
+ 
+    shift
+ 
+done
+
 . script/script_setup
 echo $DIR
 
@@ -14,4 +47,4 @@ docker run --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -w /usr/src/app \
   ichain/core:test \
-  bash -c "coverage run --source core /usr/local/bin/pytest tests/unit && coverage report $1"
+  bash -c "coverage run --source core /usr/local/bin/pytest $LOG tests/unit && coverage report $LINE"

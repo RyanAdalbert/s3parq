@@ -1,4 +1,4 @@
-from sqlalchemy import engine, create_engine, Column, Integer, String, BOOLEAN, TIMESTAMP, text, ForeignKey, func
+from sqlalchemy import engine, create_engine, Column, Integer, String, Boolean, TIMESTAMP, text, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import session, sessionmaker, relationship
 
@@ -99,6 +99,7 @@ class Pipeline(UniversalWithPrimary, Base):
     pipeline_type_id = Column(Integer, ForeignKey(
         'pipeline_types.id'), nullable=False)
     pipeline_type = relationship("PipelineType")
+    is_active = Column(Boolean, nullable=False, default= True)
     brand_id = Column(Integer, ForeignKey('brands.id'), nullable=False)
     brand = relationship("Brand", back_populates="pipelines")
     run_frequency = Column(String)
@@ -113,7 +114,7 @@ class PipelineState(UniversalWithPrimary, Base):
     pipeline_id = Column(Integer, ForeignKey('pipelines.id'), nullable=False)
     pipeline = relationship("Pipeline", back_populates="pipeline_states")
     graph_order = Column(Integer, nullable=False)
-
+    transformations = relationship("Transformation")
 
 class PipelineStateType(UniversalWithPrimary, Base):
     __tablename__ = 'pipeline_state_types'
@@ -140,7 +141,7 @@ class Transformation(UniversalWithPrimary, Base):
     transformation_template = relationship("TransformationTemplate")
     pipeline_state_id = Column(Integer,  ForeignKey(
         'pipeline_states.id'), nullable=False)
-    pipeline_state = relationship("PipelineState")
+    pipeline_state = relationship("PipelineState", back_populates='transformations')
     graph_order = Column(Integer, nullable=False, server_default=text('0'))
     extract_configurations = relationship(
         "ExtractConfiguration", order_by=ExtractConfiguration.id, back_populates='transformation')

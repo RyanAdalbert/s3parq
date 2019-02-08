@@ -10,5 +10,7 @@ def test_cli_add():
     assert result.exit_code == 0
     assert result.output == '3\n\n'
 '''
+
+
 def test_thing():
     assert True == True

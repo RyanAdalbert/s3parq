@@ -1,6 +1,5 @@
 import boto3
 import os
-import logging
 from git import Repo
 from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
 
