@@ -1,6 +1,7 @@
 from core.helpers import file_mover
 from core.models import configuration
 from core import secret, contract
+from core.constants import ENVIRONMENT
 
 import os
 import tempfile
@@ -10,14 +11,15 @@ class ExtractTransform():
     def __init__(self, **kwargs) -> None:
         """ Performs the extraction to a given output contract. 
             Valid kwargs:
-                - env one of "dev", "prod", "uat"
                 - transform a configuration contract instance
                 - output_contract a contract instance
         """
-        self.REQUIRED_PARAMS = ('env','output_contract','transform')
+        self.REQUIRED_PARAMS = ('output_contract','transform')
         
         for attr in self.REQUIRED_PARAMS:
             self.__dict__[attr] = None
+
+        self.set_env()
 
         for attr in self.REQUIRED_PARAMS:
             if attr in kwargs:
@@ -25,7 +27,8 @@ class ExtractTransform():
                 setter(kwargs[attr])
 
 
-    def set_env(self,env:str)->None:
+    def set_env(self)->None:
+        env = ENVIRONMENT
         if env in ('dev','prod','uat'):
             self.env = env
         else:
@@ -48,7 +51,7 @@ class ExtractTransform():
 
             # Fetch secret from secret contract
             # TODO: Currently configs made for FTP only, FTP type passed in directly
-            source_secret = secret.Secret(name=secret_name,env=self.env,type_of=secret_type_of,mode="write")
+            source_secret = secret.Secret(name=secret_name,type_of=secret_type_of,mode="write")
             
             # Get files from remote and start pushing to s3
             with tempfile.TemporaryDirectory() as tmp_dir:

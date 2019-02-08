@@ -4,8 +4,9 @@ import logging
 from git import Repo
 from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
 
-from core.constants import DEV_BUCKET, PROD_BUCKET, UAT_BUCKET
+from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET
 from core.logging import LoggerMixin
+from core.helpers.project_root import ProjectRoot
 
 
 class Contract(LoggerMixin):
@@ -42,7 +43,7 @@ class Contract(LoggerMixin):
             Default file name, dataset and partitions to empty (they are not required in a contract). 
             Does not support customer / brand aliases
         '''
-        attributes = ('branch', 'env', 'parent', 'child', 'state',
+        attributes = ('branch', 'parent', 'child', 'state',
                       'dataset', 'file_name', 'partitions', 'partition_size')
 
         for attr in attributes:
@@ -54,6 +55,8 @@ class Contract(LoggerMixin):
         self.dataset = str()
         self.partition_size = 100  # partition size in mb
         self.contract_type = 'state'
+
+        self.set_env()
 
         # set the attributes using the setter methods if they are in kwargs
         for attr in attributes:
@@ -155,13 +158,12 @@ class Contract(LoggerMixin):
         self.file_name = self._validate_part(file_name)
         self._set_contract_type()
 
-    def set_env(self, env: str)->None:
-        env = env.lower()
-        if env in (self.DEV, 'dev', 'development'):
+    def set_env(self)->None:
+        if ENVIRONMENT in (self.DEV, 'dev', 'development'):
             self.env = self.DEV
-        elif env in (self.PROD, 'prod', 'production'):
+        elif ENVIRONMENT in (self.PROD, 'prod', 'production'):
             self.env = self.PROD
-        elif env in (self.UAT, 'uat'):
+        elif ENVIRONMENT in (self.UAT, 'uat'):
             self.env = self.UAT
         else:
             raise ValueError(f'{env} is not a valid environment.')
@@ -170,7 +172,8 @@ class Contract(LoggerMixin):
         # if we need to override this, set the branch param first.
         if self.branch is None:
             try:
-                self.set_branch(Repo('.').active_branch.name)
+                branch_name = Repo(ProjectRoot().get_path()).active_branch.name
+                self.set_branch(branch_name)
             except:
                 raise ValueError(
                     'Your git branch name cannot be used as a contract branch path.')

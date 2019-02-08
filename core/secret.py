@@ -2,6 +2,8 @@ import boto3
 import json
 import logging
 
+from core.constants import ENVIRONMENT
+
 class Secret:
     ''' Abstracts aws secretsmanager - values of the secret are callable attributes. ie:
             secret = Secret(name='hamburger', env='dev', type_of='database', mode='read')
@@ -15,7 +17,7 @@ class Secret:
         the values will be silently substituted. 
     '''
 
-    def __init__(self, name: str = None, env: str = None, type_of: str = None, mode: str = None, identifier: str = None, force_env: bool = False) -> None:
+    def __init__(self, name: str = None,  type_of: str = None, mode: str = None, identifier: str = None, force_env: bool = False) -> None:
         ''' get the secret from secrets manager based on args.
             ARGS:
                 - name (str): this is the human-readable name, also middle part of the fully formed secret contract
@@ -31,11 +33,11 @@ class Secret:
             self.identifier = identifier
         else:
             self.name = name
-            self.environment = env
+            self.environment = ENVIRONMENT
             self.type_of = type_of
             self.mode = mode
             self.identifier = self._build_identifier(
-                name=name, env=env, type_of=type_of, mode=mode)
+                name=name, env=ENVIRONMENT, type_of=type_of, mode=mode)
 
         raw_secret = self._get_secret(self.identifier, force_env)
 
