@@ -1,0 +1,10 @@
+#!/bin/sh
+
+COMMAND=$1
+
+docker run --rm \
+  -e BRANCH_NAME \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -w /usr/src/app \
+  ichain/core:ci \
+  $COMMAND

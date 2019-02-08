@@ -8,7 +8,7 @@ def reset_constants():
         2) values defined in core_project.yml
     '''
 
-    config_file = os.path.join(ProjectRoot().get_path(),'core_project.yaml')
+    config_file = os.path.join(ProjectRoot().get_path(),'config','core_project.yaml')
     with open(config_file) as _file:
         config = yaml.safe_load(_file)
         for k, v in config.items():

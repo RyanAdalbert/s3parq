@@ -100,6 +100,8 @@ RUN python setup.py install
 
 EXPOSE 8080 5555 8793
 
+ENV AWS_DEFAULT_REGION="us-east-1"
+
 WORKDIR ${AIRFLOW_HOME}
 # ENTRYPOINT ["/entrypoint.sh"]
 CMD ["./airflow-entrypoint.sh webserver"] # set default arg for entrypoint

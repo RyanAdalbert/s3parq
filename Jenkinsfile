@@ -9,7 +9,7 @@ node {
     }
     stage('Test') {
         echo "Testing..."
-        sh "script/citest"
+        sh "script/ci_test"
     }
     stage ('Deploy') {
         echo "We are currently working on branch: ${env.BRANCH_NAME}"
@@ -25,9 +25,13 @@ node {
                 env.DEPLOYMENT_ENVIRONMENT = 'prod';
                 break;
             default: env.DEPLOYMENT_ENVIRONMENT = 'no_deploy';
-    }
+        }
         if (env.DEPLOYMENT_ENVIRONMENT != 'no_deploy') {
             echo "Trying to deploy to ${env.DEPLOYMENT_ENVIRONMENT}."
+            // sh "script/ci_shell 'corecli publish ${env.DEPLOYMENT_ENVIRONMENT}'"
         }
+    }
+    stage ('Cleanup') {
+        // sh "script/ci_shell 'corecli tidy local'"
     }
 }
