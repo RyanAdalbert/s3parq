@@ -16,7 +16,6 @@ services:
             - airflowpg
         environment:
             - INITDB=y
-            - AWS_DEFAULT_REGION=us-east-1
             - AWS_ACCESS_KEY_ID
             - AWS_SECRET_ACCESS_KEY
         volumes:
@@ -39,14 +38,13 @@ services:
           context: .
         image: ichain/core
         environment:
-            - AWS_DEFAULT_REGION=us-east-1
             - AWS_ACCESS_KEY_ID
             - AWS_SECRET_ACCESS_KEY
         volumes:
             - .:/usr/src/app
             - $HOME:/root
             - $HOME:/host/home
-            - .:/host/project
+            - .:/host/core
             - /var/run/docker.sock:/var/run/docker.sock
         # If you want to change the port mappings, just change you
         # host port, but leave the container port as 8888
@@ -54,19 +52,3 @@ services:
             - "8081:8888"
         working_dir: /host
         command: /notebook-entrypoint.sh
-
-    console:
-        build:
-          dockerfile: ./dockerfiles/core.dockerfile
-          context: .
-        image: ichain/core
-        environment:
-            - AWS_DEFAULT_REGION=us-east-1
-            - AWS_ACCESS_KEY_ID
-            - AWS_SECRET_ACCESS_KEY
-        volumes:
-            - .:/usr/src/app
-            - $HOME:/root
-            - /var/run/docker.sock:/var/run/docker.sock
-        working_dir: /usr/src/app
-        command: /bin/bash
