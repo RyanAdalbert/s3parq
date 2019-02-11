@@ -28,6 +28,7 @@ class CoreDocker(LoggerMixin):
         """ builds and tags an image of the current state of the repo."""
         d_client = self._build_docker_api_client()
         #TODO: Need to figure out a way to see see that this image didn't fail building
+        self.logger.debug(f"Building {tag} from {self.CORE_DOCKERFILE_LOCATION} with context {self.p_root}")
         response = [line for line in d_client.build(
             path=self.p_root, dockerfile=self.CORE_DOCKERFILE_LOCATION, rm=True, tag=tag
         )]
