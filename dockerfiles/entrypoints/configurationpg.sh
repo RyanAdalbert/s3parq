@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-cd ./database
+cd ./core/database
 
 alembic upgrade head
