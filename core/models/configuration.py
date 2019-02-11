@@ -1,7 +1,8 @@
 from sqlalchemy import engine, create_engine, Column, Integer, String, BOOLEAN, TIMESTAMP, text, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import session, sessionmaker, relationship
-
+from core.constants import DEV_CONFIGURATION_APPLICATION_CONN_STRING
+from core.secret import Secret
 Base = declarative_base()
 
 
@@ -32,11 +33,23 @@ class GenerateEngine:
         return self.engine
 
     def _local_engine(self) -> engine.base.Engine:
-        return create_engine('postgresql://configurator:configurator@localhost/configuration_application')
+        return create_engine(DEV_CONFIGURATION_APPLICATION_CONN_STRING)
 
     def _secret_defined_engine(self) -> engine.base.Engine:
         # TODO: in DC-57 update this to use secret
-        pass
+         secret = Secret(env=ENVIRONMENT, 
+                        name='configuration_application',
+                        type_of='database',
+                        mode='read'
+                        )
+        if secret.rdbms == "postgres":
+            conn_string = f"postgresql://{secret.user}:{secret.password}@{host}/{database}"
+        else:
+            m = "Only postgres databases are supported for configuration_application at this time."
+            logger.critical(m)
+            raise NotImplementedError(m)
+        return conn_string
+            return create_engine()
 
 
 """Mixins

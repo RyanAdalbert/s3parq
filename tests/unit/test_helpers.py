@@ -150,3 +150,13 @@ def test_get_file_type(paramiko_trans,paramiko_sftp):
     ft = fm.get_file_type(test_file, fd)
     assert ft, "dont_move"
 
+## SessionHelper
+
+def test_session_helper_prod():
+    pass
+
+def test_secret_helper_uat():
+    pass
+
+def test_secret_helper_dev():
+    pass
