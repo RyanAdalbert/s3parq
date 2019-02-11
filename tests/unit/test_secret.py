@@ -1,5 +1,6 @@
 import boto3
 import pytest
+from unittest.mock import patch
 from core.secret import Secret
 import moto
 
@@ -36,12 +37,11 @@ class Test:
         self.setup()
 
         secret = Secret(name='bluth',
-                        env='all',
                         type_of='FTP',
                         mode='read'
                         )
 
-        assert secret.identifier == 'all/FTP/bluth/read'
+        assert secret.identifier == 'dev/FTP/bluth/read'
         assert secret.password == "S3@L_s@le"
 
     def test_get_secret_with_string(self):
@@ -50,17 +50,18 @@ class Test:
         assert secret.name == 'bluth'
         assert secret.password == 'uns3cur3'
 
+    @patch("core.secret.ENVIRONMENT","prod")
     def test_none_empty_vals(self):
         self.setup()
         secret = Secret(name='bluth',
-                        env='prod',
                         type_of='database',
                         mode='write')
 
         assert secret.schema is None
 
+    @patch("core.secret.ENVIRONMENT","Pretend-RSE")
     def test_env_sub(self):
         self.setup()
         secret = Secret(name='configuration_application',
-                        env='dev', type_of='database', mode='read')
+                        type_of='database', mode='read')
         assert secret.role == 'public'

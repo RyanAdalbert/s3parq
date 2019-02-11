@@ -2,6 +2,7 @@ import boto3
 import json
 import logging
 from core.logging import LoggerMixin
+from core.constants import ENVIRONMENT
 
 class Secret(LoggerMixin):
     ''' Abstracts aws secretsmanager - values of the secret are callable attributes. ie:
@@ -16,11 +17,10 @@ class Secret(LoggerMixin):
         the values will be silently substituted. 
     '''
 
-    def __init__(self, name: str = None, env: str = None, type_of: str = None, mode: str = None, identifier: str = None, force_env: bool = False) -> None:
+    def __init__(self, name: str = None,  type_of: str = None, mode: str = None, identifier: str = None, force_env: bool = False) -> None:
         ''' get the secret from secrets manager based on args.
             ARGS:
                 - name (str): this is the human-readable name, also middle part of the fully formed secret contract
-                - env (str): one of dev, prod, uat, all
                 - type_of (str): one of FTP, database, s3
                 - mode (str): one of read / write 
                 - identifier (str): if defined this is the fully formed secret contract exactly as it is in secrets manager
@@ -32,11 +32,11 @@ class Secret(LoggerMixin):
             self.identifier = identifier
         else:
             self.name = name
-            self.environment = env
+            self.environment = ENVIRONMENT
             self.type_of = type_of
             self.mode = mode
             self.identifier = self._build_identifier(
-                name=name, env=env, type_of=type_of, mode=mode)
+                name=name, env=ENVIRONMENT, type_of=type_of, mode=mode)
 
         raw_secret = self._get_secret(self.identifier, force_env)
 

@@ -1,5 +1,6 @@
 import pytest
-from core.constants import DEV_BUCKET
+from unittest.mock import patch
+from core.constants import ENVIRONMENT, ENV_BUCKET
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 import core.models.configuration as C
 import core.contract as contract
@@ -17,42 +18,47 @@ def s3_setup():
     n_time = time.time()
     time_delta = 10000000
     output_contract = contract.Contract(
-        branch='master', parent='bluth', child='cornballer', state='raw', env='dev')
-    client.create_bucket(Bucket=DEV_BUCKET)
+        branch='master', parent='bluth', child='cornballer', state='raw')
+    client.create_bucket(Bucket= ENV_BUCKET)
 
     t_file_old = tempfile.NamedTemporaryFile()
     t_file_old.write(b'Gobias some old coffee!')
     file_name_old = os.path.split(t_file_old.name)[1]
     output_contract.set_file_name(file_name_old)
-    client.upload_file(Bucket=DEV_BUCKET, Filename=t_file_old.name, Key=output_contract.get_key(
+    client.upload_file(Bucket=ENV_BUCKET, Filename= t_file_old.name, Key= output_contract.get_key(
     ), ExtraArgs={"Metadata": {"source_modified_time": str(n_time - time_delta)}})
-
+    
     t_file_new = tempfile.NamedTemporaryFile()
     t_file_new.write(b'Gobias some new coffee!')
     file_name_new = os.path.split(t_file_new.name)[1]
     output_contract.set_file_name(file_name_new)
-    client.upload_file(Bucket=DEV_BUCKET, Filename=t_file_new.name, Key=output_contract.get_key(
+    client.upload_file(Bucket=ENV_BUCKET, Filename= t_file_new.name, Key= output_contract.get_key(
     ), ExtraArgs={"Metadata": {"source_modified_time": str(n_time + time_delta)}})
-
+    
     return (t_file_old, t_file_new, output_contract, time_delta)
 
 
 @moto.mock_s3
-def test_push_to_s3_updated_file():
+@patch.object(ExtractTransform,'_validate_required_params')
+def test_push_to_s3_updated_file(mock_validate):
+    mock_validate.return_value=True
+
     params = s3_setup()
     extract = ExtractTransform()
     client = boto3.client('s3')
     extract.push_to_s3(tmp_dir=os.path.dirname(params[0].name),
                        output_contract=params[2])
     params[2].set_file_name(os.path.split(params[0].name)[1])
-    s3_time = float(client.head_object(Bucket=DEV_BUCKET, Key=params[2].get_key())[
+    s3_time = float(client.head_object(Bucket=ENV_BUCKET, Key=params[2].get_key())[
                     'Metadata']['source_modified_time'])
-
-    assert os.stat(params[0].name).st_mtime == s3_time
-
+    
+    assert os.stat(params[0].name).st_mtime == s3_time             
 
 @moto.mock_s3
-def test_push_to_s3_new_file():
+@patch.object(ExtractTransform,'_validate_required_params')
+def test_push_to_s3_new_file(mock_validate):
+    mock_validate.return_value=True
+
     params = s3_setup()
     extract = ExtractTransform()
     client = boto3.client('s3')
@@ -61,26 +67,29 @@ def test_push_to_s3_new_file():
     extract.push_to_s3(tmp_dir=os.path.dirname(t_file.name),
                        output_contract=params[2])
     params[2].set_file_name(os.path.split(t_file.name)[1])
-    s3_time = float(client.head_object(Bucket=DEV_BUCKET, Key=params[2].get_key())[
+    s3_time = float(client.head_object(Bucket=ENV_BUCKET, Key=params[2].get_key())[
                     'Metadata']['source_modified_time'])
-
+    
     assert os.stat(t_file.name).st_mtime == s3_time
 
 
 @moto.mock_s3
-def test_push_to_s3_not_if_older():
+@patch.object(ExtractTransform,'_validate_required_params')
+def test_push_to_s3_not_if_older(mock_validate):
+    mock_validate.return_value=True
+
     params = s3_setup()
     extract = ExtractTransform()
     client = boto3.client('s3')
     params[2].set_file_name(os.path.split(params[1].name)[1])
     s3_time_before = float(client.head_object(
-        Bucket=DEV_BUCKET, Key=params[2].get_key())['Metadata']['source_modified_time'])
+        Bucket=ENV_BUCKET, Key=params[2].get_key())['Metadata']['source_modified_time'])
     extract.push_to_s3(tmp_dir=os.path.dirname(params[1].name),
                        output_contract=params[2])
     params[2].set_file_name(os.path.split(params[1].name)[1])
     s3_time_after = float(client.head_object(
-        Bucket=DEV_BUCKET, Key=params[2].get_key())['Metadata']['source_modified_time'])
-
+        Bucket=ENV_BUCKET, Key=params[2].get_key())['Metadata']['source_modified_time'])
+    
     assert s3_time_after == s3_time_before
 
 
@@ -114,10 +123,7 @@ def test_file_needs_update_doesnt_exist():
 
 def test_extract_validate_params_bad():
     with pytest.raises(ValueError) as e:
-        output_contract = contract.Contract(
-            branch='master', parent='bluth', child='cornballer', state='raw', env='dev')
-        extract = ExtractTransform(
-            env="not-an-env", output_contract=output_contract)
+        extract = ExtractTransform()
         extract._validate_required_params()
 
     assert e.type == ValueError
@@ -125,31 +131,30 @@ def test_extract_validate_params_bad():
 
 def test_extract_validate_params_good():
     output_contract = contract.Contract(
-        branch='master', parent='bluth', child='cornballer', state='raw', env='dev')
+        branch='master', parent='bluth', child='cornballer',state='raw')
     transformation = C.Transformation()
-    extract = ExtractTransform(
-        env="dev", output_contract=output_contract, transform=transformation)
+    extract = ExtractTransform(output_contract=output_contract,transform=transformation)
     extract._validate_required_params()
 
 
 def test_set_env_good():
-    extract = ExtractTransform()
-    extract.set_env("dev")
+    extract =  ExtractTransform()
 
-    assert extract.env == "dev"
+    assert extract.env == ENVIRONMENT
 
 
+@patch("core.transforms.shared.raw.extract.ENVIRONMENT","Pretend-RSE")
 def test_set_env_bad():
     with pytest.raises(ValueError) as e:
         extract = ExtractTransform()
-        extract.set_env("not-an-env")
+        extract.set_env()
 
     assert e.type == ValueError
 
 
 def test_set_output_contract():
     output_contract = contract.Contract(
-        branch='master', parent='bluth', child='cornballer', state='raw', env='dev')
+        branch='master', parent='bluth', child='cornballer', state='raw')
     extract = ExtractTransform()
     extract.set_output_contract(output_contract)
 
