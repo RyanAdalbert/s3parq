@@ -159,11 +159,12 @@ class Contract(LoggerMixin):
         self._set_contract_type()
 
     def set_env(self)->None:
-        if ENVIRONMENT in (self.DEV, 'dev', 'development'):
+        env = ENVIRONMENT.lower()
+        if env in (self.DEV, 'dev', 'development'):
             self.env = self.DEV
-        elif ENVIRONMENT in (self.PROD, 'prod', 'production'):
+        elif env in (self.PROD, 'prod', 'production'):
             self.env = self.PROD
-        elif ENVIRONMENT in (self.UAT, 'uat'):
+        elif env in (self.UAT, 'uat'):
             self.env = self.UAT
         else:
             raise ValueError(f'{env} is not a valid environment.')

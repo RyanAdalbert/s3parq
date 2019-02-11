@@ -91,3 +91,5 @@ class ExtractTransform():
         for param in self.REQUIRED_PARAMS:
             if param not in self.__dict__.keys():
                 raise ValueError(f'{param} is a required value not set for ExtractTransform.')
+            elif self.__dict__.get(param) == None:
+                raise ValueError(f'{param} is a required value not set for ExtractTransform.')
