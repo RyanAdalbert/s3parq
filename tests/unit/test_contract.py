@@ -263,16 +263,15 @@ def test_publish_raw_metadata():
     client = _s3_mock_setup()
     contract = _contract_setup()
 
-    _file = tempfile.NamedTemporaryFile()
-    text = b"Here's some money. Go see a Star War"
-    _file.write(text)
-    f_time = os.stat(_file.name).st_mtime
-    _file.seek(0)
-    contract.publish_raw_file(_file.name)
-    _file.close()
+    with tempfile.NamedTemporaryFile() as _file:
+        text = b"Here's some money. Go see a Star War"
+        _file.write(text)
+        _file.seek(0)
+        contract.publish_raw_file(_file.name)
+        f_time = os.stat(_file.name).st_mtime
 
-    key = f'master/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
-    s3_client = boto3.client('s3')
-    meta = s3_client.get_object(
-        Bucket=f'{ENV_BUCKET}', Key=key)['Metadata']
-    assert meta['source_modified_time'] == str(f_time)
+        key = f'master/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
+        s3_client = boto3.client('s3')
+        meta = s3_client.get_object(
+            Bucket=f'{ENV_BUCKET}', Key=key)['Metadata']
+        assert meta['source_modified_time'] == str(f_time)

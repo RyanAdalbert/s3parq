@@ -176,8 +176,11 @@ class Contract(LoggerMixin):
                 branch_name = Repo(ProjectRoot().get_path()).active_branch.name
                 self.set_branch(branch_name)
             except:
-                raise ValueError(
-                    'Your git branch name cannot be used as a contract branch path.')
+                try:
+                    branch_name = os.environ['BRANCH_NAME']
+                    self.set_branch(branch_name)
+                except:
+                    raise ValueError(f'Your git branch name {branch_name} cannot be used as a contract branch path.')
 
     def _set_contract_type(self)->None:
         ''' INTENT: sets what type of contract this is - file, partition, or dataset
