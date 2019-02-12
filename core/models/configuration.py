@@ -21,10 +21,12 @@ class Session():
 
 
 class GenerateEngine:
-    """ abstract defining connections here. Local assumes a psql instance on the metal. """
+    """ abstract defining connections here. Local assumes a psql instance in a local docker container. """
 
-    def __init__(self, env: str, local: bool = False) -> None:
-        if local:
+    def __init__(self, in_memory: bool = False, local: bool = False) -> None:
+        if in_memory:
+            self.engine = self._in_memory_engine()
+        elif local:
             self.engine = self._local_engine()
         else:
             self.engine = self._secret_defined_engine()
@@ -32,12 +34,17 @@ class GenerateEngine:
     def get_engine(self) -> engine.base.Engine:
         return self.engine
 
+    def _in_memory_engine(self):
+        """ For testing and other cases where you don't want the db to persist and don't care about triggers etc, this is the way to go."""
+        return create_engine('sqlite://')
+
     def _local_engine(self) -> engine.base.Engine:
+        """ Local, persisting as long as the container lives. Great for testing real PG triggers etc."""
         return create_engine(DEV_CONFIGURATION_APPLICATION_CONN_STRING)
 
     def _secret_defined_engine(self) -> engine.base.Engine:
-        # TODO: in DC-57 update this to use secret
-         secret = Secret(env=ENVIRONMENT, 
+        """ creates a session connecting to the correct configuration_application db based on ENV."""
+        secret = Secret(env=ENVIRONMENT, 
                         name='configuration_application',
                         type_of='database',
                         mode='read'
@@ -48,8 +55,7 @@ class GenerateEngine:
             m = "Only postgres databases are supported for configuration_application at this time."
             logger.critical(m)
             raise NotImplementedError(m)
-        return conn_string
-            return create_engine()
+        return create_engine(conn_string)
 
 
 """Mixins
