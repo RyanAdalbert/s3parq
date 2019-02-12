@@ -18,6 +18,7 @@ services:
             - INITDB=y
             - AWS_ACCESS_KEY_ID
             - AWS_SECRET_ACCESS_KEY
+            - CONFIGURATION_APPLICATION_DATABASE_HOST=configurationpg
         volumes:
             - ./dags:/root/airflow/dags
             - .:/usr/src/app
@@ -40,6 +41,7 @@ services:
         environment:
             - AWS_ACCESS_KEY_ID
             - AWS_SECRET_ACCESS_KEY
+            - CONFIGURATION_APPLICATION_DATABASE_HOST=configurationpg
         volumes:
             - .:/usr/src/app
             - $HOME:/root
@@ -52,3 +54,15 @@ services:
             - "8081:8888"
         working_dir: /host
         command: /notebook-entrypoint.sh
+        depends_on:
+            -  configurationpg
+
+    configurationpg:
+        image: postgres:11.1
+        environment:
+            - POSTGRES_USER=configurator
+            - POSTGRES_PASSWORD=configurator
+            - POSTGRES_DB=configuration_application
+        ports: 
+            - "5432:5432"
+
