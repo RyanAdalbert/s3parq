@@ -46,11 +46,11 @@ class Test:
 
     def test_integration_docker(self):
         self.setup()
-        imageTag = "it_test"
+        tag_without_repo = "it_test"
         job_def_name = "core_it_test"
 
         #   1. Build the image
-        tag = self.core_docker.build_image(f"{DOCKER_REPO}:{imageTag}")
+        tag = self.core_docker.build_image(f"{DOCKER_REPO}:{tag_without_repo}")
         test_image = self.docker_client.images.get(tag)
 
         #   2. Log into ECR
@@ -73,13 +73,13 @@ class Test:
             imageIds=[
                 {
                     'imageDigest': digest_sha,
-                    'imageTag': imageTag
+                    'imageTag': tag_without_repo
                 }
             ]
         )
 
         # Make sure the image got pushed in a timely manner
-        assert imageTag in ecr_resp['imageDetails'][0]['imageTags']
+        assert tag_without_repo in ecr_resp['imageDetails'][0]['imageTags']
         time_since_image_pushed = datetime.now(timezone.utc) - ecr_resp['imageDetails'][0]['imagePushedAt']
         assert timedelta(minutes=5) > time_since_image_pushed
 

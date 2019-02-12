@@ -56,6 +56,9 @@ def get_aws_tag(tag: str, account_id: str) -> str:
 
 
 class CoreDocker(LoggerMixin):
+    # Note, that in this library the variable name "tag" comes from docker terms
+    # and contains both the repo name `ichain/core` and the branch (`prod`, `uat`, 
+    # `DC-123-something_great`).
 
     def __init__(self):
         self.p_root = ProjectRoot().get_path()
@@ -83,15 +86,13 @@ class CoreDocker(LoggerMixin):
         )]
         return tag
 
-    def remove_image(self,tag: str):
-        #Note to self: do we actually do anything with the images here? 
-        ###image = d_client.images.get(tag)
+    def remove_image(self, tag: str):
         response = self.d_api_client.remove_image(tag)
         return response
 
     def remove_ecr_image(self, tag: str, repo_name: str, account_id: str):
         self._ecr_login(account_id)
-        imageTag = ":".join(tag.split(':')[1:])
+        tag_without_repo = ":".join(tag.split(':')[1:])
         aws_tag = get_aws_tag(tag, account_id)
         image = self.d_client.images.get(aws_tag)
         repo_digest = image.attrs['RepoDigests'][0]
@@ -104,7 +105,7 @@ class CoreDocker(LoggerMixin):
             imageIds=[
                 {
                     'imageDigest': digest_sha,
-                    'imageTag': imageTag
+                    'imageTag': tag_without_repo
                 },
             ]
         )
@@ -120,7 +121,7 @@ class CoreDocker(LoggerMixin):
         response = self.d_api_client.push(aws_tag)
         return response
 
-    def _ecr_login(self,account_id: str):
+    def _ecr_login(self, account_id: str):
         """ logs docker into the ecr Registry using the given account id."""
         ecr_response = self.ecr_client.get_authorization_token(registryIds=[account_id])
         auth_data = ecr_response['authorizationData'][0]
@@ -185,7 +186,7 @@ class CoreDocker(LoggerMixin):
         )
         return response
 
-    def deregister_job_definition_set(self,job_def_name: str):
+    def deregister_job_definition_set(self, job_def_name: str):
         """De-register every revision of a job_def_name"""
         job_definitions_response = self.batch_client.describe_job_definitions(jobDefinitionName=job_def_name)
         
@@ -207,7 +208,7 @@ class CoreDocker(LoggerMixin):
         return response
 
 
-    def launch_batch_job(self,job_name: str, job_definition: str, job_queue: str, container_overrides: dict):
+    def launch_batch_job(self, job_name: str, job_definition: str, job_queue: str, container_overrides: dict):
         response = self.batch_client.submit_job(
             jobName=job_name,
             jobQueue=job_queue,
