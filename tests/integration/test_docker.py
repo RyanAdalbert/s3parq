@@ -6,6 +6,7 @@ from datetime import datetime, timezone, timedelta
 from docker.models.images import Image
 from docker.errors import ImageNotFound
 from core.helpers.docker import CoreDocker
+from core.helpers import docker as c_docker
 from botocore.exceptions import ClientError
 from core.constants import AWS_ACCOUNT, DOCKER_REPO, AWS_BATCH_TEST_JOB_QUEUE
 
@@ -59,7 +60,7 @@ class Test:
 
         #   3. Push the image to ECR
         self.core_docker.register_image(tag, DOCKER_REPO, AWS_ACCOUNT)
-        aws_tag = self.core_docker.get_aws_tag(tag, AWS_ACCOUNT)
+        aws_tag = c_docker.get_aws_tag(tag, AWS_ACCOUNT)
         test_ecr_image = self.docker_client.images.get(aws_tag)
         assert type(test_ecr_image) is Image
 
