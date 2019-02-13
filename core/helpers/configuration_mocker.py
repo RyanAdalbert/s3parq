@@ -9,8 +9,9 @@ class ConfigurationMocker(LoggerMixin):
         optionally gives you a bunch of mocked data.
     '''
 
-    def __init__(self, in_memory:bool =True, local:bool =True)-> None:
-        engine = config.GenerateEngine(in_memory=in_memory, local=local).get_engine()
+    def __init__(self, in_memory: bool = True, local: bool = True)-> None:
+        engine = config.GenerateEngine(
+            in_memory=in_memory, local=local).get_engine()
 
         # this instansiates the in-memory sqlite instance
         config.Base.metadata.create_all(engine)
@@ -80,7 +81,8 @@ class ConfigurationMocker(LoggerMixin):
               pipeline_type_id=1, run_frequency='daily'),
             p(id=2, name="bluth_profitability", brand_id=2,
               pipeline_type_id=2, run_frequency='hourly'),
-            p(id=3, name="temocil_profitablility", brand_id=1, pipeline_type_id=1, run_frequency='daily'),
+            p(id=3, name="temocil_profitablility", brand_id=1,
+              pipeline_type_id=1, run_frequency='daily'),
             p(id=500, name="bluth_banana_regression_deprecated", brand_id=2,
               pipeline_type_id=1, is_active=False, run_frequency='hourly')])
         self.session.commit()
