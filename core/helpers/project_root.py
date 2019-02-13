@@ -1,3 +1,4 @@
+
 from typing import Union, List
 import os
 import sys
@@ -18,7 +19,11 @@ class ProjectRoot:
         if os.path.isfile(os.path.abspath(os.path.normpath(path + os.path.sep + 'setup.py'))):
             return path
         elif path == '/':
-            raise Exception("Unable to determine project root: setup.py not found. Are you in Core?")
+            ## the airflow docker container is a special bird where /dags and the project root do not share parent paths
+            if os.path.isfile('/usr/src/app/setup.py'):
+                return '/usr/src/app'
+            else:
+                raise Exception("Unable to determine project root: setup.py not found. Are you in Core?")
 
         else:
             return self.find_setup_file(os.path.split(os.path.abspath(os.path.normpath(f)))[0])

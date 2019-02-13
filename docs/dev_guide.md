@@ -34,8 +34,13 @@ All pipelines need configurations. These range from the name of the client to th
 We manage these configurations via a configuration application, which in turn stores them in an RDMBS. To acces these configurations you use the [Configurations module](../core/models/configuration.py)
 
 You use [SQLAlchemy Sessions](https://docs.sqlalchemy.org/en/rel_1_2/orm/tutorial.html#querying) to query that class.
-In development it can be useful to get the functionality without setting up and migrating a database, so we have a helper class that builds an in-memory sqlite instance and can populate mock data. 
 
+~~In development it can be useful to get the functionality without setting up and migrating a database, so we have a helper class that builds an in-memory sqlite instance and can populate mock data.~~
+
+**UPDATED:** We now have the `SessionHelper` class. Just create an instance of SessionHelper and use that session - it handles environment configs and automatically mocks for dev environments. 
+
+
+If you do still need to make configuration mock manually, here's how:
     # using configurations
     from core.helpers.configuration_mocker import ConfigurationMocker as CMock
     import core.models.configuration as config
@@ -105,3 +110,24 @@ Note that env should be passed from some environment-aware variable.
 
 ### Corebot
 Corebot is another CLI interface. This is meant to be the "client" part to our "server" part, allowing a separate interface for what people should be calling vs. what processes should be calling. This should only be the entry point, with the guts of the processes still living in a component in standard core.
+
+
+## Pipeline Runs: an Airflow Story
+
+### DAG basics
+We use airflow to orchestrate our pipeline runs. The structure is only a single step hierarchy, with *Pipeline* == *DAG* and *Transformation* == *Task*. We do not use subdags. 
+To keep things logically simple we do not manifest the pipeline state (raw, ingest etc) in the hierarchy; however we respect the grouping of tasks by those states, ie raw tasks will always run before ingest tasks etc. 
+This is how we manage the transform DAG within a pipeline: 
+![DAG pipeline graphic](./assets/DAG.png)
+
+
+Dags (and tasks) are generated _dynamically_ based on the records in the configuration application. A single set of files [dag\_builder.py](../core/airflow/dagbuilder/dag_builder.py) and [task\_orchestrator.py](../core/airflow/task_orchestrator.py) are all the mechanics of this process, and they feed into [executor.py](../core/airflow/dags/executor.py) which simply exposes the generated DAGs to airflow in scope. 
+
+### Spacers
+To avoid adding sub-dags or structuring DAG chains from state to state, we use a grouping method for tasks that relies on **spacers**. By mathematical definition a DAG progresses to a singular outcome - which means multiple bi-directional dependencies on the same task break the DAG. To implement stepped dependencies, spacers allow for multiple sources to act as upstream deps for a single downstream target, which in turn acts as the upstream dep for multiple downstream targets. in the diagram above you can see each point where the DAG compresses to a single task, like the narrow point of a sideways hourglass. These single spacer tasks do not actually run any code (use the DummyOperator) but act to orchestrate the overall DAG flow.  
+
+
+### Testing Operators
+tasks are instances of operators. To test operators, use the [operator\_tester.py](../core/airflow/dags/operator_tester.py) dag - this will create a simple DAG for your operator that can be run manually from the airflow GUI. 
+
+

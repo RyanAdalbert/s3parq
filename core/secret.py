@@ -1,10 +1,10 @@
 import boto3
 import json
 import logging
-
+from core.logging import LoggerMixin
 from core.constants import ENVIRONMENT
 
-class Secret:
+class Secret(LoggerMixin):
     ''' Abstracts aws secretsmanager - values of the secret are callable attributes. ie:
             secret = Secret(name='hamburger', env='dev', type_of='database', mode='read')
             secret.password 
@@ -54,7 +54,7 @@ class Secret:
 
     def _get_secret(self, identifier: str, force_env: bool) -> str:
         # first look to see if the explicit secret exists
-        print(f"Secret identifier: {identifier}")
+        self.logger.debug(f"Secret idenditifier {identifier}.")
         try:
             raw_secret = self.client.get_secret_value(SecretId=identifier)
         except Exception as e:
