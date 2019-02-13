@@ -9,9 +9,8 @@ class ConfigurationMocker(LoggerMixin):
         optionally gives you a bunch of mocked data.
     '''
 
-    def __init__(self, in_memory: bool = True, local: bool = True)-> None:
-        engine = config.GenerateEngine(
-            in_memory=in_memory, local=local).get_engine()
+    def __init__(self)-> None:
+        engine = config.GenerateEngine().get_engine()
 
         # this instansiates the in-memory sqlite instance
         config.Base.metadata.create_all(engine)

@@ -1,7 +1,7 @@
 from sqlalchemy import engine, create_engine, Column, Integer, String, Boolean, TIMESTAMP, text, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import session, sessionmaker, relationship
-from core.constants import DEV_CONFIGURATION_APPLICATION_CONN_STRING
+from core.constants import DEV_CONFIGURATION_APPLICATION_CONN_STRING, ENVIRONMENT
 from core.secret import Secret
 Base = declarative_base()
 
@@ -19,30 +19,32 @@ class Session():
     def get_session(self) -> session.Session:
         return self.session
 
-
 class GenerateEngine:
     """ abstract defining connections here. Local assumes a psql instance in a local docker container. """
 
-    def __init__(self, in_memory: bool = False, local: bool = False) -> None:
-        if in_memory:
-            self.engine = self._in_memory_engine()
-        elif local:
-            self.engine = self._local_engine()
+    def __init__(self, in_memory:bool=True) -> None:
+        """ So the default development configuration database is an in-memory sqlite instance. 
+            This is fast and easy and atomic (resets after every execution) but it is NOT exactly the same as 
+            the prod PG instance. When we want an identical configuration environment, setting in_memory to False 
+            gives you the local docker container PG. """
+
+        if ENVIRONMENT == "dev":
+            if in_memory:
+                self._url = "sqlite://"
+            else:
+                self._url = DEV_CONFIGURATION_APPLICATION_CONN_STRING
         else:
-            self.engine = self._secret_defined_engine()
+            self._url = self._secret_defined_url()
+
+    @property
+    def url(self) -> str: 
+        return self._url
 
     def get_engine(self) -> engine.base.Engine:
-        return self.engine
+        engine = create_engine(self._url)
+        return engine
 
-    def _in_memory_engine(self):
-        """ For testing and other cases where you don't want the db to persist and don't care about triggers etc, this is the way to go."""
-        return create_engine('sqlite://')
-
-    def _local_engine(self) -> engine.base.Engine:
-        """ Local, persisting as long as the container lives. Great for testing real PG triggers etc."""
-        return create_engine(DEV_CONFIGURATION_APPLICATION_CONN_STRING)
-
-    def _secret_defined_engine(self) -> engine.base.Engine:
+    def _secret_defined_url(self) -> str:
         """ creates a session connecting to the correct configuration_application db based on ENV."""
         secret = Secret(env=ENVIRONMENT, 
                         name='configuration_application',
@@ -55,7 +57,7 @@ class GenerateEngine:
             m = "Only postgres databases are supported for configuration_application at this time."
             logger.critical(m)
             raise NotImplementedError(m)
-        return create_engine(conn_string)
+        return conn_string
 
 
 """Mixins
