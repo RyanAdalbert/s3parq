@@ -1,24 +1,23 @@
 import pytest
+from unittest.mock import patch
 from core.contract import Contract
 import boto3
 import tempfile
 from core.helpers.project_root import ProjectRoot
-from core.constants import DEV_BUCKET
+from core.constants import ENVIRONMENT, ENV_BUCKET
 import moto
 import os
 
-
 def test_set_env_valid():
     contract = Contract()
-    contract.set_env('dev')
-    assert contract.env == f'{DEV_BUCKET}', 'failed to set dev environment'
+    contract.set_env()
+    assert contract.env == f'{ENV_BUCKET}', 'failed to set to the current environment'
 
-
+@patch("core.contract.ENVIRONMENT","Pretend-RSE")
 def test_set_env_invalid():
-    contract = Contract()
-
     with pytest.raises(ValueError):
-        contract.set_env('Merck')
+        contract = Contract()
+        contract.set_env()
 
 
 def test_get_s3_path_not_empty():
@@ -31,7 +30,6 @@ def test_get_s3_path_not_empty():
 def _contract():
     contract = Contract()
     contract.set_branch('master')
-    contract.set_env('dev')
     contract.set_parent('Merck')
     contract.set_child('Wonder_Drug')
     contract.set_state('ingest')
@@ -43,14 +41,14 @@ def test_dataset_only(_contract):
     contract = _contract
     path = contract.get_s3_path()
 
-    assert path == f's3://{DEV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/', 'path was incorrectly built.'
+    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/', 'path was incorrectly built.'
 
 
 def test_with_partitions(_contract):
     contract = _contract
     contract.set_partitions(['partition_1', 'partition_2'])
     path = contract.get_s3_path()
-    assert path == f's3://{DEV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/', 'path was incorrectly built with partitions.'
+    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/', 'path was incorrectly built with partitions.'
 
 
 def test_with_file_name_with_partitions(_contract):
@@ -58,7 +56,7 @@ def test_with_file_name_with_partitions(_contract):
     contract.set_file_name('29980385023509.parquet')
     contract.set_partitions(['partition_1', 'partition_2'])
     path = contract.get_s3_path()
-    assert path == f's3://{DEV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/29980385023509.parquet', 'path was incorrectly built with partitions.'
+    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/29980385023509.parquet', 'path was incorrectly built with partitions.'
 
 
 def test_file_name_no_partitions(_contract):
@@ -66,20 +64,19 @@ def test_file_name_no_partitions(_contract):
     contract.partitions = []  # hack to jump around the 0 len guard
     contract.set_file_name('29980385023509.parquet')
     path = contract.get_s3_path()
-    assert path == f's3://{DEV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/29980385023509.parquet', 'path was incorrectly built without partitions and with file name.'
+    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/29980385023509.parquet', 'path was incorrectly built without partitions and with file name.'
 
 
 def test_quick_set(_contract):
     contract = _contract
     contract = Contract(branch='master',
-                        env='dev',
                         parent='Merck',
                         child='Wonder_Drug',
                         state='ingest',
                         dataset='valid_dataset')
 
     assert contract.get_branch() == 'master', 'failed to set branch'
-    assert contract.get_env() == f'{DEV_BUCKET}', 'failed to set env'
+    assert contract.get_env() == f'{ENV_BUCKET}', 'failed to set env'
     assert contract.get_parent() == 'merck', 'failed to set parent'
     assert contract.get_child() == 'wonder_drug', 'failed to set parent'
     assert contract.get_state() == 'ingest', 'failed to set parent'
@@ -141,7 +138,6 @@ def test_set_invalid_file_name(_file_names):
 @pytest.fixture
 def _contract_type():
     contract = Contract(branch='master',
-                        env='dev',
                         parent='Merck',
                         child='Wonder_Drug',
                         state='ingest'
@@ -217,24 +213,25 @@ def test_get_partition_size():
 
 def _s3_mock_setup():
     s3_client = boto3.client('s3')
-    s3_client.create_bucket(Bucket=f'{DEV_BUCKET}')
+    s3_client.create_bucket(Bucket=f'{ENV_BUCKET}')
     return s3_client
+
 
 def _contract_setup():
     contract = Contract()
     contract = Contract(branch='master',
-                        env='dev',
                         parent='Merck',
                         child='Wonder_Drug',
                         state='raw'
                         )
     return contract
 
+
 @moto.mock_s3()
 def test_publish_raw_valid():
     client = _s3_mock_setup()
     contract = _contract_setup()
-    #_s3_mock_setup()
+    # _s3_mock_setup()
     _file = tempfile.NamedTemporaryFile()
     text = b"Here's some money. Go see a Star War"
     _file.write(text)
@@ -245,8 +242,9 @@ def test_publish_raw_valid():
     key = f'master/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
     s3_client = boto3.client('s3')
     body = s3_client.get_object(
-        Bucket=f'{DEV_BUCKET}', Key=key)['Body'].read()
+        Bucket=f'{ENV_BUCKET}', Key=key)['Body'].read()
     assert body == text
+
 
 @moto.mock_s3()
 def test_publish_raw_invalid():
@@ -263,6 +261,7 @@ def test_publish_raw_invalid():
         contract.publish_raw_file(_file.name)
     _file.close()
 
+
 @moto.mock_s3()
 def test_publish_raw_metadata():
     client = _s3_mock_setup()
@@ -278,5 +277,5 @@ def test_publish_raw_metadata():
         key = f'master/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
         s3_client = boto3.client('s3')
         meta = s3_client.get_object(
-            Bucket=f'{DEV_BUCKET}', Key=key)['Metadata']
+            Bucket=f'{ENV_BUCKET}', Key=key)['Metadata']
         assert meta['source_modified_time'] == str(f_time)

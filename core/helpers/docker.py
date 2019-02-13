@@ -2,11 +2,63 @@ import boto3
 import docker
 import base64
 import os
-from core.constants import AWS_ACCOUNT, AWS_REGION
+from core.constants import AWS_ACCOUNT, AWS_REGION, DEV_AWS_ACCOUNT, PROD_AWS_ACCOUNT, DOCKER_REPO
 from core.helpers.project_root import ProjectRoot
 from core.logging import LoggerMixin
+from git import Repo
+
+# In jenkins there isn't a branch name since the code is checked out via
+# commit hash, the work-around is to use the BRANCH_NAME env var that
+# Jenkins sets.
+def get_branch_name():
+    repo = Repo('.')
+    try:
+        return repo.active_branch.name
+    except:
+        return os.environ['BRANCH_NAME']
+
+def get_core_tag(environment: str):
+    if environment == 'local':
+        branch_name = get_branch_name()
+        return f"{DOCKER_REPO}:{branch_name}"
+    elif environment == 'uat':
+        return f"{DOCKER_REPO}:uat"
+    elif environment == 'prod':
+        return f"{DOCKER_REPO}:prod"
+    else:
+        raise Exception(f"Can't create a core tag for environment {environment}")
+
+
+def get_core_job_def_name(environment: str):
+    if environment == 'local':
+        branch_name = get_branch_name()
+        return f"core_{branch_name}"
+    elif environment == 'uat':
+        return "core_uat"
+    elif environment == 'prod':
+        return "core_prod"    
+    else:
+        raise Exception(f"Can't create a core tag job definition name for environment {environment}")
+
+def get_aws_account(environment: str):
+    if environment == 'local':
+        return DEV_AWS_ACCOUNT
+    elif environment == 'uat':
+        return PROD_AWS_ACCOUNT
+    elif environment == 'prod':
+        return PROD_AWS_ACCOUNT
+    else:
+        raise Exception(f"Can't find an AWS account id for environment {environment}")
+
+def get_aws_tag(tag: str, account_id: str) -> str:
+    """ returns the url for the aws repository. """
+    return f"{account_id}.dkr.ecr.{AWS_REGION}.amazonaws.com/{tag}"
+
 
 class CoreDocker(LoggerMixin):
+    # Note, that in this library the variable name "tag" comes from docker terms
+    # and contains both the repo name `ichain/core` and the branch (`prod`, `uat`, 
+    # `DC-123-something_great`).
 
     def __init__(self):
         self.p_root = ProjectRoot().get_path()
@@ -24,26 +76,25 @@ class CoreDocker(LoggerMixin):
     def _build_docker_client(self) -> docker.DockerClient:
         return docker.DockerClient(base_url='unix://var/run/docker.sock')
 
-    def build_image(self, full_tag: str) -> str:
+    def build_image(self, tag: str) -> str:
         """ builds and tags an image of the current state of the repo."""
         d_client = self._build_docker_api_client()
         #TODO: Need to figure out a way to see see that this image didn't fail building
+        self.logger.debug(f"Building {tag} from {self.CORE_DOCKERFILE_LOCATION} with context {self.p_root}")
         response = [line for line in d_client.build(
-            path=self.p_root, dockerfile=self.CORE_DOCKERFILE_LOCATION, rm=True, tag=full_tag
+            path=self.p_root, dockerfile=self.CORE_DOCKERFILE_LOCATION, rm=True, tag=tag
         )]
-        return full_tag
+        return tag
 
-    def remove_image(self,full_tag: str):
-        #Note to self: do we actually do anything with the images here? 
-        ###image = d_client.images.get(full_tag)
-        response = self.d_api_client.remove_image(full_tag)
+    def remove_image(self, tag: str):
+        response = self.d_api_client.remove_image(tag)
         return response
 
-    def remove_ecr_image(self,tag: str, repo_name: str, account_id: str):
+    def remove_ecr_image(self, tag: str, repo_name: str, account_id: str):
         self._ecr_login(account_id)
-        full_tag = f"{repo_name}:{tag}"
-        ecr_tagged_image_name = self.get_aws_repository(full_tag, account_id)
-        image = self.d_client.images.get(ecr_tagged_image_name)
+        tag_without_repo = ":".join(tag.split(':')[1:])
+        aws_tag = get_aws_tag(tag, account_id)
+        image = self.d_client.images.get(aws_tag)
         repo_digest = image.attrs['RepoDigests'][0]
         digest_sha = repo_digest.split("@")[-1]
 
@@ -54,23 +105,23 @@ class CoreDocker(LoggerMixin):
             imageIds=[
                 {
                     'imageDigest': digest_sha,
-                    'imageTag': tag
+                    'imageTag': tag_without_repo
                 },
             ]
         )
         # remove the local image
-        self.d_api_client.remove_image(ecr_tagged_image_name)
+        self.d_api_client.remove_image(aws_tag)
         return response
 
-    def register_image(self,tag: str, repo_name: str, account_id: str):
-        full_tag = f"{repo_name}:{tag}"
-        repo = self.get_aws_repository(full_tag, account_id)
+    def register_image(self, tag: str, repo_name: str, account_id: str):
+        repo_name = tag.split(':')[0]
+        aws_tag = get_aws_tag(tag, account_id)
         self._ecr_login(account_id)
-        self.d_api_client.tag(full_tag, repo)
-        response = self.d_api_client.push(repo)
+        self.d_api_client.tag(tag, aws_tag)
+        response = self.d_api_client.push(aws_tag)
         return response
 
-    def _ecr_login(self,account_id: str):
+    def _ecr_login(self, account_id: str):
         """ logs docker into the ecr Registry using the given account id."""
         ecr_response = self.ecr_client.get_authorization_token(registryIds=[account_id])
         auth_data = ecr_response['authorizationData'][0]
@@ -94,9 +145,6 @@ class CoreDocker(LoggerMixin):
         ecr_describe_response = self.ecr_client.describe_repositories(registryId=account_id, maxResults=1)
         return docker_response
 
-    def get_aws_repository(self,full_tag: str, account_id: str) -> str:
-        """ returns the url for the aws repository. """
-        return f"{account_id}.dkr.ecr.{AWS_REGION}.amazonaws.com/{full_tag}"
 
     def register_job_definition(self,
         job_def_name: str,
@@ -138,7 +186,7 @@ class CoreDocker(LoggerMixin):
         )
         return response
 
-    def deregister_job_definition_set(self,job_def_name: str):
+    def deregister_job_definition_set(self, job_def_name: str):
         """De-register every revision of a job_def_name"""
         job_definitions_response = self.batch_client.describe_job_definitions(jobDefinitionName=job_def_name)
         
@@ -160,7 +208,7 @@ class CoreDocker(LoggerMixin):
         return response
 
 
-    def launch_batch_job(self,job_name: str, job_definition: str, job_queue: str, container_overrides: dict):
+    def launch_batch_job(self, job_name: str, job_definition: str, job_queue: str, container_overrides: dict):
         response = self.batch_client.submit_job(
             jobName=job_name,
             jobQueue=job_queue,
@@ -168,3 +216,4 @@ class CoreDocker(LoggerMixin):
             containerOverrides=container_overrides
         )
         return response
+

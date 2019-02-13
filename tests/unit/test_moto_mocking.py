@@ -9,6 +9,7 @@ import moto
 import pytest
 from core.constants import AWS_REGION
 
+
 @moto.mock_s3
 def test_s3_is_working():
     conn = boto3.resource('s3', region_name=AWS_REGION, aws_access_key_id="this_is_not_a_real_id",

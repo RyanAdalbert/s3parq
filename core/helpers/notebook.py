@@ -7,7 +7,7 @@ from core import contract
 
 root = project_root.ProjectRoot()
 
-def run_transform(env: str, id: int, input_contract: str, output_contract: str, name: str ="shared.raw.extract") -> str:
+def run_transform(id: int, input_contract: str, output_contract: str, name: str ="shared.raw.extract") -> str:
     # First you would look up the ID and get the name of the transform so you
     # know what notebook to run. Once the core transform code has been finalized and
     # you can reach out to a db to pull the name this hard-coding will be replaced.
@@ -18,7 +18,7 @@ def run_transform(env: str, id: int, input_contract: str, output_contract: str, 
     pm.execute_notebook(
        path,
        output_s3_path,
-       parameters = dict(id=id, input_contract=input_contract, output_contract=output_contract, env=env),
+       parameters = dict(id=id, input_contract=input_contract, output_contract=output_contract),
        cwd=root.get_path()
     )
 
@@ -34,9 +34,8 @@ def output_url(output_path: str) -> str:
     url_prefix = "http://notebook.integrichain.net/view"
     return output_path.replace(s3_prefix, url_prefix)
 
-def get_contract(env, state, branch, parent, child):
-    kontract = contract.Contract(env=env,
-                                 state=state,
+def get_contract(state, branch, parent, child):
+    kontract = contract.Contract(state=state,
                                  branch=branch,
                                  parent=parent,
                                  child=child

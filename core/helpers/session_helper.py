@@ -23,3 +23,6 @@ class SessionHelper:
     def session(self)-> Session:
         return self._session
 
+    @session.setter
+    def session(self,session)->None:
+        raise ValueError("session cannot be explicitly set in session_helper.")

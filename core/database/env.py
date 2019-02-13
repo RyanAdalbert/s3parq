@@ -2,9 +2,12 @@ from __future__ import with_statement
 
 from logging.config import fileConfig
 
+from sqlalchemy import create_engine
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from core.models.configuration import Base
+from core.secret import Secret
+from core.constants import ENVIRONMENT
 from alembic import context
 
 # this is the Alembic Config object, which provides
@@ -26,6 +29,24 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+def create_conn_string_from_secret():
+    """ builds the appropriate db string based on ENV - specific secret.
+        For dev uses the value in alembic.ini."""
+    if ENVIRONMENT == "dev":
+        return config.get_main_option("sqlalchemy.url")
+
+    secret = Secret(env=ENVIRONMENT, 
+                    name='configuration_application',
+                    type_of='database',
+                    mode='read'
+                    )
+    if secret.rdbms == "postgres":
+        conn_string = f"postgresql://{secret.user}:{secret.password}@{host}/{database}"
+    else:
+        m = "Only postgres databases are supported for configuration_application at this time."
+        logger.critical(m)
+        raise NotImplementedError(m)
+    return conn_string
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
@@ -39,7 +60,7 @@ def run_migrations_offline():
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = create_conn_string_from_secret()    
     context.configure(
         url=url, target_metadata=target_metadata, literal_binds=True
     )
@@ -55,11 +76,7 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    connectable = create_engine(create_conn_string_from_secret())
 
     with connectable.connect() as connection:
         context.configure(

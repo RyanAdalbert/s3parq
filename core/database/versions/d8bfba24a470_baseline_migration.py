@@ -118,6 +118,7 @@ def upgrade():
     sa.Column('filesystem_path', sa.String(), nullable=True),
     sa.Column('prefix', sa.String(), nullable=True),
     sa.Column('secret_name', sa.String(), nullable=False),
+    sa.Column('secret_type_of', sa.String(), nullable=False),
     sa.ForeignKeyConstraint(['transformation_id'], ['transformations.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

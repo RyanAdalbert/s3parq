@@ -1,6 +1,6 @@
 ##TODO: env should ideally set these
 ENVIRONMENT: dev
-ENV_BUCKET: ichain-development
+ENV_BUCKET: ichain-dev
 
 ## constants
 DOCKER_REPO: ichain/core
