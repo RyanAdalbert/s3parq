@@ -11,7 +11,7 @@ from git import Repo
 # commit hash, the work-around is to use the BRANCH_NAME env var that
 # Jenkins sets.
 def get_branch_name():
-    repo = Repo('.')
+    repo = Repo(ProjectRoot().get_path())
     try:
         return repo.active_branch.name
     except:
