@@ -124,7 +124,9 @@ class Pipeline(UniversalWithPrimary, Base):
     brand_id = Column(Integer, ForeignKey('brands.id'), nullable=False)
     brand = relationship("Brand", back_populates="pipelines")
     run_frequency = Column(String)
+    description = Column(String)
     pipeline_states = relationship("PipelineState", back_populates='pipeline')
+
 
 
 class PipelineState(UniversalWithPrimary, Base):
