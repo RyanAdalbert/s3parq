@@ -1,10 +1,16 @@
 import pytest
 from core.helpers import docker
 from git import Repo
+from core.helpers.project_root import ProjectRoot
+import os
 
 class Test():
     def setup(self):
-        self.branch_name = Repo('.').active_branch.name
+        repo = Repo(ProjectRoot().get_path())
+        try:
+            self.branch_name =  repo.active_branch.name
+        except:
+            self.branch_name =  os.environ['BRANCH_NAME']
 
     def test_get_core_tag(self):
         self.setup()

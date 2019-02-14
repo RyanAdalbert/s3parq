@@ -5,7 +5,8 @@ from sqlalchemy.orm.session import Session
 from core.helpers.project_root import ProjectRoot
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 import core.models.configuration as config
-from core.helpers.s3_naming_helper import S3NamingHelper
+from core.helpers.session_helper import SessionHelper
+from core.helpers.s3_naming_helper import S3NamingHelper 
 from core.helpers.file_mover import FileMover, FileDestination
 from core.helpers.session_helper import SessionHelper
 
@@ -178,3 +179,31 @@ def test_get_file_type(paramiko_trans, paramiko_sftp):
     fd = [FileDestination(regex="n^", file_type="none")]
     ft = fm.get_file_type(test_file, fd)
     assert ft, "dont_move"
+
+## SessionHelper
+
+@patch("core.helpers.session_helper.config")
+@patch("core.helpers.session_helper.CMock")
+@patch("core.helpers.session_helper.ENVIRONMENT","prod")
+def test_session_helper_prod(mock_cmock, mock_config):
+    session = SessionHelper().session
+    assert mock_config.GenerateEngine.called
+    assert mock_config.Session.called
+    assert not mock_cmock.called
+
+@patch("core.helpers.session_helper.config")
+@patch("core.helpers.session_helper.CMock")
+@patch("core.helpers.session_helper.ENVIRONMENT","uat")
+def test_session_helper_uat(mock_cmock, mock_config):
+    session = SessionHelper().session
+    assert mock_config.GenerateEngine.called
+    assert mock_config.Session.called
+    assert not mock_cmock.called
+
+@patch("core.helpers.session_helper.config")
+@patch("core.helpers.session_helper.CMock")
+@patch("core.helpers.session_helper.ENVIRONMENT","dev")
+def test_session_helper_dev(mock_cmock, mock_config):
+    session = SessionHelper().session
+    assert not mock_config.GenerateEngine.called
+    assert mock_cmock.called
