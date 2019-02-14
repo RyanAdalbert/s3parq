@@ -20,7 +20,7 @@ services:
             - AWS_SECRET_ACCESS_KEY
             - CONFIGURATION_APPLICATION_DATABASE_HOST=configurationpg
         volumes:
-            - ./dags:/root/airflow/dags
+            - ./core/airflow/dags:/root/airflow/dags
             - .:/usr/src/app
             - $HOME:/root
             - /var/run/docker.sock:/var/run/docker.sock
