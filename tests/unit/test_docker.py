@@ -1,10 +1,11 @@
 import pytest
 from core.helpers import docker
 from git import Repo
+from core.helpers.project_root import ProjectRoot
 
 class Test():
     def setup(self):
-        self.branch_name = Repo('.').active_branch.name
+        self.branch_name = Repo(ProjectRoot().get_path()).active_branch.name
 
     def test_get_core_tag(self):
         self.setup()
