@@ -1,7 +1,7 @@
 import click
 from core.helpers import notebook
 from core.helpers import docker as c_docker
-from core.constants import DOCKER_REPO
+from core.constants import DOCKER_REPO, ENVIRONMENT
 from docker.errors import ImageNotFound
 from core.logging import get_logger
 
@@ -20,12 +20,11 @@ def add(a, b):
 
 
 @cli.command()
-@click.argument('env', type=click.Choice(['local', 'uat', 'prod']))
-def publish(env):
+def publish():
     core_docker = c_docker.CoreDocker()
-    tag = c_docker.get_core_tag(env)
-    job_def_name = c_docker.get_core_job_def_name(env)
-    aws_account_id = c_docker.get_aws_account(env)
+    tag = c_docker.get_core_tag()
+    job_def_name = c_docker.get_core_job_def_name()
+    aws_account_id = c_docker.get_aws_account()
     aws_tag = c_docker.get_aws_tag(tag, aws_account_id)
     job_role_arn = f"arn:aws:iam::{aws_account_id}:role/ecs-tasks"
 
@@ -33,17 +32,21 @@ def publish(env):
     core_docker.build_image(tag)
     core_docker.register_image(tag, DOCKER_REPO, aws_account_id)
 
-    logger.info(f"Registering AWS Batch job definition {job_def_name} that depnds on image {tag}")
+    logger.info(f"Registering AWS Batch job definition {job_def_name} that depends on image {tag}")
     core_docker.register_job_definition(job_def_name, aws_tag, job_role_arn)
 
 
+# This command scares me a bit, might need to have better guards against
+# deleting all uat / production images / jobs.
 @cli.command()
-@click.argument('env', type=click.Choice(['local']))
-def tidy(env):
+def tidy():
+    if ENVIRONMENT != "dev":
+        logger.warn(f"Can't run tidy in {ENVIRONMENT}.")
+        return None
     core_docker = c_docker.CoreDocker()
-    aws_account_id = c_docker.get_aws_account(env)
-    tag = c_docker.get_core_tag(env)
-    job_def_name = c_docker.get_core_job_def_name(env)
+    aws_account_id = c_docker.get_aws_account()
+    tag = c_docker.get_core_tag()
+    job_def_name = c_docker.get_core_job_def_name()
 
     logger.info(f"Deregistering all revisions of {job_def_name}")
     core_docker.deregister_job_definition_set(job_def_name)

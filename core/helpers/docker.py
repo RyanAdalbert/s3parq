@@ -2,7 +2,7 @@ import boto3
 import docker
 import base64
 import os
-from core.constants import AWS_ACCOUNT, AWS_REGION, DEV_AWS_ACCOUNT, PROD_AWS_ACCOUNT, DOCKER_REPO
+from core.constants import AWS_ACCOUNT, AWS_REGION, DEV_AWS_ACCOUNT, PROD_AWS_ACCOUNT, DOCKER_REPO, ENVIRONMENT
 from core.helpers.project_root import ProjectRoot
 from core.logging import LoggerMixin
 from git import Repo
@@ -17,38 +17,39 @@ def get_branch_name():
     except:
         return os.environ['BRANCH_NAME']
 
-def get_core_tag(environment: str):
-    if environment == 'local':
+def get_core_tag():
+    print(ENVIRONMENT)
+    if ENVIRONMENT == 'dev':
         branch_name = get_branch_name()
         return f"{DOCKER_REPO}:{branch_name}"
-    elif environment == 'uat':
+    elif ENVIRONMENT == 'uat':
         return f"{DOCKER_REPO}:uat"
-    elif environment == 'prod':
+    elif ENVIRONMENT == 'prod':
         return f"{DOCKER_REPO}:prod"
     else:
-        raise Exception(f"Can't create a core tag for environment {environment}")
+        raise Exception(f"Can't create a core tag for environment {ENVIRONMENT}")
 
 
-def get_core_job_def_name(environment: str):
-    if environment == 'local':
+def get_core_job_def_name():
+    if ENVIRONMENT == 'dev':
         branch_name = get_branch_name()
         return f"core_{branch_name}"
-    elif environment == 'uat':
+    elif ENVIRONMENT == 'uat':
         return "core_uat"
-    elif environment == 'prod':
+    elif ENVIRONMENT == 'prod':
         return "core_prod"    
     else:
-        raise Exception(f"Can't create a core tag job definition name for environment {environment}")
+        raise Exception(f"Can't create a core tag job definition name for environment {ENVIRONMENT}")
 
-def get_aws_account(environment: str):
-    if environment == 'local':
+def get_aws_account():
+    if ENVIRONMENT == 'dev':
         return DEV_AWS_ACCOUNT
-    elif environment == 'uat':
+    elif ENVIRONMENT == 'uat':
         return PROD_AWS_ACCOUNT
-    elif environment == 'prod':
+    elif ENVIRONMENT == 'prod':
         return PROD_AWS_ACCOUNT
     else:
-        raise Exception(f"Can't find an AWS account id for environment {environment}")
+        raise Exception(f"Can't find an AWS account id for environment {ENVIRONMENT}")
 
 def get_aws_tag(tag: str, account_id: str) -> str:
     """ returns the url for the aws repository. """
@@ -109,7 +110,7 @@ class CoreDocker(LoggerMixin):
                 },
             ]
         )
-        # remove the local image
+        # remove the dev image
         self.d_api_client.remove_image(aws_tag)
         return response
 
