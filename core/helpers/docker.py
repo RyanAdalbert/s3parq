@@ -18,7 +18,6 @@ def get_branch_name():
         return os.environ['BRANCH_NAME']
 
 def get_core_tag():
-    print(ENVIRONMENT)
     if ENVIRONMENT == 'dev':
         branch_name = get_branch_name()
         return f"{DOCKER_REPO}:{branch_name}"
