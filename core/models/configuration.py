@@ -1,7 +1,8 @@
 from sqlalchemy import engine, create_engine, Column, Integer, String, Boolean, TIMESTAMP, text, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import session, sessionmaker, relationship
-
+from core.constants import DEV_CONFIGURATION_APPLICATION_CONN_STRING, ENVIRONMENT
+from core.secret import Secret
 Base = declarative_base()
 
 
@@ -18,25 +19,45 @@ class Session():
     def get_session(self) -> session.Session:
         return self.session
 
-
 class GenerateEngine:
-    """ abstract defining connections here. Local assumes a psql instance on the metal. """
+    """ abstract defining connections here. Local assumes a psql instance in a local docker container. """
 
-    def __init__(self, env: str, local: bool = False) -> None:
-        if local:
-            self.engine = self._local_engine()
+    def __init__(self, in_memory:bool=True) -> None:
+        """ So the default development configuration database is an in-memory sqlite instance. 
+            This is fast and easy and atomic (resets after every execution) but it is NOT exactly the same as 
+            the prod PG instance. When we want an identical configuration environment, setting in_memory to False 
+            gives you the local docker container PG. """
+
+        if ENVIRONMENT == "dev":
+            if in_memory:
+                self._url = "sqlite://"
+            else:
+                self._url = DEV_CONFIGURATION_APPLICATION_CONN_STRING
         else:
-            self.engine = self._secret_defined_engine()
+            self._url = self._secret_defined_url()
+
+    @property
+    def url(self) -> str: 
+        return self._url
 
     def get_engine(self) -> engine.base.Engine:
-        return self.engine
+        engine = create_engine(self._url)
+        return engine
 
-    def _local_engine(self) -> engine.base.Engine:
-        return create_engine('postgresql://configurator:configurator@localhost/configuration_application')
-
-    def _secret_defined_engine(self) -> engine.base.Engine:
-        # TODO: in DC-57 update this to use secret
-        pass
+    def _secret_defined_url(self) -> str:
+        """ creates a session connecting to the correct configuration_application db based on ENV."""
+        secret = Secret(env=ENVIRONMENT, 
+                        name='configuration_application',
+                        type_of='database',
+                        mode='read'
+                        )
+        if secret.rdbms == "postgres":
+            conn_string = f"postgresql://{secret.user}:{secret.password}@{host}/{database}"
+        else:
+            m = "Only postgres databases are supported for configuration_application at this time."
+            logger.critical(m)
+            raise NotImplementedError(m)
+        return conn_string
 
 
 """Mixins
@@ -103,7 +124,9 @@ class Pipeline(UniversalWithPrimary, Base):
     brand_id = Column(Integer, ForeignKey('brands.id'), nullable=False)
     brand = relationship("Brand", back_populates="pipelines")
     run_frequency = Column(String)
+    description = Column(String)
     pipeline_states = relationship("PipelineState", back_populates='pipeline')
+
 
 
 class PipelineState(UniversalWithPrimary, Base):

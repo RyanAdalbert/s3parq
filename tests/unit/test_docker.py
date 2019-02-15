@@ -2,9 +2,9 @@ import pytest
 from core.helpers import docker
 from git import Repo
 import os
-import core.constants as core_constants
 from typing import Callable
 from unittest.mock import patch
+from core.helpers.project_root import ProjectRoot
 
 def with_env(env: str, module: str, f: Callable):
     @patch(f"{module}.ENVIRONMENT", env)
@@ -15,8 +15,11 @@ def with_env(env: str, module: str, f: Callable):
 class Test():
     def setup(self):
         self.module = "core.helpers.docker"
-        self.starting_env = core_constants.ENVIRONMENT
-        self.branch_name = Repo('.').active_branch.name
+        repo = Repo(ProjectRoot().get_path())
+        try:
+            self.branch_name =  repo.active_branch.name
+        except:
+            self.branch_name =  os.environ['BRANCH_NAME']
 
     def test_get_core_tag(self):
         self.setup()

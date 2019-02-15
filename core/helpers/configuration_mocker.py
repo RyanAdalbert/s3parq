@@ -10,9 +10,7 @@ class ConfigurationMocker(LoggerMixin):
     '''
 
     def __init__(self)-> None:
-        # TODO: migrate to local postgres instance
-        engine = create_engine('sqlite://')
-        #engine = config.GenerateEngine(env='dev', local=True).get_engine()
+        engine = config.GenerateEngine().get_engine()
 
         # this instansiates the in-memory sqlite instance
         config.Base.metadata.create_all(engine)
@@ -82,7 +80,8 @@ class ConfigurationMocker(LoggerMixin):
               pipeline_type_id=1, run_frequency='daily'),
             p(id=2, name="bluth_profitability", brand_id=2,
               pipeline_type_id=2, run_frequency='hourly'),
-            p(id=3, name="temocil_profitablility", brand_id=1, pipeline_type_id=1, run_frequency='daily'),
+            p(id=3, name="temocil_profitablility", brand_id=1,
+              pipeline_type_id=1, run_frequency='daily'),
             p(id=500, name="bluth_banana_regression_deprecated", brand_id=2,
               pipeline_type_id=1, is_active=False, run_frequency='hourly')])
         self.session.commit()
