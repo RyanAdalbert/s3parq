@@ -7,7 +7,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from core.models.configuration import Base, GenerateEngine
 from core.secret import Secret
-from core.constants import ENVIRONMENT
+from core.constants import ENVIRONMENT, DEV_CONFIGURATION_APPLICATION_CONN_STRING
 from alembic import context
 
 # this is the Alembic Config object, which provides
@@ -29,6 +29,7 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
@@ -41,7 +42,10 @@ def run_migrations_offline():
     script output.
 
     """
-    url = GenerateEngine().url    
+    if ENVIRONMENT == 'dev':
+        url = DEV_CONFIGURATION_APPLICATION_CONN_STRING
+    else:
+        url = GenerateEngine.url
     context.configure(
         url=url, target_metadata=target_metadata, literal_binds=True
     )
@@ -57,7 +61,11 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    connectable = GenerateEngine().get_engine()
+    if ENVIRONMENT == 'dev':
+        connectable = create_engine(DEV_CONFIGURATION_APPLICATION_CONN_STRING)
+    else:
+        connectable = GenerateEngine().get_engine()
+
     with connectable.connect() as connection:
         context.configure(
             connection=connection, target_metadata=target_metadata
