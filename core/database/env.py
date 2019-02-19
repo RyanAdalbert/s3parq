@@ -63,7 +63,6 @@ def run_migrations_online():
     """
     if ENVIRONMENT == 'dev':
         connectable = create_engine(DEV_CONFIGURATION_APPLICATION_CONN_STRING)
-
     else:
         connectable = GenerateEngine().get_engine()
 
