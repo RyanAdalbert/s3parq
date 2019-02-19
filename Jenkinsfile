@@ -34,6 +34,8 @@ node {
         }
     }
     stage ('Cleanup') {
-        sh "script/ci_shell 'corecli tidy local'"
+        // Jenkins will need to be able to talk to the sandbox account in order to run the 
+        // tidy local command.
+        // sh "script/ci_shell 'corecli tidy local'"
     }
 }

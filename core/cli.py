@@ -1,7 +1,7 @@
 import click
 from core.helpers import notebook
 from core.helpers import docker as c_docker
-from core.constants import ENVIRONMENT
+from core.constants import ENVIRONMENT, CORE_VERSION
 from docker.errors import ImageNotFound
 from core.logging import get_logger
 
@@ -36,9 +36,9 @@ def publish():
     # This way we can manually change a job_definition to point to the old version
     # if a rollback is needed.
     if ENVIRONMENT in ["prod", "uat"]:
-        versioned_tag = f"{tag}:{CORE_VERSION}"
+        versioned_tag = f"{tag}_{CORE_VERSION}"
         logger.info(f"Registering versioned image: {versioned_tag}")
-        core_docker.register_image(versioned_tag, aws_account_id)
+        core_docker.add_tag_in_ecr(tag, versioned_tag, aws_account_id)
 
     logger.info(f"Registering AWS Batch job definition {job_def_name} that depends on image {tag}")
     core_docker.register_job_definition(job_def_name, aws_tag, job_role_arn)

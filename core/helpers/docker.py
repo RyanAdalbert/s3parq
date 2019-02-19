@@ -115,11 +115,18 @@ class CoreDocker(LoggerMixin):
         return response
 
     def register_image(self, tag: str, account_id: str):
-        repo_name = tag.split(':')[0]
         aws_tag = get_aws_tag(tag, account_id)
         self._ecr_login(account_id)
         self.d_api_client.tag(tag, aws_tag)
         response = self.d_api_client.push(aws_tag)
+        return response
+
+    # existing_tag is the local docker tag, not the tag that includes
+    # all the aws ecr account stuff.
+    def add_tag_in_ecr(self, existing_tag: str, new_tag: str, account_id: str):
+        new_aws_tag = get_aws_tag(new_tag, account_id)
+        self.d_api_client.tag(existing_tag, new_aws_tag)
+        response = self.d_api_client.push(new_aws_tag)
         return response
 
     def _ecr_login(self, account_id: str):
