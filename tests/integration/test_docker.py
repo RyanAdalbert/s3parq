@@ -47,6 +47,7 @@ class Test:
     def test_integration_docker(self):
         self.setup()
         tag_without_repo = "it_test"
+        new_tag_without_repo = "it_test_retagged"
         job_def_name = "core_it_test"
 
         #   1. Build the image
@@ -59,7 +60,7 @@ class Test:
         self.core_docker._ecr_login(AWS_ACCOUNT)
 
         #   3. Push the image to ECR
-        self.core_docker.register_image(tag, DOCKER_REPO, AWS_ACCOUNT)
+        self.core_docker.register_image(tag, AWS_ACCOUNT)
         aws_tag = c_docker.get_aws_tag(tag, AWS_ACCOUNT)
         test_ecr_image = self.docker_client.images.get(aws_tag)
         assert type(test_ecr_image) is Image
@@ -83,6 +84,28 @@ class Test:
         time_since_image_pushed = datetime.now(timezone.utc) - ecr_resp['imageDetails'][0]['imagePushedAt']
         assert timedelta(minutes=5) > time_since_image_pushed
 
+
+        # Retag the image and make sure it's there.
+        new_tag = f"{DOCKER_REPO}:{new_tag_without_repo}"
+        self.core_docker.add_tag_in_ecr(tag, new_tag, AWS_ACCOUNT)
+
+        # grab the existing digest since we're just retagging, not rebuilding
+        repo_digest = test_ecr_image.attrs['RepoDigests'][0]
+        digest_sha = repo_digest.split("@")[-1]
+
+        ecr_resp = self.ecr_client.describe_images(
+            registryId=AWS_ACCOUNT,
+            repositoryName=DOCKER_REPO,
+            imageIds=[
+                {
+                    'imageDigest': digest_sha,
+                    'imageTag': new_tag_without_repo
+                }
+            ]
+        )
+        assert new_tag_without_repo in ecr_resp['imageDetails'][0]['imageTags']
+
+
         #   4. Register a Job Definition on Batch
         rjd_resp = self.core_docker.register_job_definition(
             job_def_name,
@@ -101,8 +124,9 @@ class Test:
         #   6. Deregister Job Definiton
         self.core_docker.deregister_job_definition_set(job_def_name)
 
-        #   7. Remove image from ECR
-        self.core_docker.remove_ecr_image(tag, DOCKER_REPO, AWS_ACCOUNT)
+        #   7. Remove images from ECR
+        self.core_docker.remove_ecr_image(tag, AWS_ACCOUNT)
+        self.core_docker.remove_ecr_image(new_tag, AWS_ACCOUNT)
 
         #   8. Remove image from your machine
         self.core_docker.remove_image(tag)
