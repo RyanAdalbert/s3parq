@@ -1,7 +1,7 @@
 import click
 from core.helpers import notebook
 from core.helpers import docker as c_docker
-from core.constants import DOCKER_REPO, ENVIRONMENT
+from core.constants import ENVIRONMENT
 from docker.errors import ImageNotFound
 from core.logging import get_logger
 
@@ -30,7 +30,7 @@ def publish():
 
     logger.info(f"Building docker image {tag}")
     core_docker.build_image(tag)
-    core_docker.register_image(tag, DOCKER_REPO, aws_account_id)
+    core_docker.register_image(tag, aws_account_id)
 
     logger.info(f"Registering AWS Batch job definition {job_def_name} that depends on image {tag}")
     core_docker.register_job_definition(job_def_name, aws_tag, job_role_arn)
@@ -52,7 +52,7 @@ def tidy():
     core_docker.deregister_job_definition_set(job_def_name)
     try:
         logger.info(f"Removing all revisions of {job_def_name} from account {aws_account_id}")
-        core_docker.remove_ecr_image(tag, DOCKER_REPO, aws_account_id)
+        core_docker.remove_ecr_image(tag, aws_account_id)
         logger.info(f"Removing local image {tag}")
         core_docker.remove_image(tag)
     except ImageNotFound:

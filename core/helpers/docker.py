@@ -90,8 +90,9 @@ class CoreDocker(LoggerMixin):
         response = self.d_api_client.remove_image(tag)
         return response
 
-    def remove_ecr_image(self, tag: str, repo_name: str, account_id: str):
+    def remove_ecr_image(self, tag: str, account_id: str):
         self._ecr_login(account_id)
+        repo_name = tag.split(':')[0]
         tag_without_repo = ":".join(tag.split(':')[1:])
         aws_tag = get_aws_tag(tag, account_id)
         image = self.d_client.images.get(aws_tag)
@@ -113,7 +114,7 @@ class CoreDocker(LoggerMixin):
         self.d_api_client.remove_image(aws_tag)
         return response
 
-    def register_image(self, tag: str, repo_name: str, account_id: str):
+    def register_image(self, tag: str, account_id: str):
         repo_name = tag.split(':')[0]
         aws_tag = get_aws_tag(tag, account_id)
         self._ecr_login(account_id)

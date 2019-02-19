@@ -59,7 +59,7 @@ class Test:
         self.core_docker._ecr_login(AWS_ACCOUNT)
 
         #   3. Push the image to ECR
-        self.core_docker.register_image(tag, DOCKER_REPO, AWS_ACCOUNT)
+        self.core_docker.register_image(tag, AWS_ACCOUNT)
         aws_tag = c_docker.get_aws_tag(tag, AWS_ACCOUNT)
         test_ecr_image = self.docker_client.images.get(aws_tag)
         assert type(test_ecr_image) is Image
@@ -102,7 +102,7 @@ class Test:
         self.core_docker.deregister_job_definition_set(job_def_name)
 
         #   7. Remove image from ECR
-        self.core_docker.remove_ecr_image(tag, DOCKER_REPO, AWS_ACCOUNT)
+        self.core_docker.remove_ecr_image(tag, AWS_ACCOUNT)
 
         #   8. Remove image from your machine
         self.core_docker.remove_image(tag)
