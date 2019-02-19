@@ -88,7 +88,7 @@ class Test:
         # Retag the image and make sure it's there.
         new_tag = f"{DOCKER_REPO}:{new_tag_without_repo}"
         self.core_docker.add_tag_in_ecr(tag, new_tag, AWS_ACCOUNT)
-        
+
         # grab the existing digest since we're just retagging, not rebuilding
         repo_digest = test_ecr_image.attrs['RepoDigests'][0]
         digest_sha = repo_digest.split("@")[-1]
@@ -124,8 +124,9 @@ class Test:
         #   6. Deregister Job Definiton
         self.core_docker.deregister_job_definition_set(job_def_name)
 
-        #   7. Remove image from ECR
+        #   7. Remove images from ECR
         self.core_docker.remove_ecr_image(tag, AWS_ACCOUNT)
+        self.core_docker.remove_ecr_image(new_tag, AWS_ACCOUNT)
 
         #   8. Remove image from your machine
         self.core_docker.remove_image(tag)
