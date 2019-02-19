@@ -7,18 +7,20 @@ from core import contract
 
 root = project_root.ProjectRoot()
 
-def run_transform(id: int, input_contract: str, output_contract: str, name: str ="shared.raw.extract") -> str:
+def run_transform(id: int, state: str, branch: str, parent: str, child: str, name: str ="shared.raw.extract") -> str:
     # First you would look up the ID and get the name of the transform so you
     # know what notebook to run. Once the core transform code has been finalized and
     # you can reach out to a db to pull the name this hard-coding will be replaced.
 
     #Then run the notebook
+    output_kontract = get_contract(state=state,branch=branch,parent=parent,child=child)
+    output_contract = output_kontract.get_s3_path()
     output_s3_path = output_path(output_contract, name)
     path = f"{root.get_path()}/transforms/{name.replace('.', '/')}.ipynb"
     pm.execute_notebook(
        path,
        output_s3_path,
-       parameters = dict(id=id, input_contract=input_contract, output_contract=output_contract),
+       parameters = dict(id=id, branch=branch, parent=parent, child=child, state=state),
        cwd=root.get_path()
     )
 
@@ -33,6 +35,17 @@ def output_url(output_path: str) -> str:
     s3_prefix = "s3://{ENV_BUCKET}/notebooks"
     url_prefix = "http://notebook.integrichain.net/view"
     return output_path.replace(s3_prefix, url_prefix)
+
+def get_input_contract(output_contract: contract.Contract, state, branch, parent, child) -> contract.Contract:
+    if (output_contract.get_previous_state()==None):
+        input_contract = None
+    else:
+        input_contract = get_contract(branch=branch,
+                                    parent=parent,
+                                    child=child,
+                                    state=output_contract.get_previous_state())
+
+    return input_contract
 
 def get_contract(state, branch, parent, child):
     kontract = contract.Contract(state=state,
