@@ -47,7 +47,7 @@ class Test:
     def test_integration_docker(self):
         self.setup()
         tag_without_repo = "it_test"
-        new_tag_without_repo = "it_test_new"
+        new_tag_without_repo = "it_test_retagged"
         job_def_name = "core_it_test"
 
         #   1. Build the image
@@ -88,6 +88,8 @@ class Test:
         # Retag the image and make sure it's there.
         new_tag = f"{DOCKER_REPO}:{new_tag_without_repo}"
         self.core_docker.add_tag_in_ecr(tag, new_tag, AWS_ACCOUNT)
+        
+        # grab the existing digest since we're just retagging, not rebuilding
         repo_digest = test_ecr_image.attrs['RepoDigests'][0]
         digest_sha = repo_digest.split("@")[-1]
 
