@@ -131,8 +131,13 @@ tasks are instances of operators. To test operators, use the [operator\_tester.p
 ## Over the Wire: Creating, Running and Managing Worker Containers via AWS Batch
 
 ### Philosophy
+
+![CORE Pipeline](https://www.lucidchart.com/publicSegments/view/383636c2-d25a-4524-b2b7-83b339a48154/image.png)
+
 Our pipeline workflow is divided into 2 very distict roles: the orchestrator and the worker. 
+
 **Orchestrators** control the timing and dependencies between tasks. If our pipeline is the [Philadelphia Orchestra](https://www.philorch.org/#/), the orchestrator would be the conductor.
+
 ![Conductor](https://media.npr.org/assets/img/2013/01/17/carnegie_philly_wide-e52d8e8169c0765d3c3c058e2c368fc118f4cf42-s400-c85.jpg)
 
 <sup>The orchestrator component of the pipeline acts as the conductor,  
@@ -147,9 +152,12 @@ Our airflow Orchestrator instance creates DAGs as collections of tasks; each tas
 
 
 ### TransformOperator and Docker.py
-get_job_def_name => gets the job definition 
-launch-batch => 
- job definition == 
+The transform operator is our key to communication between the "orchestrator" and the "workers"; this operator uses the [docker.py](../core/helpers/docker.py) library to:
+- select the correct image in Batch
+- select the job queue (we only use "core" for now)
+- insert the overrides into the corebot cli string
+
+These commands are sent to a worker instance where corebot is run! 
 
 ### Corebot
 Corebot is another CLI interface. This is meant to be the "worker" part to our "orchestrator" part, allowing a separate interface for what people should be calling vs. what processes should be calling. This should only be the entry point, with the guts of the processes still living in a component in standard core.
