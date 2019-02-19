@@ -5,7 +5,7 @@ from logging.config import fileConfig
 from sqlalchemy import create_engine
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-from core.models.configuration import Base
+from core.models.configuration import Base, GenerateEngine
 from core.secret import Secret
 from core.constants import ENVIRONMENT
 from alembic import context
@@ -29,25 +29,6 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-def create_conn_string_from_secret():
-    """ builds the appropriate db string based on ENV - specific secret.
-        For dev uses the value in alembic.ini."""
-    if ENVIRONMENT == "dev":
-        return config.get_main_option("sqlalchemy.url")
-
-    secret = Secret(env=ENVIRONMENT, 
-                    name='configuration_application',
-                    type_of='database',
-                    mode='read'
-                    )
-    if secret.rdbms == "postgres":
-        conn_string = f"postgresql://{secret.user}:{secret.password}@{host}/{database}"
-    else:
-        m = "Only postgres databases are supported for configuration_application at this time."
-        logger.critical(m)
-        raise NotImplementedError(m)
-    return conn_string
-
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
@@ -60,7 +41,7 @@ def run_migrations_offline():
     script output.
 
     """
-    url = create_conn_string_from_secret()    
+    url = GenerateEngine().url    
     context.configure(
         url=url, target_metadata=target_metadata, literal_binds=True
     )
@@ -76,8 +57,7 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    connectable = create_engine(create_conn_string_from_secret())
-
+    connectable = GenerateEngine().get_engine()
     with connectable.connect() as connection:
         context.configure(
             connection=connection, target_metadata=target_metadata

@@ -15,9 +15,11 @@ node {
         echo "We are currently working on branch: ${env.BRANCH_NAME}"
 
         switch (env.BRANCH_NAME) {
-            case 'master': 
-                env.DEPLOYMENT_ENVIRONMENT = 'dev';
-                break;
+            // No "overall" dev branch for now, this will be done on the developer's
+            // machine and the artifacts will have the git branch name in them.
+            // case 'master': 
+            //     env.DEPLOYMENT_ENVIRONMENT = 'dev';
+            //     break;
             case 'uat': 
                 env.DEPLOYMENT_ENVIRONMENT = 'uat';
                 break;
@@ -28,10 +30,12 @@ node {
         }
         if (env.DEPLOYMENT_ENVIRONMENT != 'no_deploy') {
             echo "Trying to deploy to ${env.DEPLOYMENT_ENVIRONMENT}."
-            // sh "script/ci_shell 'corecli publish ${env.DEPLOYMENT_ENVIRONMENT}'"
+            sh "script/ci_shell 'ICHAIN_ENVIRONMENT=${env.DEPLOYMENT_ENVIRONMENT} corecli publish'"
         }
     }
     stage ('Cleanup') {
+        // Jenkins will need to be able to talk to the sandbox account in order to run the 
+        // tidy local command.
         // sh "script/ci_shell 'corecli tidy local'"
     }
 }

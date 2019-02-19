@@ -2,7 +2,7 @@ import boto3
 import docker
 import base64
 import os
-from core.constants import AWS_ACCOUNT, AWS_REGION, DEV_AWS_ACCOUNT, PROD_AWS_ACCOUNT, DOCKER_REPO
+from core.constants import AWS_ACCOUNT, AWS_REGION, DEV_AWS_ACCOUNT, PROD_AWS_ACCOUNT, DOCKER_REPO, ENVIRONMENT
 from core.helpers.project_root import ProjectRoot
 from core.logging import LoggerMixin
 from git import Repo
@@ -11,44 +11,44 @@ from git import Repo
 # commit hash, the work-around is to use the BRANCH_NAME env var that
 # Jenkins sets.
 def get_branch_name():
-    repo = Repo('.')
+    repo = Repo(ProjectRoot().get_path())
     try:
         return repo.active_branch.name
     except:
         return os.environ['BRANCH_NAME']
 
-def get_core_tag(environment: str):
-    if environment == 'local':
+def get_core_tag():
+    if ENVIRONMENT == 'dev':
         branch_name = get_branch_name()
         return f"{DOCKER_REPO}:{branch_name}"
-    elif environment == 'uat':
+    elif ENVIRONMENT == 'uat':
         return f"{DOCKER_REPO}:uat"
-    elif environment == 'prod':
+    elif ENVIRONMENT == 'prod':
         return f"{DOCKER_REPO}:prod"
     else:
-        raise Exception(f"Can't create a core tag for environment {environment}")
+        raise Exception(f"Can't create a core tag for environment {ENVIRONMENT}")
 
 
-def get_core_job_def_name(environment: str):
-    if environment == 'local':
+def get_core_job_def_name():
+    if ENVIRONMENT == 'dev':
         branch_name = get_branch_name()
         return f"core_{branch_name}"
-    elif environment == 'uat':
+    elif ENVIRONMENT == 'uat':
         return "core_uat"
-    elif environment == 'prod':
+    elif ENVIRONMENT == 'prod':
         return "core_prod"    
     else:
-        raise Exception(f"Can't create a core tag job definition name for environment {environment}")
+        raise Exception(f"Can't create a core tag job definition name for environment {ENVIRONMENT}")
 
-def get_aws_account(environment: str):
-    if environment == 'local':
+def get_aws_account():
+    if ENVIRONMENT == 'dev':
         return DEV_AWS_ACCOUNT
-    elif environment == 'uat':
+    elif ENVIRONMENT == 'uat':
         return PROD_AWS_ACCOUNT
-    elif environment == 'prod':
+    elif ENVIRONMENT == 'prod':
         return PROD_AWS_ACCOUNT
     else:
-        raise Exception(f"Can't find an AWS account id for environment {environment}")
+        raise Exception(f"Can't find an AWS account id for environment {ENVIRONMENT}")
 
 def get_aws_tag(tag: str, account_id: str) -> str:
     """ returns the url for the aws repository. """
@@ -90,8 +90,9 @@ class CoreDocker(LoggerMixin):
         response = self.d_api_client.remove_image(tag)
         return response
 
-    def remove_ecr_image(self, tag: str, repo_name: str, account_id: str):
+    def remove_ecr_image(self, tag: str, account_id: str):
         self._ecr_login(account_id)
+        repo_name = tag.split(':')[0]
         tag_without_repo = ":".join(tag.split(':')[1:])
         aws_tag = get_aws_tag(tag, account_id)
         image = self.d_client.images.get(aws_tag)
@@ -109,16 +110,23 @@ class CoreDocker(LoggerMixin):
                 },
             ]
         )
-        # remove the local image
+        # remove the dev image
         self.d_api_client.remove_image(aws_tag)
         return response
 
-    def register_image(self, tag: str, repo_name: str, account_id: str):
-        repo_name = tag.split(':')[0]
+    def register_image(self, tag: str, account_id: str):
         aws_tag = get_aws_tag(tag, account_id)
         self._ecr_login(account_id)
         self.d_api_client.tag(tag, aws_tag)
         response = self.d_api_client.push(aws_tag)
+        return response
+
+    # existing_tag is the local docker tag, not the tag that includes
+    # all the aws ecr account stuff.
+    def add_tag_in_ecr(self, existing_tag: str, new_tag: str, account_id: str):
+        new_aws_tag = get_aws_tag(new_tag, account_id)
+        self.d_api_client.tag(existing_tag, new_aws_tag)
+        response = self.d_api_client.push(new_aws_tag)
         return response
 
     def _ecr_login(self, account_id: str):
