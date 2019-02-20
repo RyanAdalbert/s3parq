@@ -1,7 +1,7 @@
 FROM python:3.6-slim
 
 # Airflow
-ARG AIRFLOW_VERSION=1.10.1
+ARG AIRFLOW_VERSION=1.10.2
 ARG AIRFLOW_HOME=/usr/local/airflow
 ARG AIRFLOW_DEPS=""
 ARG PYTHON_DEPS=""
@@ -40,6 +40,7 @@ RUN set -ex \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
     && useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow \
+    && pip install --upgrade pip \
     && pip install pip setuptools wheel \
     && pip install pytz \
     && pip install pyOpenSSL \
@@ -96,6 +97,11 @@ COPY dockerfiles/entrypoints/notebook.sh /notebook-entrypoint.sh
 RUN chown -R airflow: ${AIRFLOW_HOME}
 
 COPY . $core_location
+
+# remove the enum package that some jerkface dependency is installing
+RUN rm -r /usr/local/lib/python3.6/site-packages/enum \
+    && rm -r /usr/local/lib/python3.6/site-packages/enum34-1.1.6.dist-info
+
 RUN python setup.py install
 
 EXPOSE 8080 5555 8793
