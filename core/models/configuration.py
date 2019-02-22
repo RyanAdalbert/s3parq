@@ -45,10 +45,10 @@ class GenerateEngine:
         return engine
 
     def _secret_defined_url(self) -> str:
-        """ creates a session connecting to the correct configuration_application db based on ENV."""
+        """ creates a session connecting to the correct configuration_application db."""
         secret = Secret(name='configuration_application',
                         type_of='database',
-                        mode='read'
+                        mode='write'
                         )
         if secret.rdbms == "postgres":
             conn_string = f"postgresql://{secret.user}:{secret.password}@{host}/{database}"
