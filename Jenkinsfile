@@ -33,6 +33,7 @@ node {
             sh "script/ci_shell 'ICHAIN_ENVIRONMENT=${env.DEPLOYMENT_ENVIRONMENT} corecli publish'"
             echo "Running alembic migrations for ${env.DEPLOYMENT_ENVIRONMENT}."
             sh "script/ci_shell 'cd core/database && ICHAIN_ENVIRONMENT=${env.DEPLOYMENT_ENVIRONMENT} alembic upgrade head'"
+            echo "bump"
         }
     }
     stage ('Cleanup') {
