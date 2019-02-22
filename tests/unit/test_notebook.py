@@ -35,7 +35,7 @@ class Test:
         bucket = ENV_BUCKET
         key = "notebooks/dev/important_business/raw/extract/shared.test.hello_world.ipynb"
         notebook_url = notebook.run_transform(
-            2, "dev/important_business/raw/ftp", "dev/important_business/raw/extract", name="shared.test.hello_world")
+            id=2, branch="test_branch", state="raw", parent="merck", child="prilosec")
 
         with tempfile.TemporaryDirectory() as tmpdirname:
             test_file_location = os.path.join(tmpdirname, 'test.ipynb')

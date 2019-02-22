@@ -1,6 +1,6 @@
-from airflow.models import BashOperator
-from airflow import utils as airflow_utils
-from core.helpers import session_helper
+#from airflow.models import BashOperator
+#from airflow import utils as airflow_utils
+#from core.helpers import session_helper
 from core.models.configuration import (
     PharmaceuticalCompany, 
     Brand, 
@@ -26,6 +26,54 @@ from core.airflow.plugins.transform_operator import TransformOperator
 # from core.helpers.project_root import ProjectRoot
 # from core.helpers.session_helper import SessionHelper
 # import core.models.configuration as config
+
+class Names:
+    cname, bname, ptname, sname, pname, pstname, tname = 'test_client', 'test_brand', 'test_edo_pipeline', 'test_segment', 'test_pipeline', 'test_pipeline_state', 'test_transform_template'
+class Test:
+
+    def setup_session_mock(self):
+        mock = CMock()
+        session = mock.get_session()
+        n = Names()
+        session.add(PharmaceuticalCompany(
+            id=1, display_name=n.cname, name=n.cname))
+        session.add(Brand(id=1, pharmaceutical_company_id=1,
+                          display_name=n.bname, name=n.bname))
+        session.add(Segment(id=1, name=n.sname))
+        session.add(PipelineType(id=1, segment_id=1, name=n.ptname))
+        session.add(Pipeline(id=1, pipeline_type_id=1,
+                             brand_id=1, name=n.pname))
+        session.add(PipelineStateType(id=1, name=n.pstname))
+        session.add(PipelineState(id=1, pipeline_state_type_id=1,
+                                  graph_order=1, pipeline_id=1))
+        session.add(TransformationTemplate(id=1, name=n.tname))
+
+        session.add(Transformation(id=1, graph_order=0,
+                                   transformation_template_id=1, pipeline_state_id=1))
+        session.add(Transformation(id=2, graph_order=0,
+                                   transformation_template_id=1, pipeline_state_id=1))
+        session.commit()
+        return session
+
+
+    @patch('core.airflow.plugins.transform_operator.SessionHelper', autospec=True)
+    @patch('core.airflow.plugins.transform_operator.Repo', autoSpec=True)
+    def test_transform_operator_sends_to_batch(self,mock_repo,mock_session_helper):
+        n = Names()
+        type(mock_session_helper.return_value).session = PropertyMock(return_value = self.setup_session_mock())
+            
+        type(mock_repo.return_value.active_branch.return_value).name = PropertyMock(return_value = "test_branch")
+        
+        operator = TransformOperator(transform_id=1)
+        
+        assert operator.task_id == f"{n.pname}_{n.pstname}_{n.tname}_1".lower()
+
+
+
+
+
+
+"""
 
 class Names:
     cname, bname, ptname, sname, pname, pstname, tname = 'test_client', 'test_brand', 'test_edo_pipeline', 'test_segment', 'test_pipeline', 'test_pipeline_state', 'test_transform_template'
@@ -60,12 +108,7 @@ class Test:
         session.add(PipelineState(id=1, pipeline_state_type_id=1,
                                   graph_order=1, pipeline_id=1))
         session.add(TransformationTemplate(id=1, name=n.tname))
-        session.commit()
-        return session
 
-    def setup_in_state_transforms(self):
-        session = self.setup_mock()
-        # Now for the in-state transforms
         session.add(Transformation(id=1, graph_order=0,
                                    transformation_template_id=1, pipeline_state_id=1))
         session.add(Transformation(id=2, graph_order=0,
@@ -73,16 +116,20 @@ class Test:
         session.commit()
         return session
 
-    def test_run(self):
-        # test_to = transform_operator.TransformOperator(transform_id=2)
-        pass
 
-    def test_pass_super(self):
-        pass
-
+    def stub_class_under_test(self):
+        class stub_obj(object):
+            pass
+        test_obj = stub_obj()
+        test_obj.__class__ = TransformOperator(transform_id=1)
+        test_obj.id = 1
+        
+        return test_obj
+ 
     def test_get_transform_info(self):
-        session = self.setup_in_state_transforms()
-        pass
+        session = self.setup_mock()
+        operator = self.stub_class_under_test()
+
 
     def test_generate_task_id(self, helper_session):
         type(helper_session.return_value).session = PropertyMock(
@@ -100,7 +147,7 @@ class Test:
     def test_generate_bash_command(self):
         pass
 
-    
+"""   
     
 
     
