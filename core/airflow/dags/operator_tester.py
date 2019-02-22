@@ -3,7 +3,7 @@ from airflow import DAG
 from datetime import timedelta, datetime
 from airflow.operators.dummy_operator import DummyOperator
 ### Import the operator you want to test here! ###
-from core.airflow.plugins.transform_operator import TransformOperator, _generate_run_command
+from core.airflow.plugins.transform_operator import TransformOperator
 
 if ENVIRONMENT == "dev":
 

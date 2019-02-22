@@ -39,7 +39,7 @@ class ConfigurationMocker(LoggerMixin):
         self.session.add_all([
             b(id=1, name="Teamocil", display_name="Teamocil",
               pharmaceutical_company_id=1),
-            b(id=2, name="Cornballer", display_name="Corn Baller", pharmaceutical_company_id=2)])
+            b(id=2, name="Cornballer2", display_name="Corn Baller", pharmaceutical_company_id=2)])
         self.session.commit()
         self.logger.debug('Done generating brand mocks.')
 
