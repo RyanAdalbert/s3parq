@@ -1,4 +1,4 @@
-from airflow.utils import  apply_defaults
+from airflow.utils import apply_defaults
 from airflow.contrib.operators.awsbatch_operator import AWSBatchOperator
 from git import Repo
 from collections import namedtuple
@@ -8,21 +8,25 @@ from core.helpers.project_root import ProjectRoot
 from core.helpers.session_helper import SessionHelper
 from core.helpers.docker import get_core_job_def_name
 import core.models.configuration as config
+from core.logging import get_logger
 
 
 class TransformOperator(AWSBatchOperator):
 
     @apply_defaults
-    def __init__(self, transform_id:int, *args, **kwargs) -> None:
+    def __init__(self, transform_id: int, *args, **kwargs) -> None:
         """ Transformation operator for DAGs. 
                 **kwargs are direct passed into super - PythonOperator from Airflow
                 returns a valid task object for use in DAGs only
         """
+        self.__logger = get_logger(
+            ".".join([self.__module__, self.__class__.__name__]))
+
         self.transform_id = transform_id
         task_id = self._generate_task_id()
 
         params = self._generate_contract_params()
-        
+
         job_def_name = get_core_job_def_name()
         job_name = f'{params.parent}_{params.child}_{params.state}'
         job_queue = BATCH_JOB_QUEUE
@@ -36,19 +40,20 @@ class TransformOperator(AWSBatchOperator):
             f'--child={params.child}',
             f'--state={params.state}'
         ]
+        self.__logger.debug(f"Corebot run command string: {run_command}.")
         job_container_overrides = {
             'command': run_command
         }
-
-        super(TransformOperator, self).__init__(task_id=task_id, 
-                                                job_name=job_name, 
-                                                job_definition=job_def_name, 
+        self.__logger.info(f"Executing AWSBatchOperator for {job_name}.")
+        super(TransformOperator, self).__init__(task_id=task_id,
+                                                job_name=job_name,
+                                                job_definition=job_def_name,
                                                 job_queue=job_queue,
                                                 overrides=job_container_overrides,
-                                                *args, 
+                                                *args,
                                                 **kwargs
                                                 )
-
+        self.__logger.info(f"Done. AWSBatchOperator executed for {job_name}.")
 
     def _get_transform_info(self):
         """ Gets full queried info for the transform.
@@ -57,9 +62,9 @@ class TransformOperator(AWSBatchOperator):
         """
         session = SessionHelper().session
         transform_config = config.Transformation
-        transform = session.query(transform_config).filter(transform_config.id == self.transform_id).one()
+        transform = session.query(transform_config).filter(
+            transform_config.id == self.transform_id).one()
         return transform
-
 
     def _generate_task_id(self) -> str:
         """ Creates full task_id for the transform task. 
@@ -72,8 +77,8 @@ class TransformOperator(AWSBatchOperator):
         p_stname = transform.pipeline_state.pipeline_state_type.name
         t_name = transform.transformation_template.name
         task_id = f"{p_name}_{p_stname}_{t_name}_{self.transform_id}".lower()
+        self.__logger.debug(f"task_id: {task_id}")
         return task_id
-
 
     def _generate_contract_params(self) -> [str]:
         """ Generates the params for contract creation
@@ -87,8 +92,10 @@ class TransformOperator(AWSBatchOperator):
         parent = transform.pipeline_state.pipeline.brand.pharmaceutical_company.name.lower()
         child = transform.pipeline_state.pipeline.brand.name.lower()
         state = transform.pipeline_state.pipeline_state_type.name.lower()
-
-        contract_tuple = namedtuple("params", ["branch","parent","child","state"])
-        contract_params = contract_tuple(branch,parent,child,state)
+        self.__logger.debug(
+            f"Named contract params:: branch = {branch}, parent = {parent}, child = {child}, state = {state}")
+        contract_tuple = namedtuple(
+            "params", ["branch", "parent", "child", "state"])
+        contract_params = contract_tuple(branch, parent, child, state)
 
         return contract_params
