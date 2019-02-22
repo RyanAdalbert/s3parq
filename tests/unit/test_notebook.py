@@ -1,3 +1,4 @@
+from mock import patch
 import moto
 import boto3
 import pytest
@@ -28,15 +29,22 @@ class Test:
         output_url = notebook.output_url(output_path)
         assert output_url == "http://notebook.integrichain.net/view/asdf/1234/merp/shared.raw.extract.ipynb"
 
-    def test_run_transform(self):
+    @patch("core.helpers.notebook.pm")
+    def test_run_transform(self,mock_papermill):
         self.setup()
         s3 = boto3.resource('s3')
-
+    
         bucket = ENV_BUCKET
         key = "notebooks/dev/important_business/raw/extract/shared.test.hello_world.ipynb"
-        notebook_url = notebook.run_transform(
-            2, "dev/important_business/raw/ftp", "dev/important_business/raw/extract", name="shared.test.hello_world")
+        tid=2,
+        tbranch="test_branch"
+        tstate="raw"
+        tparent="merck"
+        tchild="prilosec"
+        notebook_url = notebook.run_transform(id=tid, branch=tbranch, parent=tparent, child=tchild, state=tstate)
 
+        mock_papermill.execute_notebook.assert_called
+        """
         with tempfile.TemporaryDirectory() as tmpdirname:
             test_file_location = os.path.join(tmpdirname, 'test.ipynb')
             s3.Bucket(bucket).download_file(key, test_file_location)
@@ -46,3 +54,4 @@ class Test:
             # expected outputs if we like, but that might be overkill
             with open(test_file_location, 'r') as tmp_notebook:
                 assert type(tmp_notebook) is TextIOWrapper
+        """
