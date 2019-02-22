@@ -6,6 +6,7 @@ ICHAIN_ENVIRONMENT=$2
 docker run --rm \
   -e BRANCH_NAME \
   -e ICHAIN_ENVIRONMENT \
+  -e ICHAIN_AWS_ACCOUNT="687531504312" \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -w /usr/src/app \
   ichain/core:ci \
