@@ -14,7 +14,7 @@ def run_transform(id: int, state: str, branch: str, parent: str, child: str, nam
 
     #Then run the notebook
     output_kontract = get_contract(state=state,branch=branch,parent=parent,child=child)
-    output_contract = output_kontract.get_s3_path()
+    output_contract = output_kontract.get_key()
     output_s3_path = output_path(output_contract, name)
     path = f"{root.get_path()}/transforms/{name.replace('.', '/')}.ipynb"
     pm.execute_notebook(

@@ -49,48 +49,6 @@ class TransformOperator(AWSBatchOperator):
                                                 **kwargs
                                                 )
 
-# @apply_defaults
-#     def __init__(self,  overrides, max_retries=4200,
-#                  aws_conn_id=None, region_name=None, **kwargs):
-#         super(AWSBatchOperator, self).__init__(**kwargs)
-
-#         self.aws_conn_id = aws_conn_id
-#         self.region_name = region_name
-#         self.overrides = overrides
-#         self.max_retries = max_retries
-
-#         self.jobId = None
-#         self.jobName = None
-
-#         self.hook = self.get_hook()
-
-    # def _generate_batch_command_args(self) -> str:
-    #     """ Generates the batch command for the PythonOperator to call
-    #             This includes the corebot command as a container override
-    #             job_name should be - 'pharmaceutical company'_'brand'_'state'
-    #     """
-    #     params = self._generate_contract_params()
-        
-    #     job_def_name = get_core_job_def_name()
-    #     job_name = f'{params.parent}_{params.child}_{params.state}'
-    #     job_queue = BATCH_JOB_QUEUE
-
-    #     tranform_id = self.transform_id
-    #     run_command = f'corebot run {tranform_id} --branch={params.branch} --parent={params.parent} --child={params.child} --state={params.state}'
-    #     job_container_overrides = {
-    #         'command': [
-    #             run_command,
-    #         ]
-    #     }
-
-    #     batch_command_args = {
-    #                             "job_name":job_name, 
-    #                             "job_definition":job_def_name, 
-    #                             "job_queue":job_queue, 
-    #                             "container_overrides":job_container_overrides
-    #     }
-
-    #     return batch_command_args
 
     def _get_transform_info(self):
         """ Gets full queried info for the transform.
