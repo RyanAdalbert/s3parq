@@ -1,9 +1,11 @@
 #!/bin/sh
 
 COMMAND=$1
+ICHAIN_ENVIRONMENT=$2
 
 docker run --rm \
   -e BRANCH_NAME \
+  -e ICHAIN_ENVIRONMENT \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -w /usr/src/app \
   ichain/core:ci \

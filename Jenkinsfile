@@ -30,9 +30,9 @@ node {
         }
         if (env.DEPLOYMENT_ENVIRONMENT != 'no_deploy') {
             echo "Trying to deploy to ${env.DEPLOYMENT_ENVIRONMENT}."
-            sh "script/ci_shell 'ICHAIN_ENVIRONMENT=${env.DEPLOYMENT_ENVIRONMENT} corecli publish'"
+            sh "script/ci_shell 'corecli publish' ${env.DEPLOYMENT_ENVIRONMENT}"
             echo "Running alembic migrations for ${env.DEPLOYMENT_ENVIRONMENT}."
-            sh "script/ci_shell 'cd core/database && ICHAIN_ENVIRONMENT=${env.DEPLOYMENT_ENVIRONMENT} alembic upgrade head'"
+            sh "script/ci_shell 'cd core/database && alembic upgrade head' ${env.DEPLOYMENT_ENVIRONMENT}"
             echo "bump"
         }
     }
