@@ -8,4 +8,4 @@ docker run --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -w /usr/src/app \
   ichain/core:ci \
-  bash -c '$COMMAND'
+  bash -c "$COMMAND"
