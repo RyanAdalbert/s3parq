@@ -1,6 +1,7 @@
 import os
 import yaml
 from .helpers.project_root import ProjectRoot
+from git import Repo
 
 def reset_constants():
     ''' sets (or resets) constants based on hierarchy of 
@@ -17,5 +18,15 @@ def reset_constants():
     for key in os.environ.keys():
         if key[:7] == 'ICHAIN_':
             globals()[key.replace('ICHAIN_','')] = os.environ[key]
+    
+    ## set the branch name based on the current repo branch, and account for Jenkins weirdness with detached heads
+    def get_branch_name():
+        repo = Repo(ProjectRoot().get_path())
+        try:
+            return repo.active_branch.name
+        except:
+            return os.environ['BRANCH_NAME']
+    
+    globals()['BRANCH_NAME'] = get_branch_name()
 
 reset_constants()

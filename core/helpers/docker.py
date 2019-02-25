@@ -2,25 +2,13 @@ import boto3
 import docker
 import base64
 import os
-from core.constants import AWS_ACCOUNT, AWS_REGION, DEV_AWS_ACCOUNT, PROD_AWS_ACCOUNT, DOCKER_REPO, ENVIRONMENT
+from core.constants import AWS_ACCOUNT, AWS_REGION, DEV_AWS_ACCOUNT, PROD_AWS_ACCOUNT, DOCKER_REPO, ENVIRONMENT, BRANCH_NAME
 from core.helpers.project_root import ProjectRoot
 from core.logging import LoggerMixin
-from git import Repo
-
-# In jenkins there isn't a branch name since the code is checked out via
-# commit hash, the work-around is to use the BRANCH_NAME env var that
-# Jenkins sets.
-def get_branch_name():
-    repo = Repo(ProjectRoot().get_path())
-    try:
-        return repo.active_branch.name
-    except:
-        return os.environ['BRANCH_NAME']
 
 def get_core_tag():
     if ENVIRONMENT == 'dev':
-        branch_name = get_branch_name()
-        return f"{DOCKER_REPO}:{branch_name}"
+        return f"{DOCKER_REPO}:{BRANCH_NAME}"
     elif ENVIRONMENT == 'uat':
         return f"{DOCKER_REPO}:uat"
     elif ENVIRONMENT == 'prod':
@@ -31,8 +19,7 @@ def get_core_tag():
 
 def get_core_job_def_name():
     if ENVIRONMENT == 'dev':
-        branch_name = get_branch_name()
-        return f"core_{branch_name}"
+        return f"core_{BRANCH_NAME}"
     elif ENVIRONMENT == 'uat':
         return "core_uat"
     elif ENVIRONMENT == 'prod':

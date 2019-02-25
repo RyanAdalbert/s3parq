@@ -58,7 +58,7 @@ class TaskOrchestrator(LoggerMixin):
             for transformation_group in transformations:
                 converted_set = set()
                 for transform in transformation_group:
-                    to = TransformOperator(transform.id)
+                    to = TransformOperator(transform_id=transform.id)
                     converted_set.add(to)
                 all_transforms.append(
                     tuple([state.pipeline_state_type.name, converted_set]))

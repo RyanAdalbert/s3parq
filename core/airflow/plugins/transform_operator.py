@@ -1,12 +1,97 @@
-from airflow.operators import BaseOperator
-from airflow.operators.bash_operator import BashOperator
+from airflow.utils import apply_defaults
+from airflow.contrib.operators.awsbatch_operator import AWSBatchOperator
+from collections import namedtuple
+from core.constants import BATCH_JOB_QUEUE, BRANCH_NAME
+from core.contract import Contract
+from core.helpers.project_root import ProjectRoot
+from core.helpers.session_helper import SessionHelper
+from core.helpers.docker import get_core_job_def_name
+import core.models.configuration as config
+from core.logging import get_logger
 
 
-class TransformOperator(BashOperator):
-    """ Placeholder for Rayne's class"""
+class TransformOperator(AWSBatchOperator):
 
-    def __init__(self, id: int)->None:
-        super().__init__(bash_command='ls',
-                         task_id=f'super_fancy_task_{id}',
+    @apply_defaults
+    def __init__(self, transform_id: int, *args, **kwargs) -> None:
+        """ Transformation operator for DAGs. 
+                **kwargs are direct passed into super - PythonOperator from Airflow
+                returns a valid task object for use in DAGs only
+        """
+        self.__logger = get_logger(
+            ".".join([self.__module__, self.__class__.__name__]))
 
-                         )
+        self.transform_id = transform_id
+        task_id = self._generate_task_id()
+
+        params = self._generate_contract_params()
+
+        job_def_name = get_core_job_def_name()
+        job_name = f'{params.parent}_{params.child}_{params.state}'
+        job_queue = BATCH_JOB_QUEUE
+
+        run_command = [
+            'corebot',
+            'run',
+            f'{transform_id}',
+            f'--branch={params.branch}',
+            f'--parent={params.parent}',
+            f'--child={params.child}',
+            f'--state={params.state}'
+        ]
+        self.__logger.debug(f"Corebot run command string: {run_command}.")
+        job_container_overrides = {
+            'command': run_command
+        }
+        self.__logger.info(f"Executing AWSBatchOperator for {job_name}.")
+        super(TransformOperator, self).__init__(task_id=task_id,
+                                                job_name=job_name,
+                                                job_definition=job_def_name,
+                                                job_queue=job_queue,
+                                                overrides=job_container_overrides,
+                                                *args,
+                                                **kwargs
+                                                )
+        self.__logger.info(f"Done. AWSBatchOperator executed for {job_name}.")
+
+    def _get_transform_info(self):
+        """ Gets full queried info for the transform.
+                Uses SessionHelper to grab it based on the transform ID
+                TODO: Throw detailed exception if no transform exists
+        """
+        session = SessionHelper().session
+        transform_config = config.Transformation
+        transform = session.query(transform_config).filter(
+            transform_config.id == self.transform_id).one()
+        return transform
+
+    def _generate_task_id(self) -> str:
+        """ Creates full task_id for the transform task. 
+                This is a unique string ID that can only correlate to this task.
+                ID format = {pipeline_name}_{pipeline_state_type}_{transform_name}_{transform_id}
+                    All set to lower case for matching up
+        """
+        transform = self._get_transform_info()
+        p_name = transform.pipeline_state.pipeline.name
+        p_stname = transform.pipeline_state.pipeline_state_type.name
+        t_name = transform.transformation_template.name
+        task_id = f"{p_name}_{p_stname}_{t_name}_{self.transform_id}".lower()
+        self.__logger.debug(f"task_id: {task_id}")
+        return task_id
+
+    def _generate_contract_params(self) -> [str]:
+        """ Generates the params for contract creation
+            This passes them over in string form, since contracts cant be directly passed that way
+                allowing the receiving functions to quickly create without touching the configs schema
+        """
+        transform = self._get_transform_info()
+        parent = transform.pipeline_state.pipeline.brand.pharmaceutical_company.name.lower()
+        child = transform.pipeline_state.pipeline.brand.name.lower()
+        state = transform.pipeline_state.pipeline_state_type.name.lower()
+        self.__logger.debug(
+            f"Named contract params:: branch = {BRANCH_NAME}, parent = {parent}, child = {child}, state = {state}")
+        contract_tuple = namedtuple(
+            "params", ["branch", "parent", "child", "state"])
+        contract_params = contract_tuple(BRANCH_NAME, parent, child, state)
+
+        return contract_params
