@@ -15,6 +15,7 @@ services:
         depends_on:
             - airflowpg
         environment:
+            - ICHAIN_ENVIRONMENT=uat
             - INITDB=y
             - AWS_ACCESS_KEY_ID
             - AWS_SECRET_ACCESS_KEY
@@ -39,6 +40,7 @@ services:
           context: .
         image: ichain/core
         environment:
+            - ICHAIN_ENVIRONMENT=uat
             - AWS_ACCESS_KEY_ID
             - AWS_SECRET_ACCESS_KEY
             - CONFIGURATION_APPLICATION_DATABASE_HOST=configurationpg
@@ -60,6 +62,7 @@ services:
     configurationpg:
         image: postgres:11.1
         environment:
+            - ICHAIN_ENVIRONMENT=uat
             - POSTGRES_USER=configurator
             - POSTGRES_PASSWORD=configurator
             - POSTGRES_DB=configuration_application
