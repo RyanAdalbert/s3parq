@@ -51,7 +51,7 @@ class GenerateEngine:
                         mode='write'
                         )
         if secret.rdbms == "postgres":
-            conn_string = f"postgresql://{secret.user}:{secret.password}@{host}/{database}"
+            conn_string = f"postgresql://{secret.user}:{secret.password}@{secret.host}/{secret.database}"
         else:
             m = "Only postgres databases are supported for configuration_application at this time."
             logger.critical(m)
