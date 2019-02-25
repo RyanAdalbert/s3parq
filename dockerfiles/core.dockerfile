@@ -97,6 +97,7 @@ COPY dockerfiles/entrypoints/notebook.sh /notebook-entrypoint.sh
 RUN chown -R airflow: ${AIRFLOW_HOME}
 
 COPY . $core_location
+COPY ./core/airflow/dags /root/airflow/dags
 
 # remove the enum package that some jerkface dependency is installing
 RUN rm -r /usr/local/lib/python3.6/site-packages/enum \
