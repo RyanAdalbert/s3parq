@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import session, sessionmaker, relationship
 from core.constants import DEV_CONFIGURATION_APPLICATION_CONN_STRING, ENVIRONMENT
 from core.secret import Secret
+from core.logging import LoggerMixin
 Base = declarative_base()
 
 
@@ -19,7 +20,7 @@ class Session():
     def get_session(self) -> session.Session:
         return self.session
 
-class GenerateEngine:
+class GenerateEngine(LoggerMixin):
     """ abstract defining connections here. Local assumes a psql instance in a local docker container. """
 
     def __init__(self, in_memory:bool=True) -> None:
@@ -52,10 +53,10 @@ class GenerateEngine:
                         mode='read'
                         )
         if secret.rdbms == "postgres":
-            conn_string = f"postgresql://{secret.user}:{secret.password}@{host}/{database}"
+            conn_string = f"postgresql://{secret.user}:{secret.password}@{secret.host}/{secret.database}"
         else:
             m = "Only postgres databases are supported for configuration_application at this time."
-            logger.critical(m)
+            self.logger.critical(m)
             raise NotImplementedError(m)
         return conn_string
 
