@@ -1,9 +1,8 @@
 import boto3
 import os
-from git import Repo
 from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
 
-from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET
+from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET, BRANCH_NAME
 from core.logging import LoggerMixin
 from core.helpers.project_root import ProjectRoot
 
@@ -172,14 +171,9 @@ class Contract(LoggerMixin):
         # if we need to override this, set the branch param first.
         if self.branch is None:
             try:
-                branch_name = Repo(ProjectRoot().get_path()).active_branch.name
-                self.set_branch(branch_name)
+                self.set_branch(BRANCH_NAME)
             except:
-                try:
-                    branch_name = os.environ['BRANCH_NAME']
-                    self.set_branch(branch_name)
-                except:
-                    raise ValueError(f'Your git branch name {branch_name} cannot be used as a contract branch path.')
+                raise ValueError(f'Your git branch name {branch_name} cannot be used as a contract branch path.')
 
     def _set_contract_type(self)->None:
         ''' INTENT: sets what type of contract this is - file, partition, or dataset

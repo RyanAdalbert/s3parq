@@ -3,6 +3,7 @@ from airflow import DAG
 from datetime import timedelta, datetime
 from airflow.operators.dummy_operator import DummyOperator
 ### Import the operator you want to test here! ###
+from core.airflow.plugins.transform_operator import TransformOperator
 
 if ENVIRONMENT == "dev":
 
@@ -23,8 +24,8 @@ if ENVIRONMENT == "dev":
 
 kickoff_task = DummyOperator(task_id="task_that_does_nothing", dag=dag)
 
-# your task with your operator goes here!
-# my_task = MyOperator(task_id = <something>, dag = dag)
+# Needs to pass in the required transformation ID
+transform_task = TransformOperator(transform_id=1, dag=dag)
 
 # put them in order
-## kickoff_task >> my_task
+kickoff_task >> transform_task
