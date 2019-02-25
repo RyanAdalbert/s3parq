@@ -46,8 +46,7 @@ class GenerateEngine:
 
     def _secret_defined_url(self) -> str:
         """ creates a session connecting to the correct configuration_application db."""
-        secret = Secret(env=ENVIRONMENT,
-                        name='configuration_application',
+        secret = Secret(name='configuration_application',
                         type_of='database',
                         mode='write'
                         )
