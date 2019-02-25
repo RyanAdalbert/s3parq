@@ -1,6 +1,3 @@
-#from airflow.models import BashOperator
-#from airflow import utils as airflow_utils
-#from core.helpers import session_helper
 from core.models.configuration import (
     PharmaceuticalCompany, 
     Brand, 
@@ -17,15 +14,6 @@ from mock import patch, PropertyMock, MagicMock
 import pytest
 
 from core.airflow.plugins.transform_operator import TransformOperator
-
-# from airflow.utils import  apply_defaults
-# from airflow.operators.bash_operator import BashOperator
-# from git import Repo
-# from collections import namedtuple
-# from core.contract import Contract
-# from core.helpers.project_root import ProjectRoot
-# from core.helpers.session_helper import SessionHelper
-# import core.models.configuration as config
 
 class Names:
     cname, bname, ptname, sname, pname, pstname, tname = 'test_client', 'test_brand', 'test_edo_pipeline', 'test_segment', 'test_pipeline', 'test_pipeline_state', 'test_transform_template'
@@ -57,12 +45,12 @@ class Test:
 
 
     @patch('core.airflow.plugins.transform_operator.SessionHelper', autospec=True)
-    @patch('core.airflow.plugins.transform_operator.Repo', autoSpec=True)
+    @patch('core.airflow.plugins.transform_operator.BRANCH_NAME')
     def test_transform_operator_sends_to_batch(self,mock_repo,mock_session_helper):
         n = Names()
         type(mock_session_helper.return_value).session = PropertyMock(return_value = self.setup_session_mock())
             
-        type(mock_repo.return_value.active_branch.return_value).name = PropertyMock(return_value = "test_branch")
+        mock_repo.return_value = PropertyMock(return_value = "test_branch")
         
         operator = TransformOperator(transform_id=1)
         

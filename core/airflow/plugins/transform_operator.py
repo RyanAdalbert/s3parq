@@ -1,8 +1,7 @@
 from airflow.utils import apply_defaults
 from airflow.contrib.operators.awsbatch_operator import AWSBatchOperator
-from git import Repo
 from collections import namedtuple
-from core.constants import BATCH_JOB_QUEUE
+from core.constants import BATCH_JOB_QUEUE, BRANCH_NAME
 from core.contract import Contract
 from core.helpers.project_root import ProjectRoot
 from core.helpers.session_helper import SessionHelper
@@ -86,16 +85,13 @@ class TransformOperator(AWSBatchOperator):
                 allowing the receiving functions to quickly create without touching the configs schema
         """
         transform = self._get_transform_info()
-        repo = Repo(ProjectRoot().get_path())
-
-        branch = repo.active_branch.name.lower()
         parent = transform.pipeline_state.pipeline.brand.pharmaceutical_company.name.lower()
         child = transform.pipeline_state.pipeline.brand.name.lower()
         state = transform.pipeline_state.pipeline_state_type.name.lower()
         self.__logger.debug(
-            f"Named contract params:: branch = {branch}, parent = {parent}, child = {child}, state = {state}")
+            f"Named contract params:: branch = {BRANCH_NAME}, parent = {parent}, child = {child}, state = {state}")
         contract_tuple = namedtuple(
             "params", ["branch", "parent", "child", "state"])
-        contract_params = contract_tuple(branch, parent, child, state)
+        contract_params = contract_tuple(BRANCH_NAME, parent, child, state)
 
         return contract_params
