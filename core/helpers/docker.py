@@ -2,7 +2,7 @@ import boto3
 import docker
 import base64
 import os
-from core.constants import AWS_ACCOUNT, AWS_REGION, DEV_AWS_ACCOUNT, PROD_AWS_ACCOUNT, DOCKER_REPO, ENVIRONMENT
+from core.constants import AWS_ACCOUNT, AWS_REGION, DEV_AWS_ACCOUNT, PROD_AWS_ACCOUNT, DOCKER_REPO, ENVIRONMENT, BRANCH_NAME
 from core.helpers.project_root import ProjectRoot
 from core.logging import LoggerMixin
 from git import Repo
@@ -67,6 +67,7 @@ class CoreDocker(LoggerMixin):
                                                             'core.dockerfile')
         self.batch_client = boto3.client('batch')
         self.ecr_client = boto3.client('ecr')
+        self.ecs_client = boto3.client('ecs')
         self.d_api_client = self._build_docker_api_client()
         self.d_client = self._build_docker_client()
 
@@ -183,6 +184,18 @@ class CoreDocker(LoggerMixin):
                     {
                         'name': 'AWS_DEFAULT_REGION',
                         'value': AWS_REGION
+                    },
+                    {
+                        'name': 'ICHAIN_ENVIRONMENT',
+                        'value': ENVIRONMENT
+                    },
+                    {
+                        'name': 'BRANCH_NAME',
+                        'value': BRANCH_NAME
+                    },
+                    {
+                        'name': 'ICHAIN_ENV_BUCKET',
+                        'value': "ichain-uat"
                     }
                 ],
                 'jobRoleArn': job_role_arn,
