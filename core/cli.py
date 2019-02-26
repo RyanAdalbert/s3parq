@@ -27,6 +27,7 @@ def publish():
     aws_account_id = c_docker.get_aws_account()
     aws_tag = c_docker.get_aws_tag(tag, aws_account_id)
     job_role_arn = f"arn:aws:iam::{aws_account_id}:role/ecs-tasks"
+    
 
     logger.info(f"Building docker image {tag}")
     core_docker.build_image(tag)
