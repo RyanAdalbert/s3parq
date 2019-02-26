@@ -21,12 +21,22 @@ def reset_constants():
     
     ## set the branch name based on the current repo branch, and account for Jenkins weirdness with detached heads
     def get_branch_name():
-        repo = Repo(ProjectRoot().get_path())
-        try:
-            return repo.active_branch.name
-        except:
-            return os.environ['BRANCH_NAME']
-    
+        ## if we already picked up branch name from ICHAIN_BRANCH_NAME, leave it
+        if 'ICHAIN_BRANCH_NAME' in os.environ.keys():
+            return globals()['BRANCH_NAME']
+        ## if dev, we need to use the branch name or the os environment variable for jenkins
+        elif globals()['ENVIRONMENT'] == 'dev':
+            try:
+                repo = Repo(ProjectRoot().get_path())
+                return repo.active_branch.name
+
+            ## jenkins weirdness in dev
+            except:
+                return os.environ['BRANCH_NAME']
+        ## for prod and uat use the environment name 
+        else:
+            return globals()['ENVIRONMENT']
+
     globals()['BRANCH_NAME'] = get_branch_name()
 
 reset_constants()
