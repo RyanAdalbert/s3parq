@@ -23,3 +23,15 @@ def test_branch_is_prod_for_prod(monkeypatch):
         m.setenv('ICHAIN_ENVIRONMENT', 'prod')
         c.reset_constants()
         assert c.BRANCH_NAME == 'prod'
+
+
+def test_dynamic_configs(monkeypatch):
+    dy_configs=['AWS_ACCOUNT','BRANCH_NAME','ENV_BUCKET','BATCH_JOB_QUEUE']
+    with monkeypatch.context() as m:
+        for d in dy_configs:
+            m.setenv(f"ICHAIN_{d}",f"overriden_{d}")
+            c.reset_constants()
+            assert getattr(c,d) == f"overriden_{d}"
+
+        
+

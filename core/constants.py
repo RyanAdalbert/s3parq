@@ -46,7 +46,9 @@ def reset_constants():
             return f"ichain-{globals()['ENVIRONMENT']}"
 
     def get_aws_account():
-        if globals()['ENVIRONMENT'] in ('prod', 'uat'):
+        if 'ICHAIN_AWS_ACCOUNT' in os.environ.keys():
+            return os.environ['ICHAIN_AWS_ACCOUNT']
+        elif globals()['ENVIRONMENT'] in ('prod', 'uat'):
             return globals()['PROD_AWS_ACCOUNT']
         else:
             return globals()['DEV_AWS_ACCOUNT']
