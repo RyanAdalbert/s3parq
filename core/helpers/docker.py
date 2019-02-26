@@ -118,6 +118,7 @@ class CoreDocker(LoggerMixin):
 
     def _ecr_login(self, account_id: str):
         """ logs docker into the ecr Registry using the given account id."""
+        self.logger.debug(f"Using account {account_id}")
         ecr_response = self.ecr_client.get_authorization_token(registryIds=[account_id])
         auth_data = ecr_response['authorizationData'][0]
         decoded_token = base64.b64decode(auth_data['authorizationToken']).decode("utf-8")
@@ -134,6 +135,8 @@ class CoreDocker(LoggerMixin):
             registry=registry_url,
             reauth=True
         )
+
+        print(docker_response)
 
         # The only way to know if you're login actually succeeded is to try to do 
         # something once you've "logged in".

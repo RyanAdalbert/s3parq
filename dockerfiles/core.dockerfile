@@ -97,6 +97,7 @@ COPY dockerfiles/entrypoints/notebook.sh /notebook-entrypoint.sh
 RUN chown -R airflow: ${AIRFLOW_HOME}
 
 COPY . $core_location
+COPY ./core/airflow/dags /root/airflow/dags
 
 # remove the enum package that some jerkface dependency is installing
 RUN rm -r /usr/local/lib/python3.6/site-packages/enum \
@@ -110,4 +111,4 @@ ENV AWS_DEFAULT_REGION="us-east-1"
 
 WORKDIR ${AIRFLOW_HOME}
 # ENTRYPOINT ["/entrypoint.sh"]
-CMD ["./airflow-entrypoint.sh webserver"] # set default arg for entrypoint
+CMD ["/airflow-entrypoint.sh", "webserver"] # set default arg for entrypoint

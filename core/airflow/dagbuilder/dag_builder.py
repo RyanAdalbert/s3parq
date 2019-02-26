@@ -13,7 +13,7 @@ class DagBuilder(LoggerMixin):
         self.DEFAULT_ARGS = {
             "owner": "integriChain",
             "depends_on_past": False,
-            "start_date": datetime(2000, 1, 1),
+            "start_date": datetime(2019, 2, 24),
             "email": ["engineering@integrichain.com"],
             "email_on_failure": False,
             "email_on_retry": False,
