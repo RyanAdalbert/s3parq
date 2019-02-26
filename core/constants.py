@@ -23,7 +23,7 @@ def reset_constants():
     def get_branch_name():
         ## if we already picked up branch name from ICHAIN_BRANCH_NAME, leave it
         if 'ICHAIN_BRANCH_NAME' in os.environ.keys():
-            return globals()['BRANCH_NAME']
+            return os.environ["ICHAIN_BRANCH_NAME"]
         ## if dev, we need to use the branch name or the os environment variable for jenkins
         elif globals()['ENVIRONMENT'] == 'dev':
             try:
@@ -37,6 +37,20 @@ def reset_constants():
         else:
             return globals()['ENVIRONMENT']
 
-    globals()['BRANCH_NAME'] = get_branch_name()
+    def get_env_bucket():
+        if 'ICHAIN_ENV_BUCKET' in os.environ.keys():
+            return os.environ['ICHAIN_ENV_BUCKET']
+        else:
+            return f"ichain-{globals()['ENVIRONMENT']}"
+    
+    def get_aws_account():
+        if globals()['ENVIRONMENT'] in ('prod','uat'):
+            return globals()['PROD_AWS_ACCOUNT']
+        else:
+            return globals()['DEV_AWS_ACCOUNT']
 
+    ## Dynamic (smart) Constants
+    globals()['BRANCH_NAME'] = get_branch_name()
+    globals()['ENV_BUCKET'] = get_env_bucket()
+    globals()['AWS_ACCOUNT'] = get_aws_account()
 reset_constants()

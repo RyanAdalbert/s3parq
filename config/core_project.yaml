@@ -1,18 +1,15 @@
-##TODO: env should ideally set these
-ENVIRONMENT: dev
-ENV_BUCKET: ichain-dev
-
 ## constants
+ENVIRONMENT: dev
+##ENV_BUCKET default is set to 'ichain-<ENVIRONMENT>' 
 DOCKER_REPO: ichain/core
 DEV_BUCKET: ichain-dev
 PROD_BUCKET: ichain-production
 UAT_BUCKET: ichain-uat
 DEV_AWS_ACCOUNT: "265991248033"
 PROD_AWS_ACCOUNT: "687531504312"
-AWS_ACCOUNT: "265991248033"
 AWS_REGION: us-east-1
 AWS_BATCH_TEST_JOB_QUEUE: core
 LOGGING_CONFIG: logging.yaml
 DEV_CONFIGURATION_APPLICATION_CONN_STRING: "postgresql://configurator:configurator@configurationpg/configuration_application"
-CORE_VERSION: "0.0.1"
+CORE_VERSION: "0.0.11"
 BATCH_JOB_QUEUE: core
