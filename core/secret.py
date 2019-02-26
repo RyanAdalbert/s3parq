@@ -1,6 +1,5 @@
 import boto3
 import json
-import logging
 from core.logging import LoggerMixin
 from core.constants import ENVIRONMENT
 
