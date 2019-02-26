@@ -63,7 +63,7 @@ wait_for_port() {
   done
 }
 
-AIRFLOW__CORE__BASE_LOG_FOLDER=/usr/local/airflow/logs
+export AIRFLOW__CORE__BASE_LOG_FOLDER=/usr/local/airflow/logs
 
 if [ "$AIRFLOW__CORE__EXECUTOR" != "SequentialExecutor" ]; then
   if [ "$DB_TYPE" = "mysql" ];then
