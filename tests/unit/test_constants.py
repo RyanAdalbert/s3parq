@@ -17,8 +17,9 @@ def test_envar_overrides_config_file(monkeypatch):
         c.reset_constants()
         assert c.DEV_BUCKET == test_var
 
+
 def test_branch_is_prod_for_prod(monkeypatch):
-   with monkeypatch.context() as m:
-        m.setenv('ICHAIN_ENVIRONMENT','prod')
+    with monkeypatch.context() as m:
+        m.setenv('ICHAIN_ENVIRONMENT', 'prod')
         c.reset_constants()
         assert c.BRANCH_NAME == 'prod'
