@@ -8,11 +8,12 @@ def cli(): # pragma: no cover
 
 # Adjusting locked env variable from local -> dev for proper run, until env vars are adjusted per DC-157
 @cli.command()
-@click.argument('env', type=click.Choice(['dev']))
 @click.argument('id', type=int)
-@click.argument('input_contract', type=str)
-@click.argument('output_contract', type=str)
-def run(env, id, input_contract, output_contract):
-    notebook_url = notebook.run_transform(env, id, input_contract, output_contract)
+@click.option('--branch', default=None, type=str)
+@click.option('--parent', default=None, type=str)
+@click.option('--child', default=None, type=str)
+@click.option('--state', default=None, type=str)
+def run(id, branch, parent, child, state):
+    notebook_url = notebook.run_transform(id, branch=branch, parent=parent, child=child, state=state)
     print("See your notebook output at:")
     print(notebook_url)

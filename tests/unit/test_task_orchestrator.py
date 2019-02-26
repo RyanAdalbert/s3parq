@@ -65,10 +65,10 @@ class Test:
     def test_assign_deps_to_ordered_tasks(self):
         dag = DAG("test_dag", start_date=datetime(
             2000, 6, 1), schedule_interval="@daily")
-        ordered_transform_operators = [tuple(["raw", {TransformOperator(1), TransformOperator(2)}]),
+        ordered_transform_operators = [tuple(["raw", {TransformOperator(transform_id=1), TransformOperator(transform_id=2)}]),
                                        tuple(
-                                           ["ingest", {TransformOperator(3), TransformOperator(4)}]),
-                                       tuple(["ingest", {TransformOperator(5)}])]
+                                           ["ingest", {TransformOperator(transform_id=3), TransformOperator(transform_id=4)}]),
+                                       tuple(["ingest", {TransformOperator(transform_id=5)}])]
         to = TaskOrchestrator()
 
         dep_assigned_tasks = to._apply_deps_to_ordered_tasks(

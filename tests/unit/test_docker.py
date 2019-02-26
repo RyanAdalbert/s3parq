@@ -1,6 +1,6 @@
 import pytest
 from core.helpers import docker
-from git import Repo
+from core.constants import BRANCH_NAME
 import os
 from typing import Callable
 from unittest.mock import patch
@@ -15,16 +15,11 @@ def with_env(env: str, module: str, f: Callable):
 class Test():
     def setup(self):
         self.module = "core.helpers.docker"
-        repo = Repo(ProjectRoot().get_path())
-        try:
-            self.branch_name =  repo.active_branch.name
-        except:
-            self.branch_name =  os.environ['BRANCH_NAME']
 
     def test_get_core_tag(self):
         self.setup()
         dev_tag = with_env("dev", self.module, docker.get_core_tag)
-        assert dev_tag == f"ichain/core:{self.branch_name}"
+        assert dev_tag == f"ichain/core:{BRANCH_NAME}"
 
         uat_tag = with_env("uat", self.module, docker.get_core_tag)
         assert uat_tag == "ichain/core:uat"
@@ -38,7 +33,7 @@ class Test():
     def test_get_core_job_def_name(self):
         self.setup()
         dev_job_def_name = with_env("dev", self.module, docker.get_core_job_def_name)
-        assert dev_job_def_name == f"core_{self.branch_name}"
+        assert dev_job_def_name == f"core_{BRANCH_NAME}"
 
         uat_job_def_name = with_env("uat", self.module, docker.get_core_job_def_name)
         assert uat_job_def_name == f"core_uat"

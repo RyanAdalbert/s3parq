@@ -108,8 +108,6 @@ login creds, host URLS, and other security-minded bits are managed by aws secret
 
 Note that env should be passed from some environment-aware variable.    
 
-### Corebot
-Corebot is another CLI interface. This is meant to be the "client" part to our "server" part, allowing a separate interface for what people should be calling vs. what processes should be calling. This should only be the entry point, with the guts of the processes still living in a component in standard core.
 
 
 ## Pipeline Runs: an Airflow Story
@@ -129,5 +127,41 @@ To avoid adding sub-dags or structuring DAG chains from state to state, we use a
 
 ### Testing Operators
 tasks are instances of operators. To test operators, use the [operator\_tester.py](../core/airflow/dags/operator_tester.py) dag - this will create a simple DAG for your operator that can be run manually from the airflow GUI. 
+
+## Over the Wire: Creating, Running and Managing Worker Containers via AWS Batch
+
+### Philosophy
+
+![CORE Pipeline](https://www.lucidchart.com/publicSegments/view/383636c2-d25a-4524-b2b7-83b339a48154/image.png)
+
+Our pipeline workflow is divided into 2 very distict roles: the orchestrator and the worker. 
+
+**Orchestrators** control the timing and dependencies between tasks. If our pipeline is the [Philadelphia Orchestra](https://www.philorch.org/#/), the orchestrator would be the conductor.
+
+![Conductor](https://media.npr.org/assets/img/2013/01/17/carnegie_philly_wide-e52d8e8169c0765d3c3c058e2c368fc118f4cf42-s400-c85.jpg)
+
+<sup>The orchestrator component of the pipeline acts as the conductor,  
+directing the workers and keeping them in time.</sup>
+
+**Workers** do the actual data processing. These would be the tuba players and the violinists and such. Each worker is independent - so just like a single triangle player could call in sick and be replaced by her/his understudy, workers are readily replacable. 
+
+Continuing our orchestra example, you would never want the conductor and the triangle player to be the same person; in this case, "people" represent containers. You could hypothetically have the same person play the triangle and the wood block, but never ever should the conductor be playing an instrument. For now, we spin up a new "person" (container) for each instrument (task) to be performed. 
+
+### How it Comes Together
+Our airflow Orchestrator instance creates DAGs as collections of tasks; each task is just the set of commands to be sent to AWS Batch, where a Worker instance is created and executed for each task. The same codebase lives on both the Orchestrator and Worker containers; the difference is in what code is executed in the different containers. On the Orchestrator we run the airflow code to create the scheduler, task management etc etc. On the Worker containers we execute tasks via Corebot. 
+
+
+### TransformOperator and Docker.py
+The transform operator is our key to communication between the "orchestrator" and the "workers"; this operator uses the [docker.py](../core/helpers/docker.py) library to:
+- select the correct image in Batch
+- select the job queue (we only use "core" for now)
+- insert the overrides into the corebot cli string
+
+These commands are sent to a worker instance where corebot is run! 
+
+### Corebot
+Corebot is another CLI interface. This is meant to be the "worker" part to our "orchestrator" part, allowing a separate interface for what people should be calling vs. what processes should be calling. This should only be the entry point, with the guts of the processes still living in a component in standard core.
+
+
 
 
