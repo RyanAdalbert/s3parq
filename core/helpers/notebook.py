@@ -1,7 +1,7 @@
 import papermill as pm
 from core.helpers import project_root
 from core.constants import ENV_BUCKET
-from core.helpers import configuration_mocker
+from core.helpers.session_helper import SessionHelper
 from core.models import configuration
 from core import contract
 
@@ -56,14 +56,10 @@ def get_contract(state, branch, parent, child):
     return kontract
 
 def get_transform(transform_id):
-    config_mock = configuration_mocker.ConfigurationMocker()
-    config_mock.generate_mocks()
+    session = SessionHelper().session
 
-    session = config_mock.get_session()
-
-    ec = configuration.ExtractConfiguration
-    t = configuration.Transformation
+    transform_config = configuration.Transformation
 
     # Start querying the extract configs
-    transform = session.query(t).filter(t.id == transform_id).one()
+    transform = session.query(transform_config).filter(transform_config.id == transform_id).one()
     return transform
