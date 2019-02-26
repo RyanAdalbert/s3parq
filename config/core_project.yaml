@@ -1,6 +1,5 @@
 ## constants
 ENVIRONMENT: dev
-##ENV_BUCKET default is set to 'ichain-<ENVIRONMENT>' 
 DOCKER_REPO: ichain/core
 DEV_BUCKET: ichain-dev
 PROD_BUCKET: ichain-production
@@ -12,4 +11,8 @@ AWS_BATCH_TEST_JOB_QUEUE: core
 LOGGING_CONFIG: logging.yaml
 DEV_CONFIGURATION_APPLICATION_CONN_STRING: "postgresql://configurator:configurator@configurationpg/configuration_application"
 CORE_VERSION: "0.0.11"
-BATCH_JOB_QUEUE: core
+
+## DYNAMICS
+# AWS_ACCOUNT default is set to PROD_AWS_ACCOUNT for prod and uat, DEV_AWS_ACCOUNT otherwise
+# BATCH_JOB_QUEUE default is set to '<ENVIRONMENT>-core'
+# ENV_BUCKET default is set to 'ichain-<ENVIRONMENT>' 

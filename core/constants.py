@@ -33,7 +33,7 @@ def reset_constants():
             ## jenkins weirdness in dev
             except:
                 return os.environ['BRANCH_NAME']
-        ## for prod and uat use the environment name 
+        ## for prod and uat if they are hard-coded? for whatever reason, use the environment name 
         else:
             return globals()['ENVIRONMENT']
 
@@ -48,9 +48,17 @@ def reset_constants():
             return globals()['PROD_AWS_ACCOUNT']
         else:
             return globals()['DEV_AWS_ACCOUNT']
+    
+    def get_batch_job_queue():
+        if 'ICHAIN_BATCH_JOB_QUEUE' in os.environ.keys():
+            return os.environ['ICHAIN_BATCH_JOB_QUEUE']
+        else:
+            return f"{globals()['ENVIRONMENT']}-core"
+
 
     ## Dynamic (smart) Constants
     globals()['BRANCH_NAME'] = get_branch_name()
     globals()['ENV_BUCKET'] = get_env_bucket()
     globals()['AWS_ACCOUNT'] = get_aws_account()
+    globals()['BATCH_JOB_QUEUE'] = get_batch_job_queue()
 reset_constants()
