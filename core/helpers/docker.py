@@ -54,6 +54,7 @@ class CoreDocker(LoggerMixin):
                                                             'core.dockerfile')
         self.batch_client = boto3.client('batch')
         self.ecr_client = boto3.client('ecr')
+        self.ecs_client = boto3.client('ecs')
         self.d_api_client = self._build_docker_api_client()
         self.d_client = self._build_docker_client()
 
@@ -170,6 +171,18 @@ class CoreDocker(LoggerMixin):
                     {
                         'name': 'AWS_DEFAULT_REGION',
                         'value': AWS_REGION
+                    },
+                    {
+                        'name': 'ICHAIN_ENVIRONMENT',
+                        'value': ENVIRONMENT
+                    },
+                    {
+                        'name': 'BRANCH_NAME',
+                        'value': BRANCH_NAME
+                    },
+                    {
+                        'name': 'ICHAIN_ENV_BUCKET',
+                        'value': "ichain-uat"
                     }
                 ],
                 'jobRoleArn': job_role_arn,
