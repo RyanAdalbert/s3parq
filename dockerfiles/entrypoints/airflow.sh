@@ -35,10 +35,7 @@ export \
 
 
 # Load DAGs exemples (default: Yes)
-if [[ -z "$AIRFLOW__CORE__LOAD_EXAMPLES" && "${LOAD_EX:=n}" == n ]]
-then
-  AIRFLOW__CORE__LOAD_EXAMPLES=False
-fi
+AIRFLOW__CORE__LOAD_EXAMPLES=False
 
 # This now gets taken care of in the dockerfile
 # Install custom python package if requirements.txt is present
@@ -65,6 +62,8 @@ wait_for_port() {
     sleep 5
   done
 }
+
+export AIRFLOW__CORE__BASE_LOG_FOLDER=/usr/local/airflow/logs
 
 if [ "$AIRFLOW__CORE__EXECUTOR" != "SequentialExecutor" ]; then
   if [ "$DB_TYPE" = "mysql" ];then
