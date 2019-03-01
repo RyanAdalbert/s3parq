@@ -70,6 +70,7 @@ class Test:
             repo_digest = test_ecr_image.attrs['RepoDigests'][0]
         except:
             time.sleep(10)
+            test_ecr_image = self.docker_client.images.get(aws_tag)
             repo_digest = test_ecr_image.attrs['RepoDigests'][0]
 
         digest_sha = repo_digest.split("@")[-1]
@@ -100,7 +101,9 @@ class Test:
             repo_digest = test_ecr_image.attrs['RepoDigests'][0]
         except:
             time.sleep(10)
+            test_ecr_image = self.docker_client.images.get(aws_tag)
             repo_digest = test_ecr_image.attrs['RepoDigests'][0]
+            
         digest_sha = repo_digest.split("@")[-1]
 
         ecr_resp = self.ecr_client.describe_images(
