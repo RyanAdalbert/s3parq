@@ -106,6 +106,17 @@ class ExtractConfiguration(UniversalWithPrimary, Base):
     transformation = relationship(
         "Transformation", back_populates='extract_configurations')
 
+class InitialInjestConfiguration(UniversalWithPrimary, Base):
+    __tablename__ = 'inital_injest_configurations'
+    transformation_id = Column(Integer, ForeignKey(
+        'transformations.id'), nullable=False)
+    delimiter = Column(String, nullable=False, default=",")
+    skip_rows = Column(Integer, nullable=False, default=0)
+    encoding = Column(String, nullable=False, default="utf-8")
+    input_file_prefix = Column(String)
+    dataset_name = Column(String)
+    transformation = relationship(
+        "Transformation", back_populates='inital_injest_configurations')
 
 class PharmaceuticalCompany(UniversalWithPrimary, Base):
     __tablename__ = 'pharmaceutical_companies'
@@ -168,6 +179,8 @@ class Transformation(UniversalWithPrimary, Base):
     graph_order = Column(Integer, nullable=False, server_default=text('0'))
     extract_configurations = relationship(
         "ExtractConfiguration", order_by=ExtractConfiguration.id, back_populates='transformation')
+    initial_injest_configurations = relationship(
+        "InitialInjestConfiguration", order_by=InitialInjestConfiguration.id, back_populates='transformation')
 
 
 class TransformationTemplate(UniversalWithPrimary, Base):
