@@ -77,29 +77,29 @@ INSERT INTO transformations (transformation_template_id, pipeline_state_id, grap
         ((SELECT id FROM transformation_templates WHERE name = 'extract_from_ftp'),(SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'raw') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_just_extract')),0, 'emk@integrichain.com'),
         ((SELECT id FROM transformation_templates WHERE name = 'extract_from_ftp'),(SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'raw') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'bi_just_extract')),0, 'emk@integrichain.com');
 
-INSERT INTO extract_configurations (transformation_id, secret_name, secret_type_of, prefix, filesystem_path, last_actor)
+INSERT INTO extract_configurations (transformation_id, secret_name, secret_type_of, filesystem_path, prefix, last_actor)
     VALUES
         ((SELECT id FROM transformations WHERE transformation_template_id = (SELECT id FROM transformation_templates WHERE name = 'extract_from_ftp') AND pipeline_state_id = (SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'raw') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'sun_just_extract'))), 
         'sun',
-        'ftp',
+        'FTP',
         'frommsa/SUN',
         'INTEGRICHAIN_SUN_',
         'emk@integrichain.com'),
         ((SELECT id FROM transformations WHERE transformation_template_id = (SELECT id FROM transformation_templates WHERE name = 'extract_from_ftp') AND pipeline_state_id = (SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'raw') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'bi_just_extract'))), 
-        'bi_ipf',
-        'ftp',
+        'bi',
+        'FTP',
         'SpecilatyAnalytics',
         'IPF_PAT_',
         'emk@integrichain.com'),
         ((SELECT id FROM transformations WHERE transformation_template_id = (SELECT id FROM transformation_templates WHERE name = 'extract_from_ftp') AND pipeline_state_id = (SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'raw') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'bi_just_extract'))), 
-        'bi_bridge',
-        'ftp',
+        'bi',
+        'FTP',
         'SpecilatyAnalytics',
         'BRIDGE_PAT_',
         'emk@integrichain.com'),
         ((SELECT id FROM transformations WHERE transformation_template_id = (SELECT id FROM transformation_templates WHERE name = 'extract_from_ftp') AND pipeline_state_id = (SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'raw') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_just_extract'))), 
         'alkermes',
-        'ftp',
+        'FTP',
         'LiquidHub-Achive',
         'VIVITROL_',
         'emk@integrichain.com');
