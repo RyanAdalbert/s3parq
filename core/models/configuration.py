@@ -107,7 +107,7 @@ class ExtractConfiguration(UniversalWithPrimary, Base):
         "Transformation", back_populates='extract_configurations')
 
 class InitialInjestConfiguration(UniversalWithPrimary, Base):
-    __tablename__ = 'inital_injest_configurations'
+    __tablename__ = 'initial_injest_configurations'
     transformation_id = Column(Integer, ForeignKey(
         'transformations.id'), nullable=False)
     delimiter = Column(String, nullable=False, default=",")
@@ -116,7 +116,7 @@ class InitialInjestConfiguration(UniversalWithPrimary, Base):
     input_file_prefix = Column(String)
     dataset_name = Column(String)
     transformation = relationship(
-        "Transformation", back_populates='inital_injest_configurations')
+        "Transformation", back_populates='initial_injest_configurations')
 
 class PharmaceuticalCompany(UniversalWithPrimary, Base):
     __tablename__ = 'pharmaceutical_companies'
