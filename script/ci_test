@@ -1,9 +1,8 @@
 #!/bin/sh
 
 docker build -t ichain/core:ci -f ./dockerfiles/core.dockerfile .;
+
 docker run --rm \
-  -e ICHAIN_AWS_BATCH_TEST_JOB_QUEUE="prod_core" \
-  -e ICHAIN_AWS_ACCOUNT="687531504312" \
   -e BRANCH_NAME \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -w /usr/src/app \

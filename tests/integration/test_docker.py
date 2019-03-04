@@ -2,6 +2,7 @@ import pytest
 import docker
 import boto3
 from datetime import datetime, timezone, timedelta
+import time
 
 from docker.models.images import Image
 from docker.errors import ImageNotFound
@@ -65,7 +66,13 @@ class Test:
         test_ecr_image = self.docker_client.images.get(aws_tag)
         assert type(test_ecr_image) is Image
 
-        repo_digest = test_ecr_image.attrs['RepoDigests'][0]
+        try:
+            repo_digest = test_ecr_image.attrs['RepoDigests'][0]
+        except:
+            time.sleep(10)
+            test_ecr_image = self.docker_client.images.get(aws_tag)
+            repo_digest = test_ecr_image.attrs['RepoDigests'][0]
+
         digest_sha = repo_digest.split("@")[-1]
 
         ecr_resp = self.ecr_client.describe_images(
@@ -90,7 +97,13 @@ class Test:
         self.core_docker.add_tag_in_ecr(tag, new_tag, AWS_ACCOUNT)
 
         # grab the existing digest since we're just retagging, not rebuilding
-        repo_digest = test_ecr_image.attrs['RepoDigests'][0]
+        try:
+            repo_digest = test_ecr_image.attrs['RepoDigests'][0]
+        except:
+            time.sleep(10)
+            test_ecr_image = self.docker_client.images.get(aws_tag)
+            repo_digest = test_ecr_image.attrs['RepoDigests'][0]
+            
         digest_sha = repo_digest.split("@")[-1]
 
         ecr_resp = self.ecr_client.describe_images(
