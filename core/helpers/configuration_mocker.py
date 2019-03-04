@@ -163,8 +163,8 @@ class ConfigurationMocker(LoggerMixin):
         self.logger.debug('Generating transformation_template mocks.')
         tt = config.TransformationTemplate
         self.session.add_all([
-            tt(id=1, name='always_money_in_the_banana_stand'),
-            tt(id=2, name='02_finish_each_others_sandwiches')
+            tt(id=1, name='extract_from_ftp'),
+            tt(id=2, name='initial_ingest')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')

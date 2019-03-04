@@ -1,7 +1,7 @@
 import pytest
 import core.models.configuration as config
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
-
+from sqlalchemy.orm import with_polymorphic
 
 def test_get_extract_configuration():
     session = CMock().get_session()
@@ -9,7 +9,8 @@ def test_get_extract_configuration():
     CMock().generate_mocks()
     # make dummy records
     ec = config.ExtractConfiguration
-    t = config.Transformation
+    t = config.ExtractTransformation
+    polymorphic_t =  with_polymorphic(config.Transformation, '*')
     session.add(t(id=100, pipeline_state_id=1, transformation_template_id=1))
     session.commit()
 
@@ -23,9 +24,11 @@ def test_get_extract_configuration():
 
     session.commit()
 
-    q = session.query(t).filter(t.id == 100)
+    q = session.query(polymorphic_t).filter(t.id == 100)
+    print(q)
     secrets = []
     for f_transform in q:
+        print(f_transform)
         for extract in f_transform.extract_configurations:
             secrets.append(extract.secret_name)
 
