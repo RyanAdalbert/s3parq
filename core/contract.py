@@ -175,7 +175,8 @@ class Contract(LoggerMixin):
             try:
                 self.set_branch(BRANCH_NAME)
             except:
-                raise ValueError(f'Your git branch name {branch_name} cannot be used as a contract branch path.')
+                raise ValueError(
+                    f'Your git branch name {branch_name} cannot be used as a contract branch path.')
 
     def _set_contract_type(self)->None:
         ''' INTENT: sets what type of contract this is - file, partition, or dataset
@@ -217,14 +218,16 @@ class Contract(LoggerMixin):
         path += self.file_name
         return path
 
-    def fetch(self, filters:dict)->pd.DataFrame:
+    def fetch(self, filters: dict)->pd.DataFrame:
         if self.contract_type != "dataset":
-            raise ValueError(f"contract.fetch() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
+            raise ValueError(
+                f"contract.fetch() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
         raise NotImplementedError("Fetch does not exist yet!")
 
-    def publish(self, dataframe:pd.DataFrame)->None:
+    def publish(self, dataframe: pd.DataFrame)->None:
         if self.contract_type != "dataset":
-            raise ValueError(f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
+            raise ValueError(
+                f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
         raise NotImplementedError("Publish does not exist yet!")
 
     def publish_raw_file(self, local_file_path: str) ->None:
@@ -235,7 +238,8 @@ class Contract(LoggerMixin):
 
         s3_client = boto3.client('s3')
         self.set_file_name(os.path.split(local_file_path)[1])
-        self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()}.')
+        self.logger.info(
+            f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()}.')
 
         with open(local_file_path, 'rb') as file_data:
             extra_args = {'source_modified_time': str(
@@ -243,13 +247,13 @@ class Contract(LoggerMixin):
             s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
             ), Key=self.get_key(), ExtraArgs={"Metadata": extra_args})
 
-    def get_raw_file_metadata(self, local_file_path:str) ->None:
+    def get_raw_file_metadata(self, local_file_path: str) ->None:
         # If file exists, return its metadata
         s3_client = boto3.client('s3')
-        
+
         self.set_file_name(os.path.split(local_file_path)[1])
         try:
-            return s3_client.head_object(Bucket=self.get_bucket(),Key=self.get_key())
+            return s3_client.head_object(Bucket=self.get_bucket(), Key=self.get_key())
         except ClientError as e:
             # If file does not exist, throw back since it needs to be moved anyways
             #   Consider: cleaner handling?
