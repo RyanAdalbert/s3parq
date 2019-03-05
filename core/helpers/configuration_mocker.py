@@ -32,6 +32,7 @@ class ConfigurationMocker(LoggerMixin):
         self._mock_transformation_templates()
         self._mock_transformations()
         self._mock_extract_configurations()
+        self._mock_initial_ingest_configurations()
 
     def _mock_brands(self)-> None:
         self.logger.debug('Generating brand mocks.')
@@ -42,6 +43,17 @@ class ConfigurationMocker(LoggerMixin):
             b(id=2, name="Cornballer2", display_name="Corn Baller", pharmaceutical_company_id=2)])
         self.session.commit()
         self.logger.debug('Done generating brand mocks.')
+
+
+    def _mock_initial_ingest_configurations(self)-> None:
+        self.logger.debug('Generating initial_ingest mocks.')
+        ii = config.InitialIngestConfiguration
+        self.session.add_all([
+            ii(id=1, transformation_id=11, delimiter=',', skip_rows=0, encoding="utf-8")
+        ])
+        self.session.commit()
+        self.logger.debug('Done generating initial_ingest mocks.')
+
 
     def _mock_extract_configurations(self)-> None:
         self.logger.debug('Generating extract_configuation mocks.')
@@ -154,7 +166,9 @@ class ConfigurationMocker(LoggerMixin):
             t(id=7, transformation_template_id=1,
               pipeline_state_id=4, graph_order=1),
             t(id=8, transformation_template_id=1,
-              pipeline_state_id=4, graph_order=2)
+              pipeline_state_id=4, graph_order=2),
+            t(id=11, transformation_template_id=3,
+              pipeline_state_id=2, graph_order=0)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation mocks.')
@@ -164,7 +178,8 @@ class ConfigurationMocker(LoggerMixin):
         tt = config.TransformationTemplate
         self.session.add_all([
             tt(id=1, name='always_money_in_the_banana_stand'),
-            tt(id=2, name='02_finish_each_others_sandwiches')
+            tt(id=2, name='02_finish_each_others_sandwiches'),
+            tt(id=3, name='shared_initial_ingest')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')

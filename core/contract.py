@@ -6,6 +6,7 @@ from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET, BRA
 from core.logging import LoggerMixin
 from core.helpers.project_root import ProjectRoot
 
+from typing import List
 
 class Contract(LoggerMixin):
     ''' The s3 contract is how we structure our data lake. 
@@ -152,10 +153,6 @@ class Contract(LoggerMixin):
         self.partitions = temp_partitions
         self._set_contract_type()
 
-    def set_file_name(self, file_name: str)->None:
-        self.file_name = self._validate_part(file_name)
-        self._set_contract_type()
-
     def set_env(self)->None:
         env = ENVIRONMENT.lower()
         if env in (self.DEV, 'dev', 'development'):
@@ -212,7 +209,7 @@ class Contract(LoggerMixin):
             for p in self.partitions:
                 path += f'{p}/'
 
-        path += self.file_name
+        # path += self.file_name
         return path
 
     def publish_raw_file(self, local_file_path: str) ->None:
@@ -222,22 +219,27 @@ class Contract(LoggerMixin):
                 'publish_raw_file may only be used on raw contracts.')
 
         s3_client = boto3.client('s3')
-        self.set_file_name(os.path.split(local_file_path)[1])
-        self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()}.')
+        filename = os.path.split(local_file_path)[1]
+        key = self.get_key()+filename
+        # self.set_file_name(os.path.split(local_file_path)[1])
+        self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()+filename}.')
 
         with open(local_file_path, 'rb') as file_data:
+            print(f"publish_raw_file Key: {key}")
             extra_args = {'source_modified_time': str(
                 float(os.stat(local_file_path).st_mtime))}
-            s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
-            ), Key=self.get_key(), ExtraArgs={"Metadata": extra_args})
+            resp = s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
+            ), Key=key, ExtraArgs={"Metadata": extra_args})
+            print(resp)
 
     def get_raw_file_metadata(self, local_file_path:str) ->None:
         # If file exists, return its metadata
         s3_client = boto3.client('s3')
         
-        self.set_file_name(os.path.split(local_file_path)[1])
+        filename = os.path.split(local_file_path)[1]
+        key = self.get_key()+filename
         try:
-            return s3_client.head_object(Bucket=self.get_bucket(),Key=self.get_key())
+            return s3_client.head_object(Bucket=self.get_bucket(),Key=key)
         except ClientError as e:
             # If file does not exist, throw back since it needs to be moved anyways
             #   Consider: cleaner handling?
@@ -245,6 +247,21 @@ class Contract(LoggerMixin):
                 raise e
             else:
                 raise e
+
+    def list_files(self, file_prefix='') -> List[str]:
+        key = self.get_key()
+        keyfix = key+file_prefix
+        try:
+            s3 = boto3.resource('s3')
+            bucket = s3.Bucket(self.get_bucket())
+            objects = [obj.key for obj in bucket.objects.filter(Prefix=keyfix)]
+
+            return objects
+        except ClientError as e:
+            if e.response['Error']['Code'] == "404":
+                raise FileNotFoundError("s3 object not found: %s" % file_prefix)
+            else:
+                raise
 
     # aliases
 
