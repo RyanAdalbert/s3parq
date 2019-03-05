@@ -153,10 +153,6 @@ class Contract(LoggerMixin):
         self.partitions = temp_partitions
         self._set_contract_type()
 
-    # def set_file_name(self, file_name: str)->None:
-    #     self.file_name = self._validate_part(file_name)
-    #     self._set_contract_type()
-
     def set_env(self)->None:
         env = ENVIRONMENT.lower()
         if env in (self.DEV, 'dev', 'development'):
