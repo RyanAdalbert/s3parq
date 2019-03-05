@@ -51,20 +51,20 @@ def test_with_partitions(_contract):
     assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/', 'path was incorrectly built with partitions.'
 
 
-def test_with_file_name_with_partitions(_contract):
-    contract = _contract
-    contract.set_file_name('29980385023509.parquet')
-    contract.set_partitions(['partition_1', 'partition_2'])
-    path = contract.get_s3_path()
-    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/29980385023509.parquet', 'path was incorrectly built with partitions.'
+# def test_with_file_name_with_partitions(_contract):
+#     contract = _contract
+#     contract.set_file_name('29980385023509.parquet')
+#     contract.set_partitions(['partition_1', 'partition_2'])
+#     path = contract.get_s3_path()
+#     assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/29980385023509.parquet', 'path was incorrectly built with partitions.'
 
 
-def test_file_name_no_partitions(_contract):
-    contract = _contract
-    contract.partitions = []  # hack to jump around the 0 len guard
-    contract.set_file_name('29980385023509.parquet')
-    path = contract.get_s3_path()
-    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/29980385023509.parquet', 'path was incorrectly built without partitions and with file name.'
+# def test_file_name_no_partitions(_contract):
+#     contract = _contract
+#     contract.partitions = []  # hack to jump around the 0 len guard
+#     contract.set_file_name('29980385023509.parquet')
+#     path = contract.get_s3_path()
+#     assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/29980385023509.parquet', 'path was incorrectly built without partitions and with file name.'
 
 
 def test_quick_set(_contract):
@@ -114,25 +114,25 @@ def test_invalid_partitions(_partitions):
         contract.set_partitions(p['bad'])
 
 
-@pytest.fixture
-def _file_names():
-    good_file_name = '23598020358908325.parquet'
-    bad_file_name = '@@$10-8953095830-.jpg'
-    return {'good': good_file_name, 'bad': bad_file_name}
+# @pytest.fixture
+# def _file_names():
+#     good_file_name = '23598020358908325.parquet'
+#     bad_file_name = '@@$10-8953095830-.jpg'
+#     return {'good': good_file_name, 'bad': bad_file_name}
 
 
-def test_set_valid_file_name(_file_names):
-    f = _file_names
-    contract = Contract()
-    contract.set_file_name(f['good'])
-    assert contract.get_file_name() == f['good'], "file name was not set"
+# def test_set_valid_file_name(_file_names):
+#     f = _file_names
+#     contract = Contract()
+#     contract.set_file_name(f['good'])
+#     assert contract.get_file_name() == f['good'], "file name was not set"
 
 
-def test_set_invalid_file_name(_file_names):
-    f = _file_names
-    contract = Contract()
-    with pytest.raises(ValueError):
-        contract.set_file_name(f['bad'])
+# def test_set_invalid_file_name(_file_names):
+#     f = _file_names
+#     contract = Contract()
+#     with pytest.raises(ValueError):
+#         contract.set_file_name(f['bad'])
 
 
 @pytest.fixture
@@ -164,19 +164,19 @@ def test_contract_type_partitions(_contract_type):
     ) == 'partition', 'returned wrong type for partition contract'
 
 
-def test_contract_type_file(_contract_type):
-    contract = _contract_type
-    contract.set_partitions(['test_par'])
-    contract.set_file_name('test_file.jpg')
-    assert contract.get_contract_type() == 'file', 'returned wrong type for file contract'
+# def test_contract_type_file(_contract_type):
+#     contract = _contract_type
+#     contract.set_partitions(['test_par'])
+#     contract.set_file_name('test_file.jpg')
+#     assert contract.get_contract_type() == 'file', 'returned wrong type for file contract'
 
 
-def test_contract_type_file_no_partition(_contract_type):
-    contract = _contract_type
-    contract.partitions = []
-    contract.set_file_name('test_file.jpg')
-    assert contract.get_contract_type(
-    ) == 'file', 'returned wrong type for file contract without partition'
+# def test_contract_type_file_no_partition(_contract_type):
+#     contract = _contract_type
+#     contract.partitions = []
+#     contract.set_file_name('test_file.jpg')
+#     assert contract.get_contract_type(
+#     ) == 'file', 'returned wrong type for file contract without partition'
 
 
 def test_previous_state(_contract):
@@ -279,3 +279,28 @@ def test_publish_raw_metadata():
         meta = s3_client.get_object(
             Bucket=f'{ENV_BUCKET}', Key=key)['Metadata']
         assert meta['source_modified_time'] == str(f_time)
+
+
+@moto.mock_s3()
+def test_list_files():
+    client = _s3_mock_setup()
+    contract = _contract_setup()
+
+    with tempfile.NamedTemporaryFile(prefix="imb4") as _file:
+        text = b"Here's some money. Go see a Star War"
+        _file.write(text)
+        _file.seek(0)
+        contract.publish_raw_file(_file.name)
+
+
+        f_time = os.stat(_file.name).st_mtime
+        key = f'master/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
+
+        files = contract.list_files('imb4')
+
+        assert files == [key]
+
+        # s3_client = boto3.client('s3')
+        # meta = s3_client.get_object(
+        #     Bucket=f'{ENV_BUCKET}', Key=key)['Metadata']
+        # assert meta['source_modified_time'] == str(f_time)
