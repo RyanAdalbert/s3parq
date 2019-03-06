@@ -87,9 +87,6 @@ class Contract(LoggerMixin):
     def get_partition_size(self)->str:
         return self.partition_size
 
-    def get_file_name(self)->str:
-        return self.file_name
-
     def get_contract_type(self)->str:
         return self.contract_type
 
@@ -225,12 +222,10 @@ class Contract(LoggerMixin):
         self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()+filename}.')
 
         with open(local_file_path, 'rb') as file_data:
-            print(f"publish_raw_file Key: {key}")
             extra_args = {'source_modified_time': str(
                 float(os.stat(local_file_path).st_mtime))}
             resp = s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
             ), Key=key, ExtraArgs={"Metadata": extra_args})
-            print(resp)
 
     def get_raw_file_metadata(self, local_file_path:str) ->None:
         # If file exists, return its metadata
