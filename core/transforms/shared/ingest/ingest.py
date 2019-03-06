@@ -7,6 +7,7 @@ import os
 import tempfile
 from core.logging import LoggerMixin
 import pandas as pd
+import path from os
 
 def from_transform_id(id):
     t = notebook.get_transform(id)
@@ -38,15 +39,23 @@ class InitialIngestTransform(LoggerMixin):
         self.transform = transform
 
     def run(self):
-        input_path = self.input_contract.get_s3_path()
 
         for config in self.transform.initial_ingest_configurations:
+            in_files = self.input_contract.list_files(config.input_file_prefix)
+
+            for file in files:
+                filename = path.basename(file)
+                with input_contract.download_raw_file(filename) as f:
+                    df = pd.read_csv(f, dtype)
+
+
+
+                
             # Get a list of all the files of interest
                 # Get their metadata
 
             # Get the metadata of the target location
 
-            # Process 
 
             # Check if the file meets
 

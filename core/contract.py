@@ -7,6 +7,28 @@ from core.logging import LoggerMixin
 from core.helpers.project_root import ProjectRoot
 
 from typing import List
+from contextlib import contextmanager
+
+def download_s3_object(bucket: str, key: str, local_dir: str) -> str:
+    """
+    Download an object from s3 to a specified local directory.
+    :param bucket: s3 bucket as a string
+    :param key: s3 path to object to download
+    :param local_dir: directory to store file
+    :return: path of downloaded file
+    """
+    try:
+        s3 = boto3.resource('s3')
+        filename = os.path.split(key)[-1]
+        local_path = os.path.join(local_dir, filename)
+        s3.Bucket(bucket).download_file(key, local_path)
+
+        return local_path
+    except ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            raise FileNotFoundError(f"s3 object not found: s3://{bucket}/{key}")
+        else:
+            raise
 
 class Contract(LoggerMixin):
     ''' The s3 contract is how we structure our data lake. 
@@ -262,6 +284,13 @@ class Contract(LoggerMixin):
                 raise FileNotFoundError("s3 object not found: %s" % file_prefix)
             else:
                 raise
+
+    @contextmanager
+    def download_raw_file(self, filename):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            download_path = download_s3_object(self.get_bucket(), self.get_key()+filename, tmp_dir)
+            yield download_path
+
 
     # aliases
 
