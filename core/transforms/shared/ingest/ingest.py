@@ -7,15 +7,15 @@ import os
 import tempfile
 from core.logging import LoggerMixin
 import pandas as pd
-import path from os
+from os import path
 
-def from_transform_id(id):
-    t = notebook.get_transform(id)
-    return InitialIngestTransform(
-        id=t.id,
-        configurations=t.initial_ingest_configurations,
-        delimiter
-    )
+# def from_transform_id(id):
+#     t = notebook.get_transform(id)
+#     return InitialIngestTransform(
+#         id=t.id,
+#         configurations=t.initial_ingest_configurations,
+#         delimiter
+#     )
 
 
 def list_objects(bucket: str, prefix: str) -> List[str]:
@@ -59,7 +59,4 @@ class InitialIngestTransform(LoggerMixin):
 
             # Check if the file meets
 
-    def csv_to_df(self, delimiter, skip_rows, encoding, filename_prefix, dataset):
-
-
-    def
+    # def csv_to_df(self, delimiter, skip_rows, encoding, filename_prefix, dataset):

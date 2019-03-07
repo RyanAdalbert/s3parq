@@ -106,8 +106,8 @@ class ExtractConfiguration(UniversalWithPrimary, Base):
     transformation = relationship(
         "Transformation", back_populates='extract_configurations')
 
-class InitialInjestConfiguration(UniversalWithPrimary, Base):
-    __tablename__ = 'initial_injest_configurations'
+class InitialIngestConfiguration(UniversalWithPrimary, Base):
+    __tablename__ = 'initial_ingest_configurations'
     transformation_id = Column(Integer, ForeignKey(
         'transformations.id'), nullable=False)
     delimiter = Column(String, nullable=False, default=",")
@@ -116,7 +116,7 @@ class InitialInjestConfiguration(UniversalWithPrimary, Base):
     input_file_prefix = Column(String)
     dataset_name = Column(String)
     transformation = relationship(
-        "Transformation", back_populates='initial_injest_configurations')
+        "Transformation", back_populates='initial_ingest_configurations')
 
 class PharmaceuticalCompany(UniversalWithPrimary, Base):
     __tablename__ = 'pharmaceutical_companies'
@@ -179,8 +179,8 @@ class Transformation(UniversalWithPrimary, Base):
     graph_order = Column(Integer, nullable=False, server_default=text('0'))
     extract_configurations = relationship(
         "ExtractConfiguration", order_by=ExtractConfiguration.id, back_populates='transformation')
-    initial_injest_configurations = relationship(
-        "InitialInjestConfiguration", order_by=InitialInjestConfiguration.id, back_populates='transformation')
+    initial_ingest_configurations = relationship(
+        "InitialIngestConfiguration", order_by=InitialIngestConfiguration.id, back_populates='transformation')
 
 
 class TransformationTemplate(UniversalWithPrimary, Base):
