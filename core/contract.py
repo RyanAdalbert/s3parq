@@ -208,7 +208,7 @@ class Contract(LoggerMixin):
             t = 'state'
         self.contract_type = t
 
-    def get_s3_path(self)->str:
+    def get_s3_path(self, filename='')->str:
         ''' INTENT: builds the s3 path from the contract.
             RETURNS: string s3 path
             NOTE: requires all params to be set to at least the state level
@@ -231,7 +231,7 @@ class Contract(LoggerMixin):
             for p in self.partitions:
                 path += f'{p}/'
 
-        # path += self.file_name
+        path += filename
         return path
 
     def publish_raw_file(self, local_file_path: str) ->None:
@@ -315,6 +315,16 @@ class Contract(LoggerMixin):
 
     def set_bucket(self, env: str)->None:
         self.set_env(env)
+
+    def set_metadata(self, df, run_timestamp):
+        df['__metadata_app_version'] = CORE_VERSION
+        df['__metadata_run_timestamp'] = run_timestamp
+        df['__metadata_output_contract'] = self.get_s3_url()
+        partitions = ['__metadata_run_timestamp']
+        return (df, partitions)
+
+    def write_with_metadata(self, dataset, df, run_timestamp):
+        pass
 
     # private
 
