@@ -51,7 +51,6 @@ class Contract(LoggerMixin):
         DATASET - The name of the collection of data. In an RDBMS this would be a table or view
         PARTITION - for datasets, the partition is set in the prefix name  
         SUB-PARTITION - for datasets, the sub-partitions add additional partitioning with additional prefixes
-        FILENAME - nondescript in the contract
     '''
     DEV = DEV_BUCKET
     PROD = PROD_BUCKET
@@ -65,13 +64,12 @@ class Contract(LoggerMixin):
             Does not support customer / brand aliases
         '''
         attributes = ('branch', 'parent', 'child', 'state',
-                      'dataset', 'file_name', 'partitions', 'partition_size')
+                      'dataset', 'partitions', 'partition_size')
 
         for attr in attributes:
             self.__dict__[attr] = None
 
         # defaults
-        self.file_name = str()
         self.partitions = []
         self.dataset = str()
         self.partition_size = 100  # partition size in mb
@@ -108,9 +106,6 @@ class Contract(LoggerMixin):
 
     def get_partition_size(self)->str:
         return self.partition_size
-
-    def get_file_name(self)->str:
-        return self.file_name
 
     def get_contract_type(self)->str:
         return self.contract_type
@@ -198,9 +193,7 @@ class Contract(LoggerMixin):
         ''' INTENT: sets what type of contract this is - file, partition, or dataset
             RETURNS: None
         '''
-        if len(self.file_name) > 0:
-            t = 'file'
-        elif len(self.partitions) > 0:
+        if len(self.partitions) > 0:
             t = 'partition'
         elif len(self.dataset) > 0:
             t = 'dataset'
@@ -243,16 +236,13 @@ class Contract(LoggerMixin):
         s3_client = boto3.client('s3')
         filename = os.path.split(local_file_path)[1]
         key = self.get_key()+filename
-        # self.set_file_name(os.path.split(local_file_path)[1])
         self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()+filename}.')
 
         with open(local_file_path, 'rb') as file_data:
-            print(f"publish_raw_file Key: {key}")
             extra_args = {'source_modified_time': str(
                 float(os.stat(local_file_path).st_mtime))}
             resp = s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
             ), Key=key, ExtraArgs={"Metadata": extra_args})
-            print(resp)
 
     def get_raw_file_metadata(self, local_file_path:str) ->None:
         # If file exists, return its metadata
