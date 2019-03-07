@@ -202,7 +202,6 @@ class Contract(LoggerMixin):
             for p in self.partitions:
                 path += f'{p}/'
 
-        # path += self.file_name
         return path
 
     def publish_raw_file(self, local_file_path: str) ->None:
@@ -214,7 +213,6 @@ class Contract(LoggerMixin):
         s3_client = boto3.client('s3')
         filename = os.path.split(local_file_path)[1]
         key = self.get_key()+filename
-        # self.set_file_name(os.path.split(local_file_path)[1])
         self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()+filename}.')
 
         with open(local_file_path, 'rb') as file_data:
