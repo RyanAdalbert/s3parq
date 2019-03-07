@@ -5,11 +5,13 @@ from core.helpers import notebook
 
 import os
 import tempfile
-from core.logging import LoggerMixin
+from core.logging import LoggerMixin, get_logger
 import pandas as pd
 from os import path
 from encodings.aliases import aliases
 from datetime import datetime
+
+logger = get_logger('core.transforms.shared.ingest.ingest')
 
 class InitialIngestTransform(LoggerMixin):
 
@@ -31,35 +33,23 @@ class InitialIngestTransform(LoggerMixin):
                     self.output_contract.write_with_metadata(config.dataset, df, run_timestamp)
 
     def ingest_file(self, f, filename):
-        input_s3_url = input_contract.get_s3_url(filename)
+        input_s3_url = self.input_contract.get_s3_url(filename)
         df = pd.read_csv(f, dtype="str", encoding=config.encoding, sep=config.delimiter, skip_rows=config.skip_rows)
         df = self.set_initial_metadata(df, input_s3_url, run_timestamp)
         return df
 
-    def validate_config(self, config):
-        valid_encodings = set(aliases.keys+aliases.values)
+def validate_config(config):
+    valid_encodings = set(aliases.keys()) | set(aliases.values())
+    if config.encoding not in valid_encodings:
+        invalid_encoding_message = f"initial_ingest_configuration {config.id} has invalid encoding: {config.encoding}"
+        logger.critical(invalid_encoding_message)
+        raise ValueError(invalid_encoding_message)
+    if len(config.delimiter) < 1:
+        invalid_delimiter_message = f"initial_ingest_configuration {config.id} has no delimiter"
+        logger.critical(invalid_delimiter_message)
+        raise ValueError(invalid_delimiter_message)
 
-        if config.encoding not in valid_encodings:
-            invalid_encoding_message = f"initial_ingest_configuration {config.id} has invalid encoding: {config.encoding}"
-            self.logger.critical(invalid_encoding_message)
-            raise ValueError(invalid_encoding_message)
-        if len(config.delimiter) < 1:
-            invalid_delimiter_message = f"initial_ingest_configuration {config.id} has no delimiter"
-            self.logger.critical(invalid_delimiter_message)
-            raise ValueError(invalid_delimiter_message)
-
-    def set_initial_metadata(self, df, s3_url, run_timestamp):
-        df['__metadata_original_s3_url'] = s3_url
-        df['__metadata_ingest_timestamp'] = run_timestamp
-        return df
-
-                
-            # Get a list of all the files of interest
-                # Get their metadata
-
-            # Get the metadata of the target location
-
-
-            # Check if the file meets
-
-    # def csv_to_df(self, delimiter, skip_rows, encoding, filename_prefix, dataset):
+def set_initial_metadata(df, s3_url, run_timestamp):
+    df['__metadata_original_s3_url'] = s3_url
+    df['__metadata_ingest_timestamp'] = run_timestamp
+    return df

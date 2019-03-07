@@ -120,7 +120,7 @@ class InitialIngestConfiguration(UniversalWithPrimary, Base):
     input_file_prefix = Column(String)
     dataset_name = Column(String)
     transformation = relationship(
-        "Transformation", back_populates='initial_ingest_configurations')
+        "InitialIngestTransformation", back_populates='initial_ingest_configurations')
 
 class PharmaceuticalCompany(UniversalWithPrimary, Base):
     __tablename__ = 'pharmaceutical_companies'
@@ -195,11 +195,12 @@ class Transformation(UniversalWithPrimary, Base):
 class ExtractTransformation(Transformation):
     extract_configurations = relationship(
         "ExtractConfiguration", order_by=ExtractConfiguration.id, back_populates='transformation')
-    initial_ingest_configurations = relationship(
-        "InitialIngestConfiguration", order_by=InitialIngestConfiguration.id, back_populates='transformation')
 
     __mapper_args__ = {'polymorphic_identity': 'extract_from_ftp'}
 
 
 class InitialIngestTransformation(Transformation):
+    initial_ingest_configurations = relationship(
+        "InitialIngestConfiguration", order_by=InitialIngestConfiguration.id, back_populates='transformation')
+
     __mapper_args__ = {'polymorphic_identity': 'initial_ingest'}
