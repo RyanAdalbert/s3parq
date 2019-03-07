@@ -167,7 +167,7 @@ class ConfigurationMocker(LoggerMixin):
               pipeline_state_id=4, graph_order=1),
             t(id=8, transformation_template_id=1,
               pipeline_state_id=4, graph_order=2),
-            t(id=11, transformation_template_id=3,
+            t(id=11, transformation_template_id=2,
               pipeline_state_id=2, graph_order=0)
         ])
         self.session.commit()
@@ -177,9 +177,8 @@ class ConfigurationMocker(LoggerMixin):
         self.logger.debug('Generating transformation_template mocks.')
         tt = config.TransformationTemplate
         self.session.add_all([
-            tt(id=1, name='always_money_in_the_banana_stand'),
-            tt(id=2, name='02_finish_each_others_sandwiches'),
-            tt(id=3, name='shared_initial_ingest')
+            tt(id=1, name='extract_from_ftp'),
+            tt(id=2, name='initial_ingest')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')
