@@ -1,0 +1,31 @@
+resource "aws_ecs_task_definition" "airflow" {
+  family = "airflow"
+
+  container_definitions = <<EOF
+[
+  {
+    "name": "airflow",
+    "image": "687531504312.dkr.ecr.us-east-1.amazonaws.com/ichain/core-airflow:latest",
+    "cpu": 0,
+    "memory": 2048,
+    "portMappings": [
+      {
+        "containerPort": 8080,
+        "hostPort": 0
+      }
+    ]
+  }
+]
+EOF
+}
+
+resource "aws_ecs_service" "airflow" {
+  name            = "airflow"
+  cluster         = "uat-core-airflow"
+  task_definition = "${aws_ecs_task_definition.airflow.arn}"
+
+  desired_count = 1
+
+  deployment_maximum_percent         = 100
+  deployment_minimum_healthy_percent = 0
+}
