@@ -29,7 +29,6 @@ class Contract(LoggerMixin):
         DATASET - The name of the collection of data. In an RDBMS this would be a table or view
         PARTITION - for datasets, the partition is set in the prefix name  
         SUB-PARTITION - for datasets, the sub-partitions add additional partitioning with additional prefixes
-        FILENAME - nondescript in the contract
     '''
     DEV = DEV_BUCKET
     PROD = PROD_BUCKET
@@ -43,13 +42,12 @@ class Contract(LoggerMixin):
             Does not support customer / brand aliases
         '''
         attributes = ('branch', 'parent', 'child', 'state',
-                      'dataset', 'file_name', 'partitions', 'partition_size')
+                      'dataset', 'partitions', 'partition_size')
 
         for attr in attributes:
             self.__dict__[attr] = None
 
         # defaults
-        self.file_name = str()
         self.partitions = []
         self.dataset = str()
         self.partition_size = 100  # partition size in mb
