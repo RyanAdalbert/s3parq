@@ -43,6 +43,7 @@ class ConfigurationMocker(LoggerMixin):
         self.session.commit()
         self.logger.debug('Done generating brand mocks.')
 
+
     def _mock_extract_configurations(self)-> None:
         self.logger.debug('Generating extract_configuation mocks.')
         ex = config.ExtractConfiguration
@@ -154,7 +155,7 @@ class ConfigurationMocker(LoggerMixin):
             t(id=7, transformation_template_id=1,
               pipeline_state_id=4, graph_order=1),
             t(id=8, transformation_template_id=1,
-              pipeline_state_id=4, graph_order=2)
+              pipeline_state_id=4, graph_order=2),
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation mocks.')

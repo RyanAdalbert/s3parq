@@ -10,7 +10,10 @@ import moto
 import time
 import tempfile
 import os
+import math
 
+def get_filename_from_path(file):
+    return os.path.split(file.name)[1]
 
 @moto.mock_s3
 def s3_setup():
@@ -23,17 +26,16 @@ def s3_setup():
 
     t_file_old = tempfile.NamedTemporaryFile()
     t_file_old.write(b'Gobias some old coffee!')
-    file_name_old = os.path.split(t_file_old.name)[1]
-    output_contract.set_file_name(file_name_old)
-    client.upload_file(Bucket=ENV_BUCKET, Filename= t_file_old.name, Key= output_contract.get_key(
-    ), ExtraArgs={"Metadata": {"source_modified_time": str(n_time - time_delta)}})
+    file_name_old = get_filename_from_path(t_file_old)
+    contract_key = output_contract.get_key()
+    client.upload_file(Bucket=ENV_BUCKET, Filename= t_file_old.name, Key=contract_key+file_name_old
+        , ExtraArgs={"Metadata": {"source_modified_time": str(n_time - time_delta)}})
     
     t_file_new = tempfile.NamedTemporaryFile()
     t_file_new.write(b'Gobias some new coffee!')
-    file_name_new = os.path.split(t_file_new.name)[1]
-    output_contract.set_file_name(file_name_new)
-    client.upload_file(Bucket=ENV_BUCKET, Filename= t_file_new.name, Key= output_contract.get_key(
-    ), ExtraArgs={"Metadata": {"source_modified_time": str(n_time + time_delta)}})
+    file_name_new = get_filename_from_path(t_file_new)
+    client.upload_file(Bucket=ENV_BUCKET, Filename= t_file_new.name, Key=contract_key+file_name_new
+        , ExtraArgs={"Metadata": {"source_modified_time": str(n_time + time_delta)}})
     
     return (t_file_old, t_file_new, output_contract, time_delta)
 
@@ -43,34 +45,16 @@ def s3_setup():
 def test_push_to_s3_updated_file(mock_validate):
     mock_validate.return_value=True
 
-    params = s3_setup()
+    t_file_old, t_file_new, output_contract, time_delta = s3_setup()
     extract = ExtractTransform()
     client = boto3.client('s3')
-    extract.push_to_s3(tmp_dir=os.path.dirname(params[0].name),
-                       output_contract=params[2])
-    params[2].set_file_name(os.path.split(params[0].name)[1])
-    s3_time = float(client.head_object(Bucket=ENV_BUCKET, Key=params[2].get_key())[
+    extract.push_to_s3(tmp_dir=os.path.dirname(t_file_old.name),
+                       output_contract=output_contract)
+    file_name = get_filename_from_path(t_file_old)
+    s3_time = float(client.head_object(Bucket=ENV_BUCKET, Key=output_contract.get_key()+file_name)[
                     'Metadata']['source_modified_time'])
     
-    assert os.stat(params[0].name).st_mtime == s3_time             
-
-@moto.mock_s3
-@patch.object(ExtractTransform,'_validate_required_params')
-def test_push_to_s3_new_file(mock_validate):
-    mock_validate.return_value=True
-
-    params = s3_setup()
-    extract = ExtractTransform()
-    client = boto3.client('s3')
-    t_file = tempfile.NamedTemporaryFile()
-    t_file.write(b'Gobias some fresh coffee!')
-    extract.push_to_s3(tmp_dir=os.path.dirname(t_file.name),
-                       output_contract=params[2])
-    params[2].set_file_name(os.path.split(t_file.name)[1])
-    s3_time = float(client.head_object(Bucket=ENV_BUCKET, Key=params[2].get_key())[
-                    'Metadata']['source_modified_time'])
-    
-    assert os.stat(t_file.name).st_mtime == s3_time
+    assert math.isclose(os.stat(t_file_old.name).st_mtime, s3_time, rel_tol=0.01)      
 
 
 @moto.mock_s3
@@ -78,17 +62,19 @@ def test_push_to_s3_new_file(mock_validate):
 def test_push_to_s3_not_if_older(mock_validate):
     mock_validate.return_value=True
 
-    params = s3_setup()
+    t_file_old, t_file_new, output_contract, time_delta = s3_setup()
     extract = ExtractTransform()
     client = boto3.client('s3')
-    params[2].set_file_name(os.path.split(params[1].name)[1])
+    file_name_new = get_filename_from_path(t_file_new)
+    key = output_contract.get_key() + file_name_new
+
     s3_time_before = float(client.head_object(
-        Bucket=ENV_BUCKET, Key=params[2].get_key())['Metadata']['source_modified_time'])
-    extract.push_to_s3(tmp_dir=os.path.dirname(params[1].name),
-                       output_contract=params[2])
-    params[2].set_file_name(os.path.split(params[1].name)[1])
+        Bucket=ENV_BUCKET, Key=key)['Metadata']['source_modified_time'])
+    extract.push_to_s3(tmp_dir=os.path.dirname(t_file_new.name),
+                       output_contract=output_contract)
+
     s3_time_after = float(client.head_object(
-        Bucket=ENV_BUCKET, Key=params[2].get_key())['Metadata']['source_modified_time'])
+        Bucket=ENV_BUCKET, Key=key)['Metadata']['source_modified_time'])
     
     assert s3_time_after == s3_time_before
 
