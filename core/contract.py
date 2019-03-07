@@ -171,9 +171,7 @@ class Contract(LoggerMixin):
         ''' INTENT: sets what type of contract this is - file, partition, or dataset
             RETURNS: None
         '''
-        if len(self.file_name) > 0:
-            t = 'file'
-        elif len(self.partitions) > 0:
+        if len(self.partitions) > 0:
             t = 'partition'
         elif len(self.dataset) > 0:
             t = 'dataset'
