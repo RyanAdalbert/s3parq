@@ -110,6 +110,17 @@ class ExtractConfiguration(UniversalWithPrimary, Base):
     transformation = relationship(
         "ExtractTransformation", back_populates='extract_configurations')
 
+class InitialIngestConfiguration(UniversalWithPrimary, Base):
+    __tablename__ = 'initial_ingest_configurations'
+    transformation_id = Column(Integer, ForeignKey(
+        'transformations.id'), nullable=False)
+    delimiter = Column(String, nullable=False, default=",")
+    skip_rows = Column(Integer, nullable=False, default=0)
+    encoding = Column(String, nullable=False, default="utf-8")
+    input_file_prefix = Column(String)
+    dataset_name = Column(String)
+    transformation = relationship(
+        "InitialIngestTransformation", back_populates='initial_ingest_configurations')
 
 class PharmaceuticalCompany(UniversalWithPrimary, Base):
     __tablename__ = 'pharmaceutical_companies'
@@ -189,4 +200,7 @@ class ExtractTransformation(Transformation):
 
 
 class InitialIngestTransformation(Transformation):
+    initial_ingest_configurations = relationship(
+        "InitialIngestConfiguration", order_by=InitialIngestConfiguration.id, back_populates='transformation')
+
     __mapper_args__ = {'polymorphic_identity': 'initial_ingest'}
