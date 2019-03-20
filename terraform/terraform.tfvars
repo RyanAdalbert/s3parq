@@ -1,0 +1,5 @@
+service_name = "core"
+vpc_id = "vpc-04ff1d940c1712def" 
+environment = "dev"
+ssh_key_name = "ichain-dev"
+iam_instance_profile = "ProdAccess" 
