@@ -228,6 +228,46 @@ def test_publish_raw_metadata():
             Bucket=f'{ENV_BUCKET}', Key=key)['Metadata']
         assert meta['source_modified_time'] == str(f_time)
 
+@patch('s3parq.fetch', return_value="fake_df")
+def test_fetch_from_s3(S3parq):
+    contract = Contract()
+    contract.set_branch('master')
+    contract.set_parent('Merck')
+    contract.set_child('Wonder_Drug')
+    contract.set_state('ingest')
+    contract.set_dataset('valid_dataset')
+
+    key = contract.get_key()
+
+    fake_df = contract.fetch("fake_filters")
+
+    assert S3parq.called_once_with(
+        bucket=f'{ENV_BUCKET}',
+        key=key,
+        filters="fake_filters")
+
+    assert fake_df == "fake_df"
+    
+@patch('s3parq.publish')
+def test_publish_to_s3(S3parq):
+    contract = Contract()
+    contract.set_branch('master')
+    contract.set_parent('Merck')
+    contract.set_child('Wonder_Drug')
+    contract.set_state('ingest')
+    contract.set_dataset('valid_dataset')
+
+    key = contract.get_key()
+    fake_parts = ["fake=True","partition=faker"]
+
+    contract.publish(dataframe="fake-df",partitions=fake_parts)
+
+    assert S3parq.called_once_with(
+        bucket=f'{ENV_BUCKET}',
+        dataframe="fake-df",
+        key=key,
+        partitions=fake_parts
+        )
 
 @moto.mock_s3()
 def test_list_files():

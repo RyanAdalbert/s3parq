@@ -234,19 +234,32 @@ class Contract(LoggerMixin):
         path += filename
         return path
 
-    def fetch(self, filters: dict)->pd.DataFrame:
+    def fetch(self, filters: List[dict])->pd.DataFrame:
         if self.contract_type != "dataset":
             raise ValueError(
                 f"contract.fetch() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
+        
+        self.logger.info(
+            f'Fetching dataframe from s3 location {self.get_s3_path()}.')
+        
         return fetch(   bucket = self.env,
                         key = self.get_key(),
                         filters = filters )
 
-    def publish(self, dataframe: pd.DataFrame)->None:
+    def publish(self, dataframe: pd.DataFrame, partitions: List[str])->None:
         if self.contract_type != "dataset":
             raise ValueError(
                 f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
-        raise NotImplementedError("Publish does not exist yet!")
+
+        self.logger.info(
+            f'Publishing dataframe to s3 location {self.get_s3_path()}.')
+
+        publish(
+            bucket=self.env,
+            key=self.get_key(),
+            dataframe=dataframe,
+            partitions=partitions
+        )
 
     def publish_raw_file(self, local_file_path: str) ->None:
         '''accepts a local path to a file, publishes it as-is to s3 as long as state == raw.'''
