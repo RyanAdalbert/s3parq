@@ -1,7 +1,8 @@
 import boto3
 import os
 import pandas as pd
-#import s3_parc
+from s3parq import S3Parq
+from typing import List
 from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
 
 from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET, BRANCH_NAME
@@ -218,17 +219,40 @@ class Contract(LoggerMixin):
         path += self.file_name
         return path
 
-    def fetch(self, filters: dict)->pd.DataFrame:
+    def fetch(self, filters: List[dict])->pd.DataFrame:
         if self.contract_type != "dataset":
             raise ValueError(
                 f"contract.fetch() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
-        raise NotImplementedError("Fetch does not exist yet!")
 
-    def publish(self, dataframe: pd.DataFrame)->None:
+        bucket = self.get_bucket()
+        key = self.get_key()
+        
+        self.logger.info(
+            f'Fetching data from s3 location {self.get_s3_path()}.')
+
+        s3_fetch = S3Parq.fetch(
+            bucket=bucket,
+            key=key
+        )
+        return s3_fetch
+
+    def publish(self, dataframe: pd.DataFrame, partitions: List[str])->None:
         if self.contract_type != "dataset":
             raise ValueError(
                 f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
-        raise NotImplementedError("Publish does not exist yet!")
+
+        bucket = self.get_bucket()
+        key = self.get_key()
+
+        self.logger.info(
+            f'Publishing dataframe to s3 location {self.get_s3_path()}.')
+
+        S3Parq.publish(
+            bucket=bucket,
+            dataframe=dataframe,
+            key=key,
+            partitions=partitions
+        )
 
     def publish_raw_file(self, local_file_path: str) ->None:
         '''accepts a local path to a file, publishes it as-is to s3 as long as state == raw.'''
