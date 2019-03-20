@@ -1,7 +1,6 @@
 import boto3
 import os
-from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
-
+from s3parq import S3NamingHelper as s3Name
 from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET, BRANCH_NAME
 from core.logging import LoggerMixin
 from core.helpers.project_root import ProjectRoot
