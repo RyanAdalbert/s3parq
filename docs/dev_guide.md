@@ -31,7 +31,11 @@ aws_secret_access_key = **************************************
 ### Configurations 
 **Why?** 
 All pipelines need configurations. These range from the name of the client to the order of transformations to be applied. 
-We manage these configurations via a configuration application, which in turn stores them in an RDMBS. To acces these configurations you use the [Configurations module](../core/models/configuration.py)
+We manage these configurations via a configuration application, which in turn stores them in an RDMBS. 
+
+![Relational model as exposed to the user](https://www.lucidchart.com/publicSegments/view/71fd2b55-fa72-4eb0-92b0-72d0131f4291/image.png)
+
+To acces these configurations you use the [Configurations module](../core/models/configuration.py)
 
 You use [SQLAlchemy Sessions](https://docs.sqlalchemy.org/en/rel_1_2/orm/tutorial.html#querying) to query that class.
 
