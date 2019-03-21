@@ -9,7 +9,7 @@ node {
     }
     stage('Test') {
         echo "Testing..."
-        sh "ICHAIN_AWS_ACCOUNT=687531504312 script/ci_test"
+        sh "script/ci_test"
     }
     stage ('Deploy') {
         echo "We are currently working on branch: ${env.BRANCH_NAME}"
