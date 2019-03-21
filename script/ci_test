@@ -7,4 +7,4 @@ docker run --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -w /usr/src/app \
   ichain/core:ci \
-  bash -c "coverage run --source core /usr/local/bin/pytest tests/integration && coverage run -a --source core /usr/local/bin/pytest tests/unit && coverage report && coveralls"
+  bash -c "ICHAIN_AWS_ACCOUNT=687531504312 coverage run --source core /usr/local/bin/pytest tests/integration && coverage run -a --source core /usr/local/bin/pytest tests/unit && coverage report && coveralls"
