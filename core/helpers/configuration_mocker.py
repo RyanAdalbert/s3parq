@@ -32,40 +32,38 @@ class ConfigurationMocker(LoggerMixin):
         self._mock_pipeline_states()
         self._mock_transformation_templates()
         self._mock_transformations()
-        self._mock_transformation_settings()
-        self._mock_extract_configurations()
+        self._mock_transformation_variables()
 
     def purge(self)->None:
         """ truncates and resets all the tables"""
 
-        self.session.execute("""CREATE OR REPLACE FUNCTION truncate_if(trunc_table TEXT)
-returns void
-as $$
-BEGIN
-perform 1 FROM information_schema.tables WHERE table_name = trunc_table;
-IF FOUND THEN 
-    EXECUTE FORMAT('TRUNCATE %I RESTART IDENTITY CASCADE;',trunc_table);
-END IF;
-END;
-$$language plpgsql""")
-
-        purge_statement = ''
-        for table in (  "pharmaceutical_companies",
-                        "brands",
-                        "segments",
-                        "pipeline_types",
-                        "pipelines",
-                        "pipeline_state_types",
-                        "pipeline_states",
-                        "transformation_templates",
-                        "transformations",
-                        "transformation_settings",
-                        "extract_configurations",
-                        ):
-            purge_statement += f"SELECT truncate_if('{table}'); "
-        self.session.execute(purge_statement)        
-
-
+        self.session.execute("CREATE OR REPLACE FUNCTION truncate_if(trunc_table TEXT) \
+returns void language plpgsql \
+as $$ \
+BEGIN \
+perform 1 FROM information_schema.tables WHERE table_name = trunc_table; \
+IF FOUND THEN \
+    EXECUTE FORMAT('TRUNCATE %I RESTART IDENTITY CASCADE',trunc_table); \
+END IF; \
+END $$; ")
+        
+        ## NOTE: this must be in creation / dep order or it deadlocks! 
+        tables = [  "pharmaceutical_companies",
+                    "brands",
+                    "segments",
+                    "pipeline_types",
+                    "pipelines",
+                    "pipeline_state_types",
+                    "pipeline_states",
+                    "transformation_templates",
+                    "transformations",
+                    "transformation_variables",
+                    ]
+            
+        for table in tables[::-1]:
+            executable = f"SELECT truncate_if('{table}')"
+            self.session.execute(executable)
+    
     def _mock_brands(self)-> None:
         self.logger.debug('Generating brand mocks.')
         b = config.Brand
@@ -200,21 +198,23 @@ $$language plpgsql""")
         tt = config.TransformationTemplate
         self.session.add_all([
             tt(id=1, name='extract_from_ftp',
-                structure = '{"test_attribute":"string","test_attribute_2":"integer"}'), 
+                variable_structures = '{"test_attribute":"string","test_attribute_2":"integer"}'), 
             tt(id=2, name='initial_ingest',
-                structure = '{"another_test_attribute":"string","yet_another_test_attribute":"float"}')
+                variable_structures = '{"another_test_attribute":"string","yet_another_test_attribute":"float"}')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')
 
 
-    def _mock_transformation_settings(self)->None:
-        self.logger.debug('Generating transformation_setting mocks')
-        ts = config.TransformationSetting
+    def _mock_transformation_variables(self)->None:
+        self.logger.debug('Generating transformation_variables mocks')
+        tv = config.TransformationVariable
         self.session.add_all([
-            ts(id=1, name='test_attribute', transformation_template_id=1, value='this is text', description='testing test attribute.'),
-            ts(id=1, name='yet_another_test_attribute', transformation_template_id=2, value='55.5', description='testing test attribute float.')
+            tv(id=1, name='test_attribute', transformation_id=1, value='this is text', description='testing test attribute.'),
+            tv(id=2, name='yet_another_test_attribute', transformation_id=2, value='55.5', description='testing test attribute float.')
         ])
+        self.session.commit()
+        self.logger.debug('Done generating transformation_variables mocks.')
 
 def setup_base_session():
     mock = ConfigurationMocker()

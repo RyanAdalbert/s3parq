@@ -94,7 +94,7 @@ class Brand(UniversalWithPrimary, Base):
         "PharmaceuticalCompany", back_populates='brands')
     pipelines = relationship("Pipeline", back_populates='brand')
 
-
+'''
 class ExtractConfiguration(UniversalWithPrimary, Base):
     __tablename__ = 'extract_configurations'
     transformation_id = Column(Integer, ForeignKey(
@@ -117,6 +117,7 @@ class InitialIngestConfiguration(UniversalWithPrimary, Base):
     dataset_name = Column(String)
    ## transformation = relationship(
      ##   "InitialIngestTransformation", back_populates='initial_ingest_configurations')
+'''
 
 class PharmaceuticalCompany(UniversalWithPrimary, Base):
     __tablename__ = 'pharmaceutical_companies'
@@ -171,7 +172,7 @@ class Segment(UniversalWithPrimary, Base):
 class TransformationTemplate(UniversalWithPrimary, Base):
     __tablename__ = 'transformation_templates'
     name = Column(String, nullable=False)
-    structure = Column(JSON)
+    variable_structures = Column(JSON)
 
 class Transformation(UniversalWithPrimary, Base):
     __tablename__ = 'transformations'
@@ -182,14 +183,14 @@ class Transformation(UniversalWithPrimary, Base):
         'pipeline_states.id'), nullable=False)
     pipeline_state = relationship("PipelineState", back_populates='transformations')
     graph_order = Column(Integer, nullable=False, server_default=text('0'))
-    _raw_settings = relationship("TransformationSetting", back_populates='transformation')
+    _raw_variables = relationship("TransformationVariable", back_populates='transformation')
 
     @property
-    def settings(self):
-        structure = json.loads(self.transformation_template.structure)
+    def variables(self):
+        structure = json.loads(self.transformation_template.variable_structure)
         typed = {}
-        for setting in self._raw_settings:
-            typed[setting.name] = self._apply_type(setting.value, structure[setting.name]["type"])
+        for variable in self._raw_variables:
+            typed[variable.name] = self._apply_type(variable.value, structure[variable.name]["type"])
         return typed
 
     def _apply_type(self,value:str,typestring:str)->Any:
@@ -205,18 +206,16 @@ class Transformation(UniversalWithPrimary, Base):
             return float(value)
         
 
-class TransformationSetting(UniversalWithPrimary, Base):
-    __tablename__ = 'transformation_settings'
+class TransformationVariable(UniversalWithPrimary, Base):
+    __tablename__ = 'transformation_variables'
     transformation_id = Column(Integer, ForeignKey('transformations.id'), nullable=False)
     name = Column(String, nullable=False)
     value = Column(String)
+    description = Column(String, nullable=False)
     transformation = relationship('Transformation')
 
-    
 
-
-
-'''
+"""
 class ExtractTransformation(Transformation):
     extract_configurations = relationship(
         "ExtractConfiguration", order_by=ExtractConfiguration.id, back_populates='transformation')
@@ -229,4 +228,4 @@ class InitialIngestTransformation(Transformation):
         "InitialIngestConfiguration", order_by=InitialIngestConfiguration.id, back_populates='transformation')
 
     __mapper_args__ = {'polymorphic_identity': 'initial_ingest'}
-'''
+"""
