@@ -44,6 +44,8 @@ BEGIN \
 perform 1 FROM information_schema.tables WHERE table_name = trunc_table; \
 IF FOUND THEN \
     EXECUTE FORMAT('TRUNCATE %I RESTART IDENTITY CASCADE',trunc_table); \
+ELSE \
+    RETURN; \
 END IF; \
 END $$; ")
         
