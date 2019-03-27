@@ -14,6 +14,14 @@ class Names:
     cname, bname, ptname, sname, pname, pstname, tname = 'test_client', 'test_brand', 'test_edo_pipeline', 'test_segment', 'test_pipeline', 'test_pipeline_state', 'extract_from_ftp'
 
 
+@pytest.fixture
+def teardown():
+    mock = CMock()
+    yield 
+    mock.purge()
+    
+
+
 
 def setup_mock():
     mock = CMock()
