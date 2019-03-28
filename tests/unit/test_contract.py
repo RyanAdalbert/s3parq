@@ -1,4 +1,6 @@
 import pytest
+import dfmock 
+import pandas as pd
 from unittest.mock import patch
 from core.contract import Contract
 import boto3
@@ -228,6 +230,54 @@ def test_publish_raw_metadata():
             Bucket=f'{ENV_BUCKET}', Key=key)['Metadata']
         assert meta['source_modified_time'] == str(f_time)
 
+def test_fetch_from_s3():
+    with patch('core.contract.fetch', autospec=True) as fetch:
+        fetch.return_value = pd.DataFrame()
+        contract = Contract()
+        contract.set_branch('master')
+        contract.set_parent('Merck')
+        contract.set_child('Wonder_Drug')
+        contract.set_state('ingest')
+        contract.set_dataset('valid_dataset')
+
+        key = contract.get_key()
+        filters = {"partition":"hamburger",
+                    "comparison":"==",
+                    "values":['McDonalds']}
+
+        fake_df = contract.fetch(filters)
+
+        fetch.assert_called_once_with(
+            bucket=f'{ENV_BUCKET}',
+            key=key,
+            filters=filters)
+
+        assert isinstance(fake_df, pd.DataFrame)
+
+def test_publish_to_s3():
+    with patch('core.contract.publish', autospec=True) as publish:
+        df = dfmock.DFMock(count = 100, columns = {"fake":"boolean","partition":"string","option":{"option_count":4,"option_type":"string"}})
+        df.generate_dataframe()
+        patch.return_value = None
+        contract = Contract()
+        contract.set_branch('master')
+        contract.set_parent('Merck')
+        contract.set_child('Wonder_Drug')
+        contract.set_state('ingest')
+        contract.set_dataset('valid_dataset')
+
+        key = contract.get_key()
+        fake_parts = ["fake=True","partition=faker"]
+
+        pub = contract.publish(dataframe=df.dataframe,partitions=fake_parts)
+
+        publish.assert_called_once_with(
+            bucket=f'{ENV_BUCKET}',
+            dataframe=df.dataframe,
+            key=key,
+            partitions=fake_parts
+            )
+        assert pub is None
 
 @moto.mock_s3()
 def test_list_files():
