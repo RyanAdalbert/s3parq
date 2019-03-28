@@ -200,7 +200,7 @@ END $$; ")
         tt = config.TransformationTemplate
         self.session.add_all([
             tt(id=1, name='extract_from_ftp',
-                variable_structures = '{"test_attribute":"string","test_attribute_2":"integer"}'), 
+                variable_structures = '{"filesystem_name":"string","secret_name":"string","prefix":"string","secret_type_of":"string"}'), 
             tt(id=2, name='initial_ingest',
                 variable_structures = '{"another_test_attribute":"string","yet_another_test_attribute":"float"}')
         ])
@@ -212,8 +212,35 @@ END $$; ")
         self.logger.debug('Generating transformation_variables mocks')
         tv = config.TransformationVariable
         self.session.add_all([
-            tv(id=1, name='test_attribute', transformation_id=1, value='this is text', description='testing test attribute.'),
-            tv(id=2, name='yet_another_test_attribute', transformation_id=2, value='55.5', description='testing test attribute float.')
+            tv(id=5, name='filesystem_path', transformation_id=2, value='banana_stand_data'),
+            tv(id=6, name='prefix', transformation_id=2, value='gob'),
+            tv(id=1, name='secret_name', transformation_id=2, value='dev-sftp'),
+            tv(id=2, name='secret_type_of', transformation_id=2, value='FTP'),
+
+            tv(id=3, name='filesystem_path', transformation_id=3, value='sudden_valley_holdings'),
+            tv(id=4, name='secret_name', transformation_id=3, value='dev-sftp'),
+            tv(id=12, name='prefix', transformation_id=3, value=''),
+            tv(id=11, name='secret_type_of', transformation_id=3, value='FTP'),
+
+            tv(id=7, name='filesystem_path', transformation_id=9, value=''),
+            tv(id=8, name='prefix', transformation_id=9, value=''),
+            tv(id=9, name='secret_name', transformation_id=9, value='dev-sftp'),
+            tv(id=10, name='secret_type_of', transformation_id=9, value='FTP'),
+
+            tv(id=13, name='filesystem_path', transformation_id=1, value='/incoming'),
+            tv(id=14, name='prefix', transformation_id=1, value=''),
+            tv(id=15, name='secret_name', transformation_id=1, value='dev-sftp'),
+            tv(id=16, name='secret_type_of', transformation_id=1, value='FTP'),
+
+            tv(id=17, name='filesystem_path', transformation_id=10, value='/incoming'),
+            tv(id=18, name='prefix', transformation_id=10, value='test-extract-root-prefix'),
+            tv(id=19, name='secret_name', transformation_id=10, value='dev-sftp'),
+            tv(id=20, name='secret_type_of', transformation_id=10, value='FTP'),
+
+            tv(id=21, name='filesystem_path', transformation_id=10, value='/incoming/testing_extract'),
+            tv(id=22, name='prefix', transformation_id=11, value=''),
+            tv(id=23, name='secret_name', transformation_id=11, value='dev-sftp'),
+            tv(id=24, name='secret_type_of', transformation_id=11, value='FTP')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_variables mocks.')

@@ -33,39 +33,7 @@ def test_project_root_not_in_project(monkeypatch):
                 root.get_path()
 
 
-# Configuration Mocker
-'''
-def test_mock_extract_configurations():
-    db = CMock()
-    db.generate_mocks()
-    session = db.get_session()
-    ec = config.ExtractConfiguration
-
-    # depends on hard-coded values in mocker
-    q = session.query(ec).filter(ec.id == 2)
-    assert q[0].filesystem_path == 'banana_stand_data'
-
-
-def test_mock_transformation_relationships():
-    db = CMock()
-    db.generate_mocks()
-    session = db.get_session()
-    t = config.Transformation
-
-    # depends on hard-coded values in mocker
-    q = session.query(t).filter(t.id == 1)
-    secrets = []
-    for v in q:
-        for row in v.extract_configurations:
-            secrets.append(row.secret_name)
-
-    assert len(secrets) == 3
-
-    assert set(secrets) == set(['dev-sftp'])
-'''
 # Session Helper
-
-
 @patch('core.constants.ENVIRONMENT')
 def test_session_helper_dev(ENV):
     ENV.return_value = "dev"
