@@ -1,7 +1,8 @@
 import boto3
 import os
-from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
-
+import pandas as pd
+from s3parq.s3_naming_helper import S3NamingHelper as s3Name
+from s3parq import publish,fetch    
 from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET, BRANCH_NAME
 from core.logging import LoggerMixin
 from core.helpers.project_root import ProjectRoot
@@ -83,6 +84,10 @@ class Contract(LoggerMixin):
                 setter = getattr(self, 'set_' + attr)
                 setter(kwargs[attr])
 
+    @property
+    def env(self)->str:
+        return self._env
+
     def get_branch(self)->str:
         return self.branch
 
@@ -96,7 +101,8 @@ class Contract(LoggerMixin):
         return self.child
 
     def get_env(self)->str:
-        return self.env
+        self.logger.warning("get_env is depricated. Use env instead.")
+        return self._env
 
     def get_dataset(self)->str:
         return self.dataset
@@ -173,11 +179,11 @@ class Contract(LoggerMixin):
     def set_env(self)->None:
         env = ENVIRONMENT.lower()
         if env in (self.DEV, 'dev', 'development'):
-            self.env = self.DEV
+            self._env = self.DEV
         elif env in (self.PROD, 'prod', 'production'):
-            self.env = self.PROD
+            self._env = self.PROD
         elif env in (self.UAT, 'uat'):
-            self.env = self.UAT
+            self._env = self.UAT
         else:
             raise ValueError(f'{env} is not a valid environment.')
 
@@ -187,7 +193,8 @@ class Contract(LoggerMixin):
             try:
                 self.set_branch(BRANCH_NAME)
             except:
-                raise ValueError(f'Your git branch name {branch_name} cannot be used as a contract branch path.')
+                raise ValueError(
+                    f'Your git branch name {branch_name} cannot be used as a contract branch path.')
 
     def _set_contract_type(self)->None:
         ''' INTENT: sets what type of contract this is - file, partition, or dataset
@@ -227,6 +234,33 @@ class Contract(LoggerMixin):
         path += filename
         return path
 
+    def fetch(self, filters: List[dict])->pd.DataFrame:
+        if self.contract_type != "dataset":
+            raise ValueError(
+                f"contract.fetch() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
+        
+        self.logger.info(
+            f'Fetching dataframe from s3 location {self.get_s3_path()}.')
+        
+        return fetch(   bucket = self.env,
+                        key = self.get_key(),
+                        filters = filters )
+
+    def publish(self, dataframe: pd.DataFrame, partitions: List[str])->None:
+        if self.contract_type != "dataset":
+            raise ValueError(
+                f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
+
+        self.logger.info(
+            f'Publishing dataframe to s3 location {self.get_s3_path()}.')
+
+        publish(
+            bucket=self.env,
+            key=self.get_key(),
+            dataframe=dataframe,
+            partitions=partitions
+        )
+
     def publish_raw_file(self, local_file_path: str) ->None:
         '''accepts a local path to a file, publishes it as-is to s3 as long as state == raw.'''
         if self.get_state() != 'raw':
@@ -234,6 +268,7 @@ class Contract(LoggerMixin):
                 'publish_raw_file may only be used on raw contracts.')
 
         s3_client = boto3.client('s3')
+
         filename = os.path.split(local_file_path)[1]
         key = self.get_key()+filename
         self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()+filename}.')
@@ -244,21 +279,14 @@ class Contract(LoggerMixin):
             resp = s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
             ), Key=key, ExtraArgs={"Metadata": extra_args})
 
-    def get_raw_file_metadata(self, local_file_path:str) ->None:
+    def get_raw_file_metadata(self, local_file_path: str) ->None:
         # If file exists, return its metadata
         s3_client = boto3.client('s3')
-        
+
         filename = os.path.split(local_file_path)[1]
         key = self.get_key()+filename
-        try:
-            return s3_client.head_object(Bucket=self.get_bucket(),Key=key)
-        except ClientError as e:
-            # If file does not exist, throw back since it needs to be moved anyways
-            #   Consider: cleaner handling?
-            if e.response['ResponseMetadata']['HTTPStatusCode'] == 404:
-                raise e
-            else:
-                raise e
+        return s3_client.head_object(Bucket=self.get_bucket(),Key=key)
+
 
     def list_files(self, file_prefix='') -> List[str]:
         key = self.get_key()
