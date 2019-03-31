@@ -1,3 +1,4 @@
+"""
 from core.models.configuration import (
     PharmaceuticalCompany, 
     Brand, 
@@ -56,4 +57,4 @@ class Test:
         operator = TransformOperator(transform_id=1)
         
         assert operator.task_id == f"{n.pname}_{n.pstname}_{n.tname}_1".lower()
-
+"""

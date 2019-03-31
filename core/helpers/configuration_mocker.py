@@ -5,12 +5,14 @@ from core.logging import LoggerMixin
 
 
 class ConfigurationMocker(LoggerMixin):
-    ''' for development, creates in-memory database instance and a matching session.
-        optionally gives you a bunch of mocked data.
-    '''
+    """ for development, creates in-memory database instance and a matching session and 
+        gives you a bunch of mocked data.
+        NOTE: This generates the models directly from the core.models.configuration.py model classes, 
+        and could potentially differ from alembic migrations. 
+    """
 
     def __init__(self)-> None:
-        engine = config.GenerateEngine().get_engine()
+        engine = config.GenerateEngine(in_memory=True).get_engine()
 
         # this instansiates the in-memory sqlite instance
         config.Base.metadata.create_all(engine)
@@ -22,7 +24,6 @@ class ConfigurationMocker(LoggerMixin):
         return self.session
 
     def generate_mocks(self)-> None:
-        self.purge()
         self._mock_pharmaceutical_companies()
         self._mock_brands()
         self._mock_segments()
@@ -33,38 +34,6 @@ class ConfigurationMocker(LoggerMixin):
         self._mock_transformation_templates()
         self._mock_transformations()
         self._mock_transformation_variables()
-
-    def purge(self)->None:
-        """ truncates and resets all the tables"""
-
-        self.session.execute("CREATE OR REPLACE FUNCTION truncate_if(trunc_table TEXT) \
-returns void language plpgsql \
-as $$ \
-BEGIN \
-perform 1 FROM information_schema.tables WHERE table_name = trunc_table; \
-IF FOUND THEN \
-    EXECUTE FORMAT('TRUNCATE %I RESTART IDENTITY CASCADE',trunc_table); \
-ELSE \
-    RETURN; \
-END IF; \
-END $$; ")
-        
-        ## NOTE: this must be in creation / dep order or it deadlocks! 
-        tables = [  "pharmaceutical_companies",
-                    "brands",
-                    "segments",
-                    "pipeline_types",
-                    "pipelines",
-                    "pipeline_state_types",
-                    "pipeline_states",
-                    "transformation_templates",
-                    "transformations",
-                    "transformation_variables",
-                    ]
-            
-        for table in tables[::-1]:
-            executable = f"SELECT truncate_if('{table}')"
-            self.session.execute(executable)
     
     def _mock_brands(self)-> None:
         self.logger.debug('Generating brand mocks.')

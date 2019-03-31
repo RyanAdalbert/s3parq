@@ -27,8 +27,6 @@ class GenerateEngine(LoggerMixin):
     """ abstract defining connections here. Local assumes a psql instance in a local docker container. """
 
     def __init__(self, in_memory: bool = False) -> None:
-        """ in_memory is now nearly useless, as sqlite support of JSON requires plugins and is a general pain in the butt."""
-        
         if ENVIRONMENT == "dev":
             if in_memory:
                 self._url = "sqlite://"
@@ -170,9 +168,13 @@ class Segment(UniversalWithPrimary, Base):
 
 
 class TransformationTemplate(UniversalWithPrimary, Base):
+    """ The variable_structures store is intended to be JSON.
+        At this moment supporting JSON column type means cascading changes to test env etc.
+        So for now a varchar column will work fine.
+    """
     __tablename__ = 'transformation_templates'
     name = Column(String, nullable=False)
-    variable_structures = Column(JSON)
+    variable_structures = Column(String)
 
 class Transformation(UniversalWithPrimary, Base):
     __tablename__ = 'transformations'
