@@ -1,8 +1,8 @@
-"""comments
+"""boilerplate comments
 
-Revision ID: 7333d20cbb08
-Revises: 1134cec79e78
-Create Date: 2019-01-20 18:48:50.863496
+Revision ID: e7f82f654287
+Revises: 41cbaa495f77
+Create Date: 2019-03-27 16:11:56.527091
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7333d20cbb08'
-down_revision = '1134cec79e78'
+revision = 'e7f82f654287'
+down_revision = '41cbaa495f77'
 branch_labels = None
 depends_on = None
 

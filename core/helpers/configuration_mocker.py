@@ -3,13 +3,6 @@ from sqlalchemy import create_engine
 import core.models.configuration as config
 from core.logging import LoggerMixin
 
-from core.models.configuration import (
-    PharmaceuticalCompany, 
-    Brand, 
-    Pipeline, 
-    PipelineType, 
-    Segment
-)
 
 class ConfigurationMocker(LoggerMixin):
     ''' for development, creates in-memory database instance and a matching session.
@@ -29,6 +22,7 @@ class ConfigurationMocker(LoggerMixin):
         return self.session
 
     def generate_mocks(self)-> None:
+        self.purge()
         self._mock_pharmaceutical_companies()
         self._mock_brands()
         self._mock_segments()
@@ -38,8 +32,40 @@ class ConfigurationMocker(LoggerMixin):
         self._mock_pipeline_states()
         self._mock_transformation_templates()
         self._mock_transformations()
-        self._mock_extract_configurations()
+        self._mock_transformation_variables()
 
+    def purge(self)->None:
+        """ truncates and resets all the tables"""
+
+        self.session.execute("CREATE OR REPLACE FUNCTION truncate_if(trunc_table TEXT) \
+returns void language plpgsql \
+as $$ \
+BEGIN \
+perform 1 FROM information_schema.tables WHERE table_name = trunc_table; \
+IF FOUND THEN \
+    EXECUTE FORMAT('TRUNCATE %I RESTART IDENTITY CASCADE',trunc_table); \
+ELSE \
+    RETURN; \
+END IF; \
+END $$; ")
+        
+        ## NOTE: this must be in creation / dep order or it deadlocks! 
+        tables = [  "pharmaceutical_companies",
+                    "brands",
+                    "segments",
+                    "pipeline_types",
+                    "pipelines",
+                    "pipeline_state_types",
+                    "pipeline_states",
+                    "transformation_templates",
+                    "transformations",
+                    "transformation_variables",
+                    ]
+            
+        for table in tables[::-1]:
+            executable = f"SELECT truncate_if('{table}')"
+            self.session.execute(executable)
+    
     def _mock_brands(self)-> None:
         self.logger.debug('Generating brand mocks.')
         b = config.Brand
@@ -141,7 +167,7 @@ class ConfigurationMocker(LoggerMixin):
 
     def _mock_transformations(self)-> None:
         self.logger.debug('Generating transformation mocks.')
-        t = config.ExtractTransformation
+        t = config.Transformation
         self.session.add_all([
             t(id=1, transformation_template_id=1,
               pipeline_state_id=1, graph_order=0),
@@ -173,11 +199,24 @@ class ConfigurationMocker(LoggerMixin):
         self.logger.debug('Generating transformation_template mocks.')
         tt = config.TransformationTemplate
         self.session.add_all([
-            tt(id=1, name='extract_from_ftp'),
-            tt(id=2, name='initial_ingest')
+            tt(id=1, name='extract_from_ftp',
+                variable_structures = '{"test_attribute":"string","test_attribute_2":"integer"}'), 
+            tt(id=2, name='initial_ingest',
+                variable_structures = '{"another_test_attribute":"string","yet_another_test_attribute":"float"}')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')
+
+
+    def _mock_transformation_variables(self)->None:
+        self.logger.debug('Generating transformation_variables mocks')
+        tv = config.TransformationVariable
+        self.session.add_all([
+            tv(id=1, name='test_attribute', transformation_id=1, value='this is text', description='testing test attribute.'),
+            tv(id=2, name='yet_another_test_attribute', transformation_id=2, value='55.5', description='testing test attribute float.')
+        ])
+        self.session.commit()
+        self.logger.debug('Done generating transformation_variables mocks.')
 
 def setup_base_session():
     mock = ConfigurationMocker()
