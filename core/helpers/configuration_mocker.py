@@ -105,13 +105,13 @@ class ConfigurationMocker(LoggerMixin):
         self.logger.debug('Generating pipeline state type mocks.')
         p = config.PipelineStateType
         self.session.add_all([
-            p(id=1, name="Raw"),
-            p(id=2, name="Ingest"),
-            p(id=3, name="Master"),
-            p(id=4, name="Enhance"),
-            p(id=5, name="Enrich"),
-            p(id=6, name="Metrics"),
-            p(id=7, name="Dimensional")])
+            p(id=1, name="raw"),
+            p(id=2, name="ingest"),
+            p(id=3, name="master"),
+            p(id=4, name="enhance"),
+            p(id=5, name="enrich"),
+            p(id=6, name="metrics"),
+            p(id=7, name="dimensional")])
         self.session.commit()
         self.logger.debug('Done generating pipeline state type mocks.')
 

@@ -17,11 +17,10 @@ class Test:
 
     def test_output_path(self):
         self.setup()
-        output_contract = "asdf/1234/merp"
-        transformation_name = "shared.raw.extract"
+        output_contract = "asdf/1234/merp/boomboom"
         output_path = notebook.output_path(
-            output_contract, transformation_name)
-        assert output_path == f"s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/shared.raw.extract.ipynb"
+            output_contract)
+        assert output_path == f"s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/boomboom.ipynb"
 
     def test_output_url(self):
         self.setup()
@@ -36,7 +35,7 @@ class Test:
     
         bucket = ENV_BUCKET
         key = "notebooks/dev/important_business/raw/extract/shared.test.hello_world.ipynb"
-        tid=2,
+        tid=2
         tbranch="test_branch"
         tstate="raw"
         tparent="merck"

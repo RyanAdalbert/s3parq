@@ -8,13 +8,12 @@ from core.contract import Contract
 root = project_root.ProjectRoot().get_path()
 
 def run_transform(transform_id:int) -> str:
-
     ## notebook name == transform_template.name
     t_configs = get_transform(transform_id)
     notebook = t_configs.transformation_template.name
     output_contract = Contract(
-                        parent = t_configs.pipeline_state.brand.pharmacutical_company,
-                        child = t_configs.pipeline_state.brand,
+                        parent = t_configs.pipeline_state.pipeline.brand.pharmaceutical_company.name,
+                        child = t_configs.pipeline_state.pipeline.brand.name,
                         state = t_configs.pipeline_state.pipeline_state_type.name,
                         dataset = notebook)
 
@@ -25,10 +24,10 @@ def run_transform(transform_id:int) -> str:
         path,
         output_path(output_contract.get_key()),       
         parameters = dict(id=transform_id),
-        cwd=self.root
+        cwd=root
     )
 
-    return output_url(output_s3_path)
+    return output_url(output_path(output_contract.get_key()))
 
 # TODO: figure out how else we're going to separate the notebook 
 def output_path(output_contract: str) -> str:
@@ -43,6 +42,6 @@ def output_url(output_path: str) -> str:
 def get_transform(transform_id):
     session = SessionHelper().session
     transform_config = configuration.Transformation
-    # Start querying the extract configs
+    # Start querying the extract config
     transform = session.query(transform_config).filter(transform_config.id == transform_id).one()
     return transform
