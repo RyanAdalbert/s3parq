@@ -29,7 +29,7 @@ class Test:
         output_url = notebook.output_url(output_path)
         assert output_url == "http://notebook.integrichain.net/view/asdf/1234/merp/shared.raw.extract.ipynb"
 
-    @patch("core.helpers.notebook.pm")
+    @patch("core.helpers.notebook.papermill")
     def test_run_transform(self,mock_papermill):
         self.setup()
         s3 = boto3.resource('s3')
@@ -41,7 +41,7 @@ class Test:
         tstate="raw"
         tparent="merck"
         tchild="prilosec"
-        notebook_url = notebook.run_transform(id=tid, branch=tbranch, parent=tparent, child=tchild, state=tstate)
+        notebook_url = notebook.run_transform(transform_id=tid)
 
         mock_papermill.execute_notebook.assert_called
         """
