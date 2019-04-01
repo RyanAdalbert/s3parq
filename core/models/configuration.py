@@ -1,10 +1,12 @@
 from sqlalchemy import engine, create_engine, Column, Integer, String, Boolean, TIMESTAMP, text, ForeignKey, func, JSON
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import session, sessionmaker, relationship
+from sqlalchemy.orm import session, sessionmaker, relationship, validates
 from core.constants import DEV_CONFIGURATION_APPLICATION_CONN_STRING, ENVIRONMENT
 from core.secret import Secret
 from core.logging import LoggerMixin
 import json
+from types import SimpleNamespace
+from datetime import datetime
 from typing import Any
 Base = declarative_base()
 
@@ -27,8 +29,6 @@ class GenerateEngine(LoggerMixin):
     """ abstract defining connections here. Local assumes a psql instance in a local docker container. """
 
     def __init__(self, in_memory: bool = False) -> None:
-        """ in_memory is now nearly useless, as sqlite support of JSON requires plugins and is a general pain in the butt."""
-        
         if ENVIRONMENT == "dev":
             if in_memory:
                 self._url = "sqlite://"
@@ -170,9 +170,19 @@ class Segment(UniversalWithPrimary, Base):
 
 
 class TransformationTemplate(UniversalWithPrimary, Base):
+    """ The variable_structures store is intended to be JSON.
+        At this moment supporting JSON column type means cascading changes to test env etc.
+        So for now a varchar column will work fine.
+    """
     __tablename__ = 'transformation_templates'
     name = Column(String, nullable=False)
-    variable_structures = Column(JSON)
+    variable_structures = Column(String)
+
+    @validates('variable_structures')
+    def validate_variable_structures(self, key, variable_structures):
+        assert json.loads(variable_structures)
+        return variable_structures
+
 
 class Transformation(UniversalWithPrimary, Base):
     __tablename__ = 'transformations'
@@ -187,11 +197,12 @@ class Transformation(UniversalWithPrimary, Base):
 
     @property
     def variables(self):
-        structure = json.loads(self.transformation_template.variable_structure)
+        structure = json.loads(self.transformation_template.variable_structures)
         typed = {}
         for variable in self._raw_variables:
-            typed[variable.name] = self._apply_type(variable.value, structure[variable.name]["type"])
-        return typed
+            typed[variable.name] = self._apply_type(variable.value, structure[variable.name]["datatype"])
+        dot_notated = SimpleNamespace(**typed)
+        return dot_notated
 
     def _apply_type(self,value:str,typestring:str)->Any:
         """ takes a value string and a type string and returns the value typed to the type string"""
@@ -199,7 +210,7 @@ class Transformation(UniversalWithPrimary, Base):
         if typestring in ("str","string","char","varchar", "text"):
             return str(value)
         if typestring in ("datetime","date"):
-            return datetime.strftime(value)
+            return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
         if typestring in ("int","integer"):
             return int(value)
         if typestring in ("float","decimal","number", "double"):
@@ -211,7 +222,6 @@ class TransformationVariable(UniversalWithPrimary, Base):
     transformation_id = Column(Integer, ForeignKey('transformations.id'), nullable=False)
     name = Column(String, nullable=False)
     value = Column(String)
-    description = Column(String, nullable=False)
     transformation = relationship('Transformation')
 
 

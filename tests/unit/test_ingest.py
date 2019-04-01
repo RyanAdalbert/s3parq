@@ -3,12 +3,12 @@ from core.models.configuration import (
     PipelineStateType, 
     TransformationTemplate, 
     Transformation,
-    InitialIngestTransformation,
-    InitialIngestConfiguration
+##    InitialIngestTransformation,
+##    InitialIngestConfiguration
 )
 
 from core.helpers.configuration_mocker import setup_base_session
-from core.transforms.shared.ingest.ingest import InitialIngestTransform
+##from core.transforms.shared.ingest.ingest import InitialIngestTransform
 from core.transforms.shared.ingest import ingest
 from mock import patch, PropertyMock, MagicMock
 import pytest
@@ -20,9 +20,10 @@ import time
 import core.contract as contract
 from core.constants import ENV_BUCKET
 import os
-
+"""
 def get_filename_from_path(file):
     return os.path.split(file.name)[1]
+
 
 class Test:
     @moto.mock_s3
@@ -87,3 +88,4 @@ class Test:
 
         t.run()
         # Need to have the output_contract.write_with_metadata function defined before this can be tested
+"""
