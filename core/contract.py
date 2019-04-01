@@ -83,29 +83,60 @@ class Contract(LoggerMixin):
                 setter = getattr(self, 'set_' + attr)
                 setter(kwargs[attr])
 
-    def get_branch(self)->str:
-        return self.branch
+    # deleted getters/setters:
+    #   partition_size
 
-    def get_parent(self)->str:
-        return self.parent
 
-    def get_state(self)->str:
-        return self.state
+    @property
+    def branch(self)->str:
+        return self._branch
 
-    def get_child(self)->str:
-        return self.child
+    @branch.setter
+    def branch(self, branch: str)->None:
+        self._branch = self._validate_part(branch)
+
+    @property
+    def parent(self)->str:
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent:str)->None:
+        self._parent = self._validate_part(parent)
+
+    @property
+    def state(self)->str:
+        return self._state
+
+    @state.setter
+    def state(self, state: str)->None:
+        if state in self.STATES:
+            self._state = state
+        else:
+            raise ValueError(f'{state} is not a valid state')
+
+    @property
+    def child(self)->str:
+        return self._child
+
+    @child.setter
+    def child(self, child: str)->None:
+        self._child = self._validate_part(child)
 
     def get_env(self)->str:
         return self.env
 
-    def get_dataset(self)->str:
-        return self.dataset
+    @property
+    def dataset(self)->str:
+        return self._dataset
+
+    @dataset.setter
+    def dataset(self, dataset: str)->None:
+        # leave in natural case for datasets
+        self._dataset = self._validate_part(dataset)
+        self._set_contract_type()
 
     def get_partitions(self)->str:
         return self.partitions
-
-    def get_partition_size(self)->str:
-        return self.partition_size
 
     def get_contract_type(self)->str:
         return self.contract_type
@@ -129,29 +160,6 @@ class Contract(LoggerMixin):
             return None
         else:
             return self.STATES[cur + 1]
-
-    def set_branch(self, branch: str)->None:
-        self.branch = self._validate_part(branch)
-
-    def set_parent(self, parent: str)->None:
-        self.parent = self._validate_part(parent)
-
-    def set_child(self, child: str)->None:
-        self.child = self._validate_part(child)
-
-    def set_state(self, state: str)->None:
-        if state in self.STATES:
-            self.state = state
-        else:
-            raise ValueError(f'{state} is not a valid state')
-
-    def set_dataset(self, dataset: str)->None:
-        # leave in natural case for datasets
-        self.dataset = self._validate_part(dataset)
-        self._set_contract_type()
-
-    def set_partition_size(self, size: int)->None:
-        self.partition_size = size
 
     def set_partitions(self, partitions: list)->None:
         ''' INTENT: sets the partitions for a contract
@@ -185,7 +193,7 @@ class Contract(LoggerMixin):
         # if we need to override this, set the branch param first.
         if self.branch is None:
             try:
-                self.set_branch(BRANCH_NAME)
+                self.branch = BRANCH_NAME
             except:
                 raise ValueError(f'Your git branch name {branch_name} cannot be used as a contract branch path.')
 
@@ -251,12 +259,12 @@ class Contract(LoggerMixin):
         filename = os.path.split(local_file_path)[1]
         key = self.get_key()+filename
         try:
-            return s3_client.head_object(Bucket=self.get_bucket(),Key=key)
+            return s3_client.head_object(Bucket=self.get_bucket(),Key=key)["Metadata"]
         except ClientError as e:
             # If file does not exist, throw back since it needs to be moved anyways
             #   Consider: cleaner handling?
             if e.response['ResponseMetadata']['HTTPStatusCode'] == 404:
-                raise e
+                raise KeyError("File not found!")
             else:
                 raise e
 
@@ -284,27 +292,34 @@ class Contract(LoggerMixin):
 
     # aliases
 
-    def get_brand(self)->str:
-        return self.get_child()
+    @property
+    def brand(self)->str:
+        return self._child
 
-    def get_customer(self)->str:
-        return self.get_parent()
+    @brand.setter
+    def brand(self, brand: str)->None:
+        self.child = brand
 
-    def set_brand(self, val)->None:
-        self.set_child(val)
+    @property
+    def customer(self)->str:
+        return self._parent
 
-    def set_customer(self)->None:
-        self.set_brand(val)
+    @customer.setter
+    def customer(self, customer: str)->None:
+        self.parent = customer
 
-    def get_bucket(self)->str:
+    @property
+    def bucket(self)->str:
         return self.get_env()
+
+    @bucket.setter
+    def bucket(self, env: str)->None:
+        self.set_env(env)
 
     def get_key(self)->str:
         ''' Removes the s3 domain and the environment prefix'''
         return '/'.join(self.get_s3_path()[5:].split('/')[1:])
 
-    def set_bucket(self, env: str)->None:
-        self.set_env(env)
 
     def set_metadata(self, df, run_timestamp):
         df['__metadata_app_version'] = CORE_VERSION
