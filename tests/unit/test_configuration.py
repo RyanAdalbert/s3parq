@@ -29,12 +29,24 @@ def test_variables_rendered(wrapper):
     assert transform.variables.age == 23
     assert transform.variables.birthdate == datetime(2018,10,11,10,24,1)
 
-def test_all_variables_must_be_present(wrapper):
+def test_all_variables_from_template_must_be_present(wrapper):
     session = wrapper
     session.add(config.TransformationVariable(transformation_id=1000, name='name', value='big_test'))
     session.add(config.TransformationVariable(transformation_id=1000, name='age', value='23'))
     session.commit()
 
     with pytest.raises(config.MissingTransformationVariableError):
+        transform = session.query(config.Transformation).filter(config.Transformation.id==1000).one()
+        print(transform.variables)
+
+def test_no_extra_variables_must_be_present(wrapper):
+    session = wrapper
+    session.add(config.TransformationVariable(transformation_id=1000, name='name', value='big_test'))
+    session.add(config.TransformationVariable(transformation_id=1000, name='birthdate', value='2018-10-11 10:24:01'))
+    session.add(config.TransformationVariable(transformation_id=1000, name='age', value='23'))
+    session.add(config.TransformationVariable(transformation_id=1000, name='ham_sandwich', value='good on rye bread'))
+    session.commit()
+
+    with pytest.raises(config.ExtraTransformationVariableError):
         transform = session.query(config.Transformation).filter(config.Transformation.id==1000).one()
         print(transform.variables)

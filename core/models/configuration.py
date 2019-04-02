@@ -199,10 +199,9 @@ class Transformation(UniversalWithPrimary, Base):
         structure = json.loads(self.transformation_template.variable_structures)
         typed = {}
 
-
         for variable in self._raw_variables:
             ## make sure there are no extra vars
-            if variable not in structure.keys():
+            if variable.name not in structure.keys():
                 message = f"{variable.name} is not a valid variable, but was set for tranformation {self.id}"
                 raise ExtraTransformationVariableError(message)
             
