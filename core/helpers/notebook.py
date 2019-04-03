@@ -22,12 +22,12 @@ def run_transform(transform_id:int) -> str:
     path = f"{root}/transforms/{notebook}.ipynb"
     papermill.execute_notebook(
         path,
-        output_path(output_contract.get_key()),       
-        parameters = dict(id=transform_id),
+        output_path(output_contract.key),       
+        parameters = dict(transform_id=transform_id),
         cwd=root
     )
 
-    return output_url(output_path(output_contract.get_key()))
+    return output_url(output_path(output_contract.key))
 
 # TODO: figure out how else we're going to separate the notebook 
 def output_path(output_contract: str) -> str:
