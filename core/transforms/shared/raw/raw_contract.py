@@ -1,10 +1,7 @@
 import boto3
 import os
-from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
 
-from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET, BRANCH_NAME
-from core.logging import LoggerMixin
-from core.helpers.project_root import ProjectRoot
+from core.contract import Contract
 
 from typing import List
 from contextlib import contextmanager
@@ -30,7 +27,7 @@ def download_s3_object(bucket: str, key: str, local_dir: str) -> str:
         else:
             raise
 
-class RawContract(LoggerMixin):
+class RawContract(Contract):
     ''' *** This is specific to the raw state! ***
         The s3 contract is how we structure our data lake. 
         This contract defines the output structure of data into S3.
@@ -50,91 +47,24 @@ class RawContract(LoggerMixin):
         CHILD - The sub level source identifier, generally the brand (and is aliased as such) 
         STATE - One of: raw or ingest
     '''
-    DEV = DEV_BUCKET
-    PROD = PROD_BUCKET
-    UAT = UAT_BUCKET
-    STATES = ['raw', 'ingest']
 
     def __init__(self, parent: str, child: str, state: str, branch: str = None):
         ''' Initialize with the key params
-            Branch can pull from environment variables though so not required
+            Calls them all up to super as the common attributes
         '''
 
-        self.parent = parent
-        self.child = child
-        self.state = state
-        
-        self._set_env()
+        super().__init__(parent=parent, child=child, state=state, branch=branch)
 
-        if branch is None:
-            self._branch = branch
-            self._set_branch()
-        else:
-            self.branch = branch
-
+        self._contract_type = "state"
 
     @property
-    def branch(self)->str:
-        return self._branch
-
-    @branch.setter
-    def branch(self, branch: str)->None:
-        self._branch = self._validate_part(branch)
-
-    @property
-    def parent(self)->str:
-        return self._parent
-
-    @parent.setter
-    def parent(self, parent:str)->None:
-        self._parent = self._validate_part(parent)
-
-    @property
-    def state(self)->str:
-        return self._state
-
-    @state.setter
-    def state(self, state: str)->None:
-        if state in self.STATES:
-            self._state = state
-        else:
-            raise ValueError(f'{state} is not a valid state')
-
-    @property
-    def child(self)->str:
-        return self._child
-
-    @child.setter
-    def child(self, child: str)->None:
-        self._child = self._validate_part(child)
+    def key(self)->str:
+        ''' Removes the s3 domain and the environment prefix'''
+        return '/'.join(self.s3_path[5:].split('/')[1:])
 
     # Properties that shouldn't be touched from the outside
 
-    @property
-    def env(self)->str:
-        return self._env
-
-    def _set_env(self)->None:
-        env = ENVIRONMENT.lower()
-        if env in (self.DEV, 'dev', 'development'):
-            self._env = self.DEV
-        elif env in (self.PROD, 'prod', 'production'):
-            self._env = self.PROD
-        elif env in (self.UAT, 'uat'):
-            self._env = self.UAT
-        else:
-            raise ValueError(f'{env} is not a valid environment.')
-
-    def _set_branch(self)->None:
-        # set branch default to the git branch.
-        # if we need to override this, set the branch param first.
-        if self.branch is None:
-            try:
-                self.branch = BRANCH_NAME
-            except:
-                raise ValueError(f'Your git branch name {branch_name} cannot be used as a contract branch path.')
-
-    def raw_get_s3_path(self, filename='')->str:
+    def s3_path_with_filename(self, filename: str)->str:
         ''' INTENT: builds the s3 path from the contract.
             RETURNS: string s3 path
             NOTE: requires all params to be set to at least the state level
@@ -146,34 +76,12 @@ class RawContract(LoggerMixin):
                 self.state
                 ):
             raise ValueError(
-                'raw_get_s3_path() requires all contract params to be set.')
+                's3_path_with_filename() requires all contract params to be set.')
 
         path = f's3://{self.env}/{self.branch}/{self.parent}/{self.child}/{self.state}/'
 
         path += filename
         return path
-
-    @property
-    def previous_state(self)->str:
-        ''' INTENT: returns the state before this contract state
-            RETURNS: str state name
-        '''
-        cur = self.STATES.index(self._state)
-        if cur < 1:
-            return None
-        else:
-            return self.STATES[cur - 1]
-
-    @property
-    def next_state(self)->str:
-        ''' INTENT: returns the state after this contract state
-            RETURNS: str state name
-        '''
-        cur = self.STATES.index(self._state)
-        if cur == len(self.STATES) - 1:
-            return None
-        else:
-            return self.STATES[cur + 1]
 
     # Outside functions
 
@@ -186,7 +94,7 @@ class RawContract(LoggerMixin):
         s3_client = boto3.client('s3')
         filename = os.path.split(local_file_path)[1]
         key = self.key+filename
-        self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.raw_get_s3_path(filename)}.')
+        self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.s3_path_with_filename(filename)}.')
 
         with open(local_file_path, 'rb') as file_data:
             extra_args = {'source_modified_time': str(
@@ -199,7 +107,7 @@ class RawContract(LoggerMixin):
         s3_client = boto3.client('s3')
         
         filename = os.path.split(local_file_path)[1]
-        key = self.raw_get_s3_path(filename)
+        key = self.s3_path_with_filename(filename)
         try:
             return s3_client.head_object(Bucket=self.bucket,Key=key)["Metadata"]
         except ClientError as e:
@@ -233,23 +141,6 @@ class RawContract(LoggerMixin):
 
     # aliases
 
-    @property
-    def bucket(self)->str:
-        return self.env
-
-    @property
-    def key(self)->str:
-        ''' Removes the s3 domain and the environment prefix'''
-        return '/'.join(self.raw_get_s3_path()[5:].split('/')[1:])
-
-    @property
-    def brand(self)->str:
-        return self._child
-
-    @brand.setter
-    def brand(self, brand: str)->None:
-        self.child = brand
-
     def set_metadata(self, df, run_timestamp):
         df['__metadata_app_version'] = CORE_VERSION
         df['__metadata_run_timestamp'] = run_timestamp
@@ -260,11 +151,3 @@ class RawContract(LoggerMixin):
     def write_with_metadata(self, dataset, df, run_timestamp):
         pass
 
-    # private
-
-    def _validate_part(self, part: str)->str:
-        val = s3Name().validate_part(part.lower(), allow_prefix=False)
-        if val[0]:
-            return part.lower()
-        else:
-            raise ValueError(val[1])

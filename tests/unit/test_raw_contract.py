@@ -3,27 +3,9 @@ from unittest.mock import patch
 from core.transforms.shared.raw.raw_contract import RawContract
 import boto3
 import tempfile
-from core.helpers.project_root import ProjectRoot
 from core.constants import ENVIRONMENT, ENV_BUCKET
 import moto
 import os
-
-def test_set_env_valid():
-    contract = RawContract(
-            parent="Merck",
-            child="Wonder_Drug",
-            state="raw"
-        )
-    assert contract.env == f'{ENV_BUCKET}', 'failed to set to the current environment'
-
-@patch("core.transforms.shared.raw.raw_contract.ENVIRONMENT","Pretend-RSE")
-def test_set_env_invalid():
-    with pytest.raises(ValueError):
-        contract = RawContract(
-            parent="Merck",
-            child="Wonder_Drug",
-            state="raw"
-        )
 
 
 @pytest.fixture
@@ -34,44 +16,6 @@ def _contract():
         state="raw"
     )
     return contract
-
-
-def test_alias_brand():
-    contract = RawContract(
-        parent="Merck",
-        child="Wonder_Drug",
-        state="raw"
-    )
-    brand = 'Merck'
-    contract.brand = brand
-    assert contract.brand == brand.lower(), "brand alias not set"
-    assert contract.child == brand.lower(), "brand does not alias to child"
-
-
-def test_previous_state(_contract):
-    contract = _contract
-    contract.state = 'ingest'
-
-    assert contract.previous_state == 'raw', 'previous state incorrect'
-
-
-def test_previous_from_raw(_contract):
-    contract = _contract
-    contract.state = 'raw'
-    assert contract.previous_state == None, 'previous state for raw'
-
-
-def test_next_state(_contract):
-    contract = _contract
-    contract.state = 'raw'
-    assert contract.next_state == 'ingest', 'next state incorrect'
-
-
-def test_next_state_from_ingest(_contract):
-    contract = _contract
-    contract.state = 'ingest'
-    assert contract.next_state == None, 'next state for ingest'
-
 
 
 def _s3_mock_setup():
