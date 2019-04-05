@@ -4,41 +4,20 @@ from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
 
 from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET, BRANCH_NAME
 from core.logging import LoggerMixin
-from core.helpers.project_root import ProjectRoot
 
 from typing import List
-from contextlib import contextmanager
 
-def download_s3_object(bucket: str, key: str, local_dir: str) -> str:
-    """
-    Download an object from s3 to a specified local directory.
-    :param bucket: s3 bucket as a string
-    :param key: s3 path to object to download
-    :param local_dir: directory to store file
-    :return: path of downloaded file
-    """
-    try:
-        s3 = boto3.resource('s3')
-        filename = os.path.split(key)[-1]
-        local_path = os.path.join(local_dir, filename)
-        s3.Bucket(bucket).download_file(key, local_path)
-
-        return local_path
-    except ClientError as e:
-        if e.response['Error']['Code'] == "404":
-            raise FileNotFoundError(f"s3 object not found: s3://{bucket}/{key}")
-        else:
-            raise
 
 class Contract(LoggerMixin):
-    ''' The s3 contract is how we structure our data lake. 
+    ''' This class is the base contracts for all other typed contracts.
+        The s3 contract is how we structure our data lake. 
         This contract defines the output structure of data into S3.
-        *--------------------------------------------------------------------------------------------------------------------*
-        | contract structure in s3:                                                                                          |
-        |                                                                                                                    |
-        | s3:// {ENV} / {BRANCH} / {PARENT} / {CHILD} / {STATE} / {DATASET} / {PARTITION} [ / {SUB-PARTITION} / ] {FILENAME} |
-        |                                                                                                                    |
-        *--------------------------------------------------------------------------------------------------------------------*
+        *-------------------------------------------------------*
+        | contract structure in s3:                             |
+        |                                                       |
+        | s3:// {ENV} / {BRANCH} / {PARENT} / {CHILD} / {STATE} |
+        |                                                       |
+        *-------------------------------------------------------*
         ENV - environment Must be one of development, uat, production. 
             Prefixed with integrichain- due to global unique reqirement
         BRANCH - the software branch for development this will be the working pull request (eg pr-225)
@@ -48,9 +27,6 @@ class Contract(LoggerMixin):
             or another aggregator for future-proofing
         CHILD - The sub level source identifier, generally the brand (and is aliased as such) 
         STATE - One of: raw, ingest, master, enhance, Enrich, Metrics 
-        DATASET - The name of the collection of data. In an RDBMS this would be a table or view
-        PARTITION - for datasets, the partition is set in the prefix name  
-        SUB-PARTITION - for datasets, the sub-partitions add additional partitioning with additional prefixes
     '''
     DEV = DEV_BUCKET
     PROD = PROD_BUCKET
@@ -58,7 +34,7 @@ class Contract(LoggerMixin):
     STATES = ['raw', 'ingest', 'master', 'enhance',
               'enrich', 'metrics', 'dimensional']
 
-    def __init__(self, **kwargs):
+    def __init__(self, parent: str, child: str, state: str, branch=None):
         ''' Set the initial vals to None.
             Default file name, dataset and partitions to empty (they are not required in a contract). 
             Does not support customer / brand aliases
@@ -66,26 +42,18 @@ class Contract(LoggerMixin):
         attributes = ('branch', 'parent', 'child', 'state',
                       'dataset', 'partitions', 'partition_size')
 
-        for attr in attributes:
-            self.__dict__[attr] = None
+        self.parent = parent
+        self.child = child
+        self.state = state
+        self._contract_type = "state"
 
-        # defaults
-        self.partitions = []
-        self.dataset = str()
-        self.partition_size = 100  # partition size in mb
-        self.contract_type = 'state'
+        self._set_env()
 
-        self.set_env()
-
-        # set the attributes using the setter methods if they are in kwargs
-        for attr in attributes:
-            if attr in kwargs:
-                setter = getattr(self, 'set_' + attr)
-                setter(kwargs[attr])
-
-    # deleted getters/setters:
-    #   partition_size
-
+        if branch is None:
+            self._branch = branch
+            self._init_branch()
+        else:
+            self.branch = branch
 
     @property
     def branch(self)->str:
@@ -122,94 +90,60 @@ class Contract(LoggerMixin):
     def child(self, child: str)->None:
         self._child = self._validate_part(child)
 
-    def get_env(self)->str:
-        return self.env
+    @property
+    def contract_type(self)->str:
+        return self._contract_type
 
     @property
-    def dataset(self)->str:
-        return self._dataset
-
-    @dataset.setter
-    def dataset(self, dataset: str)->None:
-        # leave in natural case for datasets
-        self._dataset = self._validate_part(dataset)
-        self._set_contract_type()
-
-    def get_partitions(self)->str:
-        return self.partitions
-
-    def get_contract_type(self)->str:
-        return self.contract_type
-
-    def get_previous_state(self)->str:
+    def previous_state(self)->str:
         ''' INTENT: returns the state before this contract state
             RETURNS: str state name
         '''
-        cur = self.STATES.index(self.state)
+        cur = self.STATES.index(self._state)
         if cur < 1:
             return None
         else:
             return self.STATES[cur - 1]
 
-    def get_next_state(self)->str:
+    @property
+    def next_state(self)->str:
         ''' INTENT: returns the state after this contract state
             RETURNS: str state name
         '''
-        cur = self.STATES.index(self.state)
+        cur = self.STATES.index(self._state)
         if cur == len(self.STATES) - 1:
             return None
         else:
             return self.STATES[cur + 1]
 
-    def set_partitions(self, partitions: list)->None:
-        ''' INTENT: sets the partitions for a contract
-            ARGS:
-                - partitions (list) an ordered list of partition names.
-                    will be applied in list order
-            RETURNS: None
-        '''
-        temp_partitions = []
-        for p in partitions:
-            val = s3Name().validate_part(p)
-            if val[0]:
-                temp_partitions.append(p)
-            else:
-                raise ValueError(val[1])
-        self.partitions = temp_partitions
-        self._set_contract_type()
+    # Properties that shouldn't be touched from the outside
 
-    def set_env(self)->None:
+    @property
+    def env(self)->str:
+        return self._env
+
+    def _set_env(self)->None:
         env = ENVIRONMENT.lower()
         if env in (self.DEV, 'dev', 'development'):
-            self.env = self.DEV
+            self._env = self.DEV
         elif env in (self.PROD, 'prod', 'production'):
-            self.env = self.PROD
+            self._env = self.PROD
         elif env in (self.UAT, 'uat'):
-            self.env = self.UAT
+            self._env = self.UAT
         else:
             raise ValueError(f'{env} is not a valid environment.')
 
+    def _init_branch(self)->None:
         # set branch default to the git branch.
         # if we need to override this, set the branch param first.
-        if self.branch is None:
+        if self._branch is None:
             try:
                 self.branch = BRANCH_NAME
             except:
                 raise ValueError(f'Your git branch name {branch_name} cannot be used as a contract branch path.')
 
-    def _set_contract_type(self)->None:
-        ''' INTENT: sets what type of contract this is - file, partition, or dataset
-            RETURNS: None
-        '''
-        if len(self.partitions) > 0:
-            t = 'partition'
-        elif len(self.dataset) > 0:
-            t = 'dataset'
-        else:
-            t = 'state'
-        self.contract_type = t
-
-    def get_s3_path(self, filename='')->str:
+    @property
+    def s3_path(self)->str:
         ''' INTENT: builds the s3 path from the contract.
             RETURNS: string s3 path
             NOTE: requires all params to be set to at least the state level
@@ -221,74 +155,11 @@ class Contract(LoggerMixin):
                 self.state
                 ):
             raise ValueError(
-                'get_s3_path() requires all contract params to be set.')
+                's3_path requires all contract params to be set.')
 
         path = f's3://{self.env}/{self.branch}/{self.parent}/{self.child}/{self.state}/'
 
-        if len(self.dataset) > 0:
-            path += f'{self.dataset}/'
-
-            # no partitions without a data set
-            for p in self.partitions:
-                path += f'{p}/'
-
-        path += filename
         return path
-
-    def publish_raw_file(self, local_file_path: str) ->None:
-        '''accepts a local path to a file, publishes it as-is to s3 as long as state == raw.'''
-        if self.get_state() != 'raw':
-            raise ValueError(
-                'publish_raw_file may only be used on raw contracts.')
-
-        s3_client = boto3.client('s3')
-        filename = os.path.split(local_file_path)[1]
-        key = self.get_key()+filename
-        self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()+filename}.')
-
-        with open(local_file_path, 'rb') as file_data:
-            extra_args = {'source_modified_time': str(
-                float(os.stat(local_file_path).st_mtime))}
-            resp = s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
-            ), Key=key, ExtraArgs={"Metadata": extra_args})
-
-    def get_raw_file_metadata(self, local_file_path:str) ->None:
-        # If file exists, return its metadata
-        s3_client = boto3.client('s3')
-        
-        filename = os.path.split(local_file_path)[1]
-        key = self.get_key()+filename
-        try:
-            return s3_client.head_object(Bucket=self.get_bucket(),Key=key)["Metadata"]
-        except ClientError as e:
-            # If file does not exist, throw back since it needs to be moved anyways
-            #   Consider: cleaner handling?
-            if e.response['ResponseMetadata']['HTTPStatusCode'] == 404:
-                raise KeyError("File not found!")
-            else:
-                raise e
-
-    def list_files(self, file_prefix='') -> List[str]:
-        key = self.get_key()
-        keyfix = key+file_prefix
-        try:
-            s3 = boto3.resource('s3')
-            bucket = s3.Bucket(self.get_bucket())
-            objects = [obj.key for obj in bucket.objects.filter(Prefix=keyfix)]
-
-            return objects
-        except ClientError as e:
-            if e.response['Error']['Code'] == "404":
-                raise FileNotFoundError("s3 object not found: %s" % file_prefix)
-            else:
-                raise
-
-    @contextmanager
-    def download_raw_file(self, filename):
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            download_path = download_s3_object(self.get_bucket(), self.get_key()+filename, tmp_dir)
-            yield download_path
-
 
     # aliases
 
@@ -310,26 +181,12 @@ class Contract(LoggerMixin):
 
     @property
     def bucket(self)->str:
-        return self.get_env()
+        return self.env
 
-    @bucket.setter
-    def bucket(self, env: str)->None:
-        self.set_env(env)
-
-    def get_key(self)->str:
+    @property
+    def key(self)->str:
         ''' Removes the s3 domain and the environment prefix'''
-        return '/'.join(self.get_s3_path()[5:].split('/')[1:])
-
-
-    def set_metadata(self, df, run_timestamp):
-        df['__metadata_app_version'] = CORE_VERSION
-        df['__metadata_run_timestamp'] = run_timestamp
-        df['__metadata_output_contract'] = self.get_s3_url()
-        partitions = ['__metadata_run_timestamp']
-        return (df, partitions)
-
-    def write_with_metadata(self, dataset, df, run_timestamp):
-        pass
+        return '/'.join(self.s3_path[5:].split('/')[1:])
 
     # private
 
