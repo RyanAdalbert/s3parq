@@ -9,8 +9,8 @@ services:
 
     airflow:
         build:
-          dockerfile: ./dockerfiles/core.dockerfile
-          context: .
+            dockerfile: ./dockerfiles/core.dockerfile
+            context: .
         image: ichain/core
         depends_on:
             - airflowpg
@@ -35,8 +35,8 @@ services:
 
     notebook:
         build:
-          dockerfile: ./dockerfiles/core.dockerfile
-          context: .
+            dockerfile: ./dockerfiles/core.dockerfile
+            context: .
         image: ichain/core
         environment:
             - AWS_ACCESS_KEY_ID
