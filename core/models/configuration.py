@@ -237,6 +237,20 @@ class TransformationVariable(UniversalWithPrimary, Base):
     value = Column(String)
     transformation = relationship('Transformation')
 
+    ## validate the variable is defined in the variable_structures for this transform template
+    @validates('name')
+    def validate_name(self, key, name):
+        raise ValueError(dir(self.__mapper__))
+        struct = json.loads(self.transformation.transformation_template.variable_structures)
+        if name in struct.keys():
+            return name
+        else:
+            template_name = self.transformation.transformation_template.name
+            raise ExtraTransformationVariableError(f"{name} is not a valid variable for transformation template {template_name}")
+
+
+
+
 class ExtraTransformationVariableError(ValueError):
     """ This is specifically for cases when variables 
         defined in the variable_structures are not present.
@@ -250,17 +264,4 @@ class MissingTransformationVariableError(ValueError):
     pass
 
 
-"""
-class ExtractTransformation(Transformation):
-    extract_configurations = relationship(
-        "ExtractConfiguration", order_by=ExtractConfiguration.id, back_populates='transformation')
 
-    __mapper_args__ = {'polymorphic_identity': 'extract_from_ftp'}
-
-
-class InitialIngestTransformation(Transformation):
-    initial_ingest_configurations = relationship(
-        "InitialIngestConfiguration", order_by=InitialIngestConfiguration.id, back_populates='transformation')
-
-    __mapper_args__ = {'polymorphic_identity': 'initial_ingest'}
-"""

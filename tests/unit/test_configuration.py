@@ -50,3 +50,5 @@ def test_no_extra_variables_must_be_present(wrapper):
     with pytest.raises(config.ExtraTransformationVariableError):
         transform = session.query(config.Transformation).filter(config.Transformation.id==1000).one()
         print(transform.variables)
+
+   
