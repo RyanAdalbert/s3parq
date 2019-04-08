@@ -2,6 +2,7 @@ import boto3
 import os
 
 from core.contract import Contract
+from botocore.exceptions import ClientError
 
 from typing import List
 from contextlib import contextmanager

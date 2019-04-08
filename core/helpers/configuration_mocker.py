@@ -169,7 +169,11 @@ class ConfigurationMocker(LoggerMixin):
         tt = config.TransformationTemplate
         self.session.add_all([
             tt(id=1, name='extract_from_ftp',
-                variable_structures = '{"filesystem_name":"string","secret_name":"string","prefix":"string","secret_type_of":"string"}'), 
+                  variable_structures = ''' {"filesystem_path":{"datatype": "string", "description": "the remote path to the files"},
+                          "secret_name":{"datatype":"string","description":"the name of the secret in secret manager"},
+                          "prefix":{"datatype":"string","description":"the prefix of the files to get on the remote filesystem"},
+                          "secret_type_of":{"datatype":"string","description":"the type of the remote server, used in the secret path"}
+                          }'''),
             tt(id=2, name='initial_ingest',
                 variable_structures = '{"another_test_attribute":"string","yet_another_test_attribute":"float"}')
         ])
