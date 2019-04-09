@@ -7,7 +7,8 @@ from core.models.configuration import (
     PipelineState, 
     PipelineStateType, 
     TransformationTemplate, 
-    Transformation
+    Transformation,
+    ExtractTransformation
 )
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 from mock import patch, PropertyMock, MagicMock
@@ -16,7 +17,7 @@ import pytest
 from core.airflow.plugins.transform_operator import TransformOperator
 
 class Names:
-    cname, bname, ptname, sname, pname, pstname, tname = 'test_client', 'test_brand', 'test_edo_pipeline', 'test_segment', 'test_pipeline', 'test_pipeline_state', 'test_transform_template'
+    cname, bname, ptname, sname, pname, pstname, tname = 'test_client', 'test_brand', 'test_edo_pipeline', 'test_segment', 'test_pipeline', 'test_pipeline_state', 'extract_from_ftp'
 class Test:
 
     def setup_session_mock(self):
@@ -36,7 +37,7 @@ class Test:
                                   graph_order=1, pipeline_id=1))
         session.add(TransformationTemplate(id=1, name=n.tname))
 
-        session.add(Transformation(id=1, graph_order=0,
+        session.add(ExtractTransformation(id=1, graph_order=0,
                                    transformation_template_id=1, pipeline_state_id=1))
         session.add(Transformation(id=2, graph_order=0,
                                    transformation_template_id=1, pipeline_state_id=1))

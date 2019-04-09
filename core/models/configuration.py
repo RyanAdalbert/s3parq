@@ -1,9 +1,12 @@
+from sqlalchemy import *
+from sqlalchemy.orm import *
 from sqlalchemy import engine, create_engine, Column, Integer, String, Boolean, TIMESTAMP, text, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import session, sessionmaker, relationship
 from core.constants import DEV_CONFIGURATION_APPLICATION_CONN_STRING, ENVIRONMENT
 from core.secret import Secret
 from core.logging import LoggerMixin
+
 Base = declarative_base()
 
 
@@ -20,10 +23,11 @@ class Session():
     def get_session(self) -> session.Session:
         return self.session
 
+
 class GenerateEngine(LoggerMixin):
     """ abstract defining connections here. Local assumes a psql instance in a local docker container. """
 
-    def __init__(self, in_memory:bool=True) -> None:
+    def __init__(self, in_memory: bool = True) -> None:
         """ So the default development configuration database is an in-memory sqlite instance. 
             This is fast and easy and atomic (resets after every execution) but it is NOT exactly the same as 
             the prod PG instance. When we want an identical configuration environment, setting in_memory to False 
@@ -38,7 +42,7 @@ class GenerateEngine(LoggerMixin):
             self._url = self._secret_defined_url()
 
     @property
-    def url(self) -> str: 
+    def url(self) -> str:
         return self._url
 
     def get_engine(self) -> engine.base.Engine:
@@ -104,8 +108,19 @@ class ExtractConfiguration(UniversalWithPrimary, Base):
     secret_type_of = Column(String, nullable=False)
     secret_name = Column(String, nullable=False)
     transformation = relationship(
-        "Transformation", back_populates='extract_configurations')
+        "ExtractTransformation", back_populates='extract_configurations')
 
+class InitialIngestConfiguration(UniversalWithPrimary, Base):
+    __tablename__ = 'initial_ingest_configurations'
+    transformation_id = Column(Integer, ForeignKey(
+        'transformations.id'), nullable=False)
+    delimiter = Column(String, nullable=False, default=",")
+    skip_rows = Column(Integer, nullable=False, default=0)
+    encoding = Column(String, nullable=False, default="utf-8")
+    input_file_prefix = Column(String)
+    dataset_name = Column(String)
+    transformation = relationship(
+        "InitialIngestTransformation", back_populates='initial_ingest_configurations')
 
 class PharmaceuticalCompany(UniversalWithPrimary, Base):
     __tablename__ = 'pharmaceutical_companies'
@@ -120,13 +135,12 @@ class Pipeline(UniversalWithPrimary, Base):
     pipeline_type_id = Column(Integer, ForeignKey(
         'pipeline_types.id'), nullable=False)
     pipeline_type = relationship("PipelineType")
-    is_active = Column(Boolean, nullable=False, default= True)
+    is_active = Column(Boolean, nullable=False, default=True)
     brand_id = Column(Integer, ForeignKey('brands.id'), nullable=False)
     brand = relationship("Brand", back_populates="pipelines")
     run_frequency = Column(String)
     description = Column(String)
     pipeline_states = relationship("PipelineState", back_populates='pipeline')
-
 
 
 class PipelineState(UniversalWithPrimary, Base):
@@ -138,6 +152,7 @@ class PipelineState(UniversalWithPrimary, Base):
     pipeline = relationship("Pipeline", back_populates="pipeline_states")
     graph_order = Column(Integer, nullable=False)
     transformations = relationship("Transformation")
+
 
 class PipelineStateType(UniversalWithPrimary, Base):
     __tablename__ = 'pipeline_state_types'
@@ -157,19 +172,35 @@ class Segment(UniversalWithPrimary, Base):
     pipeline_types = relationship("PipelineType", back_populates='segment')
 
 
-class Transformation(UniversalWithPrimary, Base):
-    __tablename__ = 'transformations'
-    transformation_template_id = Column(Integer,  ForeignKey(
-        'transformation_templates.id'), nullable=False)
-    transformation_template = relationship("TransformationTemplate")
-    pipeline_state_id = Column(Integer,  ForeignKey(
-        'pipeline_states.id'), nullable=False)
-    pipeline_state = relationship("PipelineState", back_populates='transformations')
-    graph_order = Column(Integer, nullable=False, server_default=text('0'))
-    extract_configurations = relationship(
-        "ExtractConfiguration", order_by=ExtractConfiguration.id, back_populates='transformation')
-
-
 class TransformationTemplate(UniversalWithPrimary, Base):
     __tablename__ = 'transformation_templates'
     name = Column(String, nullable=False)
+
+
+class Transformation(UniversalWithPrimary, Base):
+    __tablename__ = 'transformations'
+    transformation_template_id = Column(Integer, ForeignKey(
+        'transformation_templates.id'), nullable=False)
+    transformation_template = relationship("TransformationTemplate")
+    pipeline_state_id = Column(Integer, ForeignKey(
+        'pipeline_states.id'), nullable=False)
+    pipeline_state = relationship("PipelineState", back_populates='transformations')
+    graph_order = Column(Integer, nullable=False, server_default=text('0'))
+
+    type_name = column_property(select([TransformationTemplate.name]).where(
+        TransformationTemplate.id == transformation_template_id).as_scalar())
+    __mapper_args__ = {'polymorphic_identity': 'a', 'polymorphic_on': type_name}
+
+
+class ExtractTransformation(Transformation):
+    extract_configurations = relationship(
+        "ExtractConfiguration", order_by=ExtractConfiguration.id, back_populates='transformation')
+
+    __mapper_args__ = {'polymorphic_identity': 'extract_from_ftp'}
+
+
+class InitialIngestTransformation(Transformation):
+    initial_ingest_configurations = relationship(
+        "InitialIngestConfiguration", order_by=InitialIngestConfiguration.id, back_populates='transformation')
+
+    __mapper_args__ = {'polymorphic_identity': 'initial_ingest'}

@@ -3,6 +3,13 @@ from sqlalchemy import create_engine
 import core.models.configuration as config
 from core.logging import LoggerMixin
 
+from core.models.configuration import (
+    PharmaceuticalCompany, 
+    Brand, 
+    Pipeline, 
+    PipelineType, 
+    Segment
+)
 
 class ConfigurationMocker(LoggerMixin):
     ''' for development, creates in-memory database instance and a matching session.
@@ -42,6 +49,7 @@ class ConfigurationMocker(LoggerMixin):
             b(id=2, name="Cornballer2", display_name="Corn Baller", pharmaceutical_company_id=2)])
         self.session.commit()
         self.logger.debug('Done generating brand mocks.')
+
 
     def _mock_extract_configurations(self)-> None:
         self.logger.debug('Generating extract_configuation mocks.')
@@ -133,17 +141,17 @@ class ConfigurationMocker(LoggerMixin):
 
     def _mock_transformations(self)-> None:
         self.logger.debug('Generating transformation mocks.')
-        t = config.Transformation
+        t = config.ExtractTransformation
         self.session.add_all([
             t(id=1, transformation_template_id=1,
               pipeline_state_id=1, graph_order=0),
             t(id=2, transformation_template_id=1,
               pipeline_state_id=2, graph_order=0),
-            t(id=3, transformation_template_id=2,
+            t(id=3, transformation_template_id=1,
               pipeline_state_id=2, graph_order=1),
-            t(id=9, transformation_template_id=2,
+            t(id=9, transformation_template_id=1,
               pipeline_state_id=2, graph_order=0),
-            t(id=10, transformation_template_id=2,
+            t(id=10, transformation_template_id=1,
               pipeline_state_id=2, graph_order=0),
             t(id=4, transformation_template_id=1,
               pipeline_state_id=4, graph_order=0),
@@ -154,7 +162,9 @@ class ConfigurationMocker(LoggerMixin):
             t(id=7, transformation_template_id=1,
               pipeline_state_id=4, graph_order=1),
             t(id=8, transformation_template_id=1,
-              pipeline_state_id=4, graph_order=2)
+              pipeline_state_id=4, graph_order=2),
+            t(id=11, transformation_template_id=1,
+              pipeline_state_id=2, graph_order=0)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation mocks.')
@@ -163,8 +173,18 @@ class ConfigurationMocker(LoggerMixin):
         self.logger.debug('Generating transformation_template mocks.')
         tt = config.TransformationTemplate
         self.session.add_all([
-            tt(id=1, name='always_money_in_the_banana_stand'),
-            tt(id=2, name='02_finish_each_others_sandwiches')
+            tt(id=1, name='extract_from_ftp'),
+            tt(id=2, name='initial_ingest')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')
+
+def setup_base_session():
+    mock = ConfigurationMocker()
+    session = mock.get_session()
+    session.add(PharmaceuticalCompany(id=1, display_name='test_client', name='test_client'))
+    session.add(Brand(id=1, pharmaceutical_company_id=1, display_name='test_brand', name='test_brand'))
+    session.add(Segment(id=1, name='test_segment'))
+    session.add(PipelineType(id=1, segment_id=1, name='test_patient_pipeline'))
+    session.add(Pipeline(id=1, pipeline_type_id=1, brand_id=1, name='test_pipeline'))
+    return session

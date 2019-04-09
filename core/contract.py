@@ -6,6 +6,29 @@ from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET, BRA
 from core.logging import LoggerMixin
 from core.helpers.project_root import ProjectRoot
 
+from typing import List
+from contextlib import contextmanager
+
+def download_s3_object(bucket: str, key: str, local_dir: str) -> str:
+    """
+    Download an object from s3 to a specified local directory.
+    :param bucket: s3 bucket as a string
+    :param key: s3 path to object to download
+    :param local_dir: directory to store file
+    :return: path of downloaded file
+    """
+    try:
+        s3 = boto3.resource('s3')
+        filename = os.path.split(key)[-1]
+        local_path = os.path.join(local_dir, filename)
+        s3.Bucket(bucket).download_file(key, local_path)
+
+        return local_path
+    except ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            raise FileNotFoundError(f"s3 object not found: s3://{bucket}/{key}")
+        else:
+            raise
 
 class Contract(LoggerMixin):
     ''' The s3 contract is how we structure our data lake. 
@@ -28,7 +51,6 @@ class Contract(LoggerMixin):
         DATASET - The name of the collection of data. In an RDBMS this would be a table or view
         PARTITION - for datasets, the partition is set in the prefix name  
         SUB-PARTITION - for datasets, the sub-partitions add additional partitioning with additional prefixes
-        FILENAME - nondescript in the contract
     '''
     DEV = DEV_BUCKET
     PROD = PROD_BUCKET
@@ -42,13 +64,12 @@ class Contract(LoggerMixin):
             Does not support customer / brand aliases
         '''
         attributes = ('branch', 'parent', 'child', 'state',
-                      'dataset', 'file_name', 'partitions', 'partition_size')
+                      'dataset', 'partitions', 'partition_size')
 
         for attr in attributes:
             self.__dict__[attr] = None
 
         # defaults
-        self.file_name = str()
         self.partitions = []
         self.dataset = str()
         self.partition_size = 100  # partition size in mb
@@ -85,9 +106,6 @@ class Contract(LoggerMixin):
 
     def get_partition_size(self)->str:
         return self.partition_size
-
-    def get_file_name(self)->str:
-        return self.file_name
 
     def get_contract_type(self)->str:
         return self.contract_type
@@ -152,10 +170,6 @@ class Contract(LoggerMixin):
         self.partitions = temp_partitions
         self._set_contract_type()
 
-    def set_file_name(self, file_name: str)->None:
-        self.file_name = self._validate_part(file_name)
-        self._set_contract_type()
-
     def set_env(self)->None:
         env = ENVIRONMENT.lower()
         if env in (self.DEV, 'dev', 'development'):
@@ -179,9 +193,7 @@ class Contract(LoggerMixin):
         ''' INTENT: sets what type of contract this is - file, partition, or dataset
             RETURNS: None
         '''
-        if len(self.file_name) > 0:
-            t = 'file'
-        elif len(self.partitions) > 0:
+        if len(self.partitions) > 0:
             t = 'partition'
         elif len(self.dataset) > 0:
             t = 'dataset'
@@ -189,7 +201,7 @@ class Contract(LoggerMixin):
             t = 'state'
         self.contract_type = t
 
-    def get_s3_path(self)->str:
+    def get_s3_path(self, filename='')->str:
         ''' INTENT: builds the s3 path from the contract.
             RETURNS: string s3 path
             NOTE: requires all params to be set to at least the state level
@@ -212,7 +224,7 @@ class Contract(LoggerMixin):
             for p in self.partitions:
                 path += f'{p}/'
 
-        path += self.file_name
+        path += filename
         return path
 
     def publish_raw_file(self, local_file_path: str) ->None:
@@ -222,22 +234,24 @@ class Contract(LoggerMixin):
                 'publish_raw_file may only be used on raw contracts.')
 
         s3_client = boto3.client('s3')
-        self.set_file_name(os.path.split(local_file_path)[1])
-        self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()}.')
+        filename = os.path.split(local_file_path)[1]
+        key = self.get_key()+filename
+        self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()+filename}.')
 
         with open(local_file_path, 'rb') as file_data:
             extra_args = {'source_modified_time': str(
                 float(os.stat(local_file_path).st_mtime))}
-            s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
-            ), Key=self.get_key(), ExtraArgs={"Metadata": extra_args})
+            resp = s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
+            ), Key=key, ExtraArgs={"Metadata": extra_args})
 
     def get_raw_file_metadata(self, local_file_path:str) ->None:
         # If file exists, return its metadata
         s3_client = boto3.client('s3')
         
-        self.set_file_name(os.path.split(local_file_path)[1])
+        filename = os.path.split(local_file_path)[1]
+        key = self.get_key()+filename
         try:
-            return s3_client.head_object(Bucket=self.get_bucket(),Key=self.get_key())
+            return s3_client.head_object(Bucket=self.get_bucket(),Key=key)
         except ClientError as e:
             # If file does not exist, throw back since it needs to be moved anyways
             #   Consider: cleaner handling?
@@ -245,6 +259,28 @@ class Contract(LoggerMixin):
                 raise e
             else:
                 raise e
+
+    def list_files(self, file_prefix='') -> List[str]:
+        key = self.get_key()
+        keyfix = key+file_prefix
+        try:
+            s3 = boto3.resource('s3')
+            bucket = s3.Bucket(self.get_bucket())
+            objects = [obj.key for obj in bucket.objects.filter(Prefix=keyfix)]
+
+            return objects
+        except ClientError as e:
+            if e.response['Error']['Code'] == "404":
+                raise FileNotFoundError("s3 object not found: %s" % file_prefix)
+            else:
+                raise
+
+    @contextmanager
+    def download_raw_file(self, filename):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            download_path = download_s3_object(self.get_bucket(), self.get_key()+filename, tmp_dir)
+            yield download_path
+
 
     # aliases
 
@@ -269,6 +305,16 @@ class Contract(LoggerMixin):
 
     def set_bucket(self, env: str)->None:
         self.set_env(env)
+
+    def set_metadata(self, df, run_timestamp):
+        df['__metadata_app_version'] = CORE_VERSION
+        df['__metadata_run_timestamp'] = run_timestamp
+        df['__metadata_output_contract'] = self.get_s3_url()
+        partitions = ['__metadata_run_timestamp']
+        return (df, partitions)
+
+    def write_with_metadata(self, dataset, df, run_timestamp):
+        pass
 
     # private
 
