@@ -66,3 +66,17 @@ services:
         ports: 
             - "5432:5432"
 
+    flaskapi:
+        build:
+            dockerfile: ./dockerfiles/flaskapi.dockerfile
+            context: .
+        image: ichain/core_flask_api
+        depends_on:
+            - configurationpg
+        environment:
+            - CONFIGURATION_APPLICATION_DATABASE_HOST=configurationpg
+        volumes:
+            - ./core/api/:/app/
+        ports:
+            - "5000:5000"
+
