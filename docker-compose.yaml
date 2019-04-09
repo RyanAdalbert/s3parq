@@ -80,3 +80,18 @@ services:
         ports:
             - "5000:5000"
 
+    gui:
+        build:
+            dockerfile: ./dockerfiles/gui.dockerfile
+            context: .
+        image: ichain/core_gui
+        depends_on:
+            - flaskapi
+        environment:
+            - CONFIGURATION_APPLICATION_DATABASE_HOST=configurationpg
+            - API_HOST=flaskapi
+        volumes:
+            - ./core/:/core/
+        ports:
+            - "3000:3000"
+
