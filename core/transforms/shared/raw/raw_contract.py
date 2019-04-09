@@ -1,5 +1,6 @@
 import boto3
 import os
+import tempfile
 
 from core.contract import Contract
 from botocore.exceptions import ClientError

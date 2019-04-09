@@ -159,6 +159,8 @@ class ConfigurationMocker(LoggerMixin):
             t(id=8, transformation_template_id=1,
               pipeline_state_id=4, graph_order=2),
             t(id=11, transformation_template_id=1,
+              pipeline_state_id=2, graph_order=0),
+            t(id=13, transformation_template_id=2,
               pipeline_state_id=2, graph_order=0)
         ])
         self.session.commit()
@@ -175,11 +177,14 @@ class ConfigurationMocker(LoggerMixin):
                           "secret_type_of":{"datatype":"string","description":"the type of the remote server, used in the secret path"}
                           }'''),
             tt(id=2, name='initial_ingest',
-                variable_structures = '{"another_test_attribute":"string","yet_another_test_attribute":"float"}')
+                variable_structures = ''' {"delimiter":{"datatype": "string", "description": "the input file delimiter"},
+                "skip_rows":{"datatype":"int","description":"the number of rows to skip at the top of the file"},
+                "encoding":{"datatype":"string","description":"the encoding of the input file"},
+                "input_file_prefix":{"datatype":"string","description":"the prefix of the selected input files"}
+                }''')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')
-
 
     def _mock_transformation_variables(self)->None:
         self.logger.debug('Generating transformation_variables mocks')
@@ -213,7 +218,12 @@ class ConfigurationMocker(LoggerMixin):
             tv(id=21, name='filesystem_path', transformation_id=10, value='/incoming/testing_extract'),
             tv(id=22, name='prefix', transformation_id=11, value=''),
             tv(id=23, name='secret_name', transformation_id=11, value='dev-sftp'),
-            tv(id=24, name='secret_type_of', transformation_id=11, value='FTP')
+            tv(id=24, name='secret_type_of', transformation_id=11, value='FTP'),
+
+            tv(id=25, name='delimiter', transformation_id=13, value='|'),
+            tv(id=26, name='skip_rows', transformation_id=13, value=2),
+            tv(id=27, name='encoding', transformation_id=13, value='utf8'),
+            tv(id=28, name='input_file_prefix', transformation_id=13, value='rommsa.SUN.INTEGRICHAIN_SUN_MCKESSON')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_variables mocks.')

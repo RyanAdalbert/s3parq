@@ -1,6 +1,10 @@
 from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
 from core.contract import Contract
 
+import pandas as pd
+
+from s3parq import publish,fetch
+
 from typing import List
 
 class DatasetContract(Contract):
@@ -114,14 +118,36 @@ class DatasetContract(Contract):
 
         self._contract_type = t
 
+    # functions for use
+
+    def publish(self, dataframe: pd.DataFrame, partitions: List[str])->None:
+        if self.contract_type != "dataset":
+            raise ValueError(
+                f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
+
+        self.logger.info(
+            f'Publishing dataframe to s3 location {self.s3_path}.')
+
+        publish(
+            bucket=self.env,
+            key=self.key,
+            dataframe=dataframe,
+            partitions=partitions
+        )
+
     # aliases
 
     def set_metadata(self, df, run_timestamp):
-        df['__metadata_app_version'] = CORE_VERSION
+        # df['__metadata_app_version'] = CORE_VERSION
         df['__metadata_run_timestamp'] = run_timestamp
-        df['__metadata_output_contract'] = self.get_s3_url()
+        df['__metadata_run_timestamp'] = df['__metadata_run_timestamp'].astype(str)
+        df['__metadata_output_contract'] = self.s3_path
         partitions = ['__metadata_run_timestamp']
+        df = df.astype(str)
         return (df, partitions)
 
     def write_with_metadata(self, dataset, df, run_timestamp):
-        pass
+        df, partitions = self.set_metadata(df=df,run_timestamp=run_timestamp)
+        print (partitions)
+        print (df.head())
+        self.publish(dataframe=df,partitions=partitions)
