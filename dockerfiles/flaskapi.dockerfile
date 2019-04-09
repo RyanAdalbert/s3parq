@@ -15,7 +15,7 @@ RUN pip install --upgrade pip \
     ## pin version?
     && pip install flask 
 
-COPY ./core/api/ /app/
+COPY ./core/ /core/    
 EXPOSE 5000
 ENTRYPOINT ["python3"]
-CMD ["/app/app.py"]
+CMD ["/core/api/app.py"]

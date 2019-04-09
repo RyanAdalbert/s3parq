@@ -76,7 +76,7 @@ services:
         environment:
             - CONFIGURATION_APPLICATION_DATABASE_HOST=configurationpg
         volumes:
-            - ./core/api/:/app/
+            - ./core/:/core/
         ports:
             - "5000:5000"
 
