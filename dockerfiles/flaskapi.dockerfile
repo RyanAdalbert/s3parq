@@ -1,6 +1,7 @@
 FROM python:3.6-slim
 
 
+ENV PYTHONPATH=/usr/local/lib/python3.6/site-packages:/core
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
