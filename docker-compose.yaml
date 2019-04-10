@@ -74,7 +74,7 @@ services:
         depends_on:
             - configurationpg
         volumes:
-            - ./core/:/core/
+            - ./:/core/
         ports:
             - "5000:5000"
 
