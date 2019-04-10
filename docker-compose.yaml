@@ -9,8 +9,8 @@ services:
 
     airflow:
         build:
-          dockerfile: ./dockerfiles/core.dockerfile
-          context: .
+            dockerfile: ./dockerfiles/core.dockerfile
+            context: .
         image: ichain/core
         depends_on:
             - airflowpg
@@ -35,8 +35,8 @@ services:
 
     notebook:
         build:
-          dockerfile: ./dockerfiles/core.dockerfile
-          context: .
+            dockerfile: ./dockerfiles/core.dockerfile
+            context: .
         image: ichain/core
         environment:
             - AWS_ACCESS_KEY_ID
@@ -65,4 +65,30 @@ services:
             - DB_NAME=configuration_application
         ports: 
             - "5432:5432"
+
+    flaskapi:
+        build:
+            dockerfile: ./dockerfiles/flaskapi.dockerfile
+            context: .
+        image: ichain/core_flask_api
+        depends_on:
+            - configurationpg
+        volumes:
+            - ./core/:/core/
+        ports:
+            - "5000:5000"
+
+    gui:
+        build:
+            dockerfile: ./dockerfiles/gui.dockerfile
+            context: .
+        image: ichain/core_gui
+        depends_on:
+            - flaskapi
+        environment:
+            - ICHAIN_API_HOST=flaskapi_1
+        volumes:
+            - ./core/:/core/
+        ports:
+            - "3000:3000"
 
