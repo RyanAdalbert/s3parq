@@ -15,7 +15,7 @@ RUN apt-get update -y
 RUN apt-get install -y python-pip python-dev build-essential git
 RUN pip install --upgrade pip \
     && pip install -r /core/requirements/api.txt
-
+WORKDIR /core
 EXPOSE 5000
 ENTRYPOINT ["python3"]
-CMD ["/core/core/api/app.py"]
+CMD ["./core/api/app.py"]
