@@ -7,10 +7,10 @@ node {
     stage('Build') {
         echo "Building..."
     }
-    stage('Test') {
-        echo "Testing..."
-        sh "script/ci_test"
-    }
+    // stage('Test') {
+    //     echo "Testing..."
+    //     sh "script/ci_test"
+    // }
     stage ('Deploy') {
         echo "We are currently working on branch: ${env.BRANCH_NAME}"
 
