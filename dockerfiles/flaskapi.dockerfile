@@ -12,7 +12,7 @@ ENV LC_MESSAGES en_US.UTF-8
 
 COPY ./ /core/    
 RUN apt-get update -y
-RUN apt-get install -y python-pip python-dev build-essential
+RUN apt-get install -y python-pip python-dev build-essential git
 RUN pip install --upgrade pip \
     && pip install -r /core/requirements/api.txt
 

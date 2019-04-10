@@ -2,9 +2,9 @@
 from typing import Union, List
 import os
 import sys
+from core.logging import LoggerMixin
 
-
-class ProjectRoot:
+class ProjectRoot(LoggerMixin):
     # Finds the absolute project root path for Core. Must be called inside the project.
 
     def __init__(self) -> None:
@@ -15,12 +15,14 @@ class ProjectRoot:
             RETURNS: the parent folder for setup.py, or False if this is not a Core package.
         '''
         path = os.path.abspath(os.path.normpath(f))
-        # print(path)
+        self.logger.info(f"inspecting path {path}")
         if os.path.isfile(os.path.abspath(os.path.normpath(path + os.path.sep + 'setup.py'))):
+            self.logger.info(f"found at {path}")
             return path
         elif path == '/':
+            self.logger.info(f"at root, setup.py not found")
             ## the airflow docker container is a special bird where /dags and the project root do not share parent paths
-            if os.path.isfile('/usr/src/app/setup.py'):
+            if os.path.isfile('/usr/src/app/setup.py'):    
                 return '/usr/src/app'
             else:
                 raise Exception("Unable to determine project root: setup.py not found. Are you in Core?")
