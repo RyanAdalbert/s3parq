@@ -73,8 +73,6 @@ services:
         image: ichain/core_flask_api
         depends_on:
             - configurationpg
-        environment:
-            - CONFIGURATION_APPLICATION_DATABASE_HOST=configurationpg
         volumes:
             - ./core/:/core/
         ports:
@@ -88,8 +86,7 @@ services:
         depends_on:
             - flaskapi
         environment:
-            - CONFIGURATION_APPLICATION_DATABASE_HOST=configurationpg
-            - API_HOST=flaskapi
+            - ICHAIN_API_HOST=flaskapi
         volumes:
             - ./core/:/core/
         ports:

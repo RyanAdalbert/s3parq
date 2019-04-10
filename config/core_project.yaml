@@ -9,7 +9,7 @@ PROD_AWS_ACCOUNT: "687531504312"
 AWS_REGION: us-east-1
 AWS_BATCH_TEST_JOB_QUEUE: core
 LOGGING_CONFIG: logging.yaml
-DEV_CONFIGURATION_APPLICATION_CONN_STRING: "postgresql://configurator:configurator@configurationpg/configuration_application"
+DEV_CONFIGURATION_APPLICATION_CONN_STRING: "postgresql://configurator:configurator@configurationpg_1/configuration_application"
 CORE_VERSION: "0.0.11"
 
 ## DYNAMICS
