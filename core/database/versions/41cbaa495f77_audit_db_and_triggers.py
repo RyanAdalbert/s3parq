@@ -1,8 +1,8 @@
-"""audit db and triggers
+"""audit_db_and_triggers
 
-Revision ID: 1134cec79e78
-Revises: d8bfba24a470
-Create Date: 2019-01-20 17:57:27.820702
+Revision ID: 41cbaa495f77
+Revises: 565320ba43b3
+Create Date: 2019-03-27 16:10:04.757035
 
 """
 from alembic import op
@@ -10,10 +10,11 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1134cec79e78'
-down_revision = 'd8bfba24a470'
+revision = '41cbaa495f77'
+down_revision = '565320ba43b3'
 branch_labels = None
 depends_on = None
+
 
 
 def upgrade():
@@ -123,3 +124,4 @@ def downgrade():
         DROP SCHEMA auditing CASCADE;
         """
     )
+
