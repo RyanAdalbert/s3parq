@@ -1,3 +1,14 @@
 #!/bin/sh
+CDTO="core"
+if [ "$1" == "--flask" ]; then
+  CON="flaskapi"
+elif [ "$1" == "--gui" ]; then
+  CON="gui"
+  CDTO="./"
+else
+  CON="notebook"  
+fi
 
-docker-compose exec notebook bash -c "cd core && bash";
+docker-compose exec $CON bash -c "cd ${CDTO} && bash";
+
+

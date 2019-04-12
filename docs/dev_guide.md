@@ -6,6 +6,36 @@ This project uses the idea of having basic (mostly) scripts to do tasks like tes
 
 ## Getting Started
 
+### Developing in Docker
+We develop in a docker-compose orchestrated environment. We work in containers, we deploy to containers. To get started with CORE:
+1. clone the repo
+2. `cd` into the repo root (`/core` in most cases)
+3. start your development environment with the `script/dev_env` command. This will create all the containers, network them, start all the services, and give you a shell prompt into the container of your choosing. 
+
+**Select a container with flags**
+`--flask` gives you the flask api container
+`--gui` gives you the gui container
+`--notebook` gives you the notebook container (this is also the default workspace if no flag is set)
+
+example: 
+
+    ## I want to work in the react container
+    cd /home/user/repos/core
+    script/dev_env --gui
+
+    ### much logging of the container building later...
+    $core: ## prompt from _inside_ the container
+
+
+_the containers_:
+- `gui` container serves the react gui on `localhost:3000`
+- `notebook` container serves the jupyter notebooks at `localhost:8081`
+- `airflow` container serves the airflow scheduler at `localhost:8080`
+- `airflow_pg` container serves the airflow database (not exposed)
+- `configurationpg` container serves the configuration application postgres database (not exposed)
+- `flask_api` container serves the flask api
+
+ 
 ### AWS Credentials and Accounts
 There are two AWS accounts here at Integrichain, one is `sandbox` and the other is `main`. Basically, `sandbox` is dev and `main` houses both `prod` and `uat`. You should have 2 separate sets of AWS Access key pairs, but only have 1 key pair in the `credentials` file at a time. If you want to switch accounts, just copy the appropriate credentials file over `credentials`.
 

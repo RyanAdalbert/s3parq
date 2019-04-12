@@ -1,7 +1,8 @@
 import boto3
 import os
-from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
-
+import pandas as pd
+from s3parq.s3_naming_helper import S3NamingHelper as s3Name
+from s3parq import publish,fetch    
 from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET, BRANCH_NAME
 from core.logging import LoggerMixin
 
@@ -59,9 +60,18 @@ class Contract(LoggerMixin):
     def branch(self)->str:
         return self._branch
 
+<<<<<<< HEAD
     @branch.setter
     def branch(self, branch: str)->None:
         self._branch = self._validate_part(branch)
+=======
+    @property
+    def env(self)->str:
+        return self._env
+
+    def get_branch(self)->str:
+        return self.branch
+>>>>>>> 1737ec98bbf6c97c6d46ba295499e721315f2467
 
     @property
     def parent(self)->str:
@@ -75,12 +85,21 @@ class Contract(LoggerMixin):
     def state(self)->str:
         return self._state
 
+<<<<<<< HEAD
     @state.setter
     def state(self, state: str)->None:
         if state in self.STATES:
             self._state = state
         else:
             raise ValueError(f'{state} is not a valid state')
+=======
+    def get_env(self)->str:
+        self.logger.warning("get_env is depricated. Use env instead.")
+        return self._env
+
+    def get_dataset(self)->str:
+        return self.dataset
+>>>>>>> 1737ec98bbf6c97c6d46ba295499e721315f2467
 
     @property
     def child(self)->str:
@@ -140,7 +159,8 @@ class Contract(LoggerMixin):
             try:
                 self.branch = BRANCH_NAME
             except:
-                raise ValueError(f'Your git branch name {branch_name} cannot be used as a contract branch path.')
+                raise ValueError(
+                    f'Your git branch name {branch_name} cannot be used as a contract branch path.')
 
     @property
     def s3_path(self)->str:
@@ -161,6 +181,85 @@ class Contract(LoggerMixin):
 
         return path
 
+<<<<<<< HEAD
+=======
+    def fetch(self, filters: List[dict])->pd.DataFrame:
+        if self.contract_type != "dataset":
+            raise ValueError(
+                f"contract.fetch() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
+        
+        self.logger.info(
+            f'Fetching dataframe from s3 location {self.get_s3_path()}.')
+        
+        return fetch(   bucket = self.env,
+                        key = self.get_key(),
+                        filters = filters )
+
+    def publish(self, dataframe: pd.DataFrame, partitions: List[str])->None:
+        if self.contract_type != "dataset":
+            raise ValueError(
+                f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
+
+        self.logger.info(
+            f'Publishing dataframe to s3 location {self.get_s3_path()}.')
+
+        publish(
+            bucket=self.env,
+            key=self.get_key(),
+            dataframe=dataframe,
+            partitions=partitions
+        )
+
+    def publish_raw_file(self, local_file_path: str) ->None:
+        '''accepts a local path to a file, publishes it as-is to s3 as long as state == raw.'''
+        if self.get_state() != 'raw':
+            raise ValueError(
+                'publish_raw_file may only be used on raw contracts.')
+
+        s3_client = boto3.client('s3')
+
+        filename = os.path.split(local_file_path)[1]
+        key = self.get_key()+filename
+        self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()+filename}.')
+
+        with open(local_file_path, 'rb') as file_data:
+            extra_args = {'source_modified_time': str(
+                float(os.stat(local_file_path).st_mtime))}
+            resp = s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
+            ), Key=key, ExtraArgs={"Metadata": extra_args})
+
+    def get_raw_file_metadata(self, local_file_path: str) ->None:
+        # If file exists, return its metadata
+        s3_client = boto3.client('s3')
+
+        filename = os.path.split(local_file_path)[1]
+        key = self.get_key()+filename
+        return s3_client.head_object(Bucket=self.get_bucket(),Key=key)
+
+
+    def list_files(self, file_prefix='') -> List[str]:
+        key = self.get_key()
+        keyfix = key+file_prefix
+        try:
+            s3 = boto3.resource('s3')
+            bucket = s3.Bucket(self.get_bucket())
+            objects = [obj.key for obj in bucket.objects.filter(Prefix=keyfix)]
+
+            return objects
+        except ClientError as e:
+            if e.response['Error']['Code'] == "404":
+                raise FileNotFoundError("s3 object not found: %s" % file_prefix)
+            else:
+                raise
+
+    @contextmanager
+    def download_raw_file(self, filename):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            download_path = download_s3_object(self.get_bucket(), self.get_key()+filename, tmp_dir)
+            yield download_path
+
+
+>>>>>>> 1737ec98bbf6c97c6d46ba295499e721315f2467
     # aliases
 
     @property

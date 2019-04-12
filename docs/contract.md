@@ -10,7 +10,24 @@ The contract class defines the way we write to and read from the S3 data lake. I
     *--------------------------------------------------------------------------------------------------------------------*
 
 This is enforced by using `getter` and `setter` arguments - i.e. `get\_state()` to retrieve a contract state, `set\_state('raw')` to set the state.
+_TODO:_ we want to migrate these to `@property` python attributes. 
     
+
+### Writing to S3
+Invoke the `publish()` command to write to a given contract. Some things to know:
+- To invoke publish a contract must be at the grain of dataset. This is because file names will be set by the dataframe=\>parquet conversion. 
+- publish only accepts a pandas dataframe.
+- publish does not allow for timedelta data types at this time (this is missing functionality in pyarrow).
+- publish handles partitioning the data as per contract, creating file paths, and creating the binary parquet files in S3, as well as the needed metadata.
+
+### Reading from S3
+Invoke the `fetch()` command to query a given contract. Some things to know:
+- To invoke fetch a contract must be at the grain of dataset. This is because file names and partitions to read from will be set by the command params.
+- fetch allows for basic filtering on partitioned columns only. 
+- fetch returns a single pandas dataframe based on the filter criterion. 
+
+
+
 **Notables**:
 get\_brand() and get\_child() are synonymous.
 get\_customer() get\_parent() are synonymous.
