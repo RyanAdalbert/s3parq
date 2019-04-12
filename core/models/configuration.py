@@ -224,18 +224,3 @@ class TransformationVariable(UniversalWithPrimary, Base):
     value = Column(String)
     transformation = relationship('Transformation')
 
-
-"""
-class ExtractTransformation(Transformation):
-    extract_configurations = relationship(
-        "ExtractConfiguration", order_by=ExtractConfiguration.id, back_populates='transformation')
-
-    __mapper_args__ = {'polymorphic_identity': 'extract_from_ftp'}
-
-
-class InitialIngestTransformation(Transformation):
-    initial_ingest_configurations = relationship(
-        "InitialIngestConfiguration", order_by=InitialIngestConfiguration.id, back_populates='transformation')
-
-    __mapper_args__ = {'polymorphic_identity': 'initial_ingest'}
-"""
