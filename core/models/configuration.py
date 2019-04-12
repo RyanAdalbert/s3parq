@@ -55,7 +55,6 @@ class GenerateEngine(LoggerMixin):
             conn_string = f"postgresql://{secret.user}:{secret.password}@{secret.host}/{secret.database}"
         else:
             m = "Only postgres databases are supported for configuration_application at this time."
-            self.logger.critical(m)
             raise NotImplementedError(m)
         return conn_string
 
@@ -199,9 +198,23 @@ class Transformation(UniversalWithPrimary, Base):
     def variables(self):
         structure = json.loads(self.transformation_template.variable_structures)
         typed = {}
+
         for variable in self._raw_variables:
+            ## make sure there are no extra vars
+            if variable.name not in structure.keys():
+                message = f"{variable.name} is not a valid variable, but was set for tranformation {self.id}"
+                raise ExtraTransformationVariableError(message)
+            
             typed[variable.name] = self._apply_type(variable.value, structure[variable.name]["datatype"])
         dot_notated = SimpleNamespace(**typed)
+        ## make sure there are no missing variables
+        for key in structure.keys():
+            try:
+                typed[key]
+            except:
+                message = f"Missing transform variable {key} in Transformation {self.id}."
+                raise MissingTransformationVariableError(message)    
+
         return dot_notated
 
     def _apply_type(self,value:str,typestring:str)->Any:
@@ -223,4 +236,30 @@ class TransformationVariable(UniversalWithPrimary, Base):
     name = Column(String, nullable=False)
     value = Column(String)
     transformation = relationship('Transformation')
+
+    ## validate the variable is defined in the variable_structures for this transform template
+    @validates('name')
+    def validate_name(self, key, name):
+        raise ValueError(dir(self.__mapper__))
+        struct = json.loads(self.transformation.transformation_template.variable_structures)
+        if name in struct.keys():
+            return name
+        else:
+            template_name = self.transformation.transformation_template.name
+            raise ExtraTransformationVariableError(f"{name} is not a valid variable for transformation template {template_name}")
+
+
+class ExtraTransformationVariableError(ValueError):
+    """ This is specifically for cases when variables 
+        defined in the variable_structures are not present.
+    """
+    pass
+
+class MissingTransformationVariableError(ValueError):
+    """ This is specifically for cases when variables 
+        defined in the variable_structures are not present.
+    """
+    pass
+
+
 
