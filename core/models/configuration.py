@@ -93,7 +93,7 @@ class Brand(UniversalWithPrimary, Base):
         "PharmaceuticalCompany", back_populates='brands')
     pipelines = relationship("Pipeline", back_populates='brand')
 
-'''
+"""
 class ExtractConfiguration(UniversalWithPrimary, Base):
     __tablename__ = 'extract_configurations'
     transformation_id = Column(Integer, ForeignKey(
@@ -116,7 +116,7 @@ class InitialIngestConfiguration(UniversalWithPrimary, Base):
     dataset_name = Column(String)
    ## transformation = relationship(
      ##   "InitialIngestTransformation", back_populates='initial_ingest_configurations')
-'''
+"""
 
 class PharmaceuticalCompany(UniversalWithPrimary, Base):
     __tablename__ = 'pharmaceutical_companies'
@@ -240,7 +240,6 @@ class TransformationVariable(UniversalWithPrimary, Base):
     ## validate the variable is defined in the variable_structures for this transform template
     @validates('name')
     def validate_name(self, key, name):
-        raise ValueError(dir(self.__mapper__))
         struct = json.loads(self.transformation.transformation_template.variable_structures)
         if name in struct.keys():
             return name
