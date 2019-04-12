@@ -21,50 +21,18 @@ def test_project_root_not_in_project(monkeypatch):
     with monkeypatch.context() as m:
         m.chdir('/')
 
-    # this feels icky. But project root needs the docker path for special cases, so we bake it in here.
-    docker_special_path = '/usr/src/app'
-    if os.path.isfile(f'{docker_special_path}/setup.py'):
-        root = ProjectRoot()
-        assert root.get_path() == docker_special_path
-    else:
-        with pytest.raises(Exception):
+        # this feels icky. But project root needs the docker path for special cases, so we bake it in here.
+        docker_special_path = '/usr/src/app'
+        if os.path.isfile(f'{docker_special_path}/setup.py'):
             root = ProjectRoot()
-            root.get_path()
+            assert root.get_path() == docker_special_path
+        else:
+            with pytest.raises(Exception):
+                root = ProjectRoot()
+                root.get_path()
 
-
-# Configuration Mocker
-
-def test_mock_extract_configurations():
-    db = CMock()
-    db.generate_mocks()
-    session = db.get_session()
-    ec = config.ExtractConfiguration
-
-    # depends on hard-coded values in mocker
-    q = session.query(ec).filter(ec.id == 2)
-    assert q[0].filesystem_path == 'banana_stand_data'
-
-
-def test_mock_transformation_relationships():
-    db = CMock()
-    db.generate_mocks()
-    session = db.get_session()
-    t = config.Transformation
-
-    # depends on hard-coded values in mocker
-    q = session.query(t).filter(t.id == 1)
-    secrets = []
-    for v in q:
-        for row in v.extract_configurations:
-            secrets.append(row.secret_name)
-
-    assert len(secrets) == 3
-
-    assert set(secrets) == set(['dev-sftp'])
 
 # Session Helper
-
-
 @patch('core.constants.ENVIRONMENT')
 def test_session_helper_dev(ENV):
     ENV.return_value = "dev"

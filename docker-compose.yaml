@@ -60,9 +60,9 @@ services:
     configurationpg:
         image: postgres:11.1
         environment:
-            - DB_USER=configurator
-            - DB_PASSWORD=configurator
-            - DB_NAME=configuration_application
+            - POSTGRES_USER=configurator
+            - POSTGRES_PASSWORD=configurator
+            - POSTGRES_DB=configuration_application
         ports: 
             - "5432:5432"
 
