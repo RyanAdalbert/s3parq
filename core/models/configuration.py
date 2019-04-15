@@ -224,6 +224,12 @@ class TransformationVariable(UniversalWithPrimary, Base):
     value = Column(String)
     transformation = relationship('Transformation')
 
+class Administrator(UniversalWithPrimary, Base):
+    __tablename__ = 'administrators'
+    email_address = Column(String, nullable=False)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+
 
 """
 class ExtractTransformation(Transformation):
