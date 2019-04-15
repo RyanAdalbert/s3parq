@@ -1,7 +1,20 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import styled from 'styled-components';
 
-const App = () => <div className="App" />;
+const Wrapper = styled.div`
+  display: flex;
+
+  p {
+    color: #000;
+  }
+`;
+
+class App extends Component {
+  render() {
+    <Wrapper>
+      <p>This is the app.</p>
+    </Wrapper>;
+  }
+}
 
 export default App;
