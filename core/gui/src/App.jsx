@@ -1,7 +1,7 @@
 import React from 'react';
+
 import styled from 'styled-components';
 
-import Routes from './Routes/Routes';
 import Sidebar from './Components/Sidebar/Sidebar';
 import Header from './Components/Header/Header';
 
@@ -12,10 +12,20 @@ const Wrapper = styled.div`
   background: #e0e0e0;
 `;
 
+const Main = styled.div`
+  flex: 5;
+`;
+
+const Reactv = require('react');
+
+console.log(Reactv.version);
+
 const App = () => (
   <Wrapper>
     <Sidebar />
-    <Header />
+    <Main>
+      <Header />
+    </Main>
   </Wrapper>
 );
 

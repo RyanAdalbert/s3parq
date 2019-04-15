@@ -2,11 +2,11 @@ import React from 'react';
 
 import styled from 'styled-components';
 
+// Styles
 const Wrapper = styled.div`
   display: flex;
-  padding: 0 5%;
+  padding: 6px 5%;
   justify-content: flex-end;
-  width: 100%;
   background: #004cae;
   color: #fff;
 `;
