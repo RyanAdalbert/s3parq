@@ -1,7 +1,8 @@
 import boto3
 import os
-from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
-
+import pandas as pd
+from s3parq.s3_naming_helper import S3NamingHelper as s3Name
+from s3parq import publish,fetch    
 from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET, BRANCH_NAME
 from core.logging import LoggerMixin
 
@@ -140,7 +141,8 @@ class Contract(LoggerMixin):
             try:
                 self.branch = BRANCH_NAME
             except:
-                raise ValueError(f'Your git branch name {branch_name} cannot be used as a contract branch path.')
+                raise ValueError(
+                    f'Your git branch name {branch_name} cannot be used as a contract branch path.')
 
     @property
     def s3_path(self)->str:

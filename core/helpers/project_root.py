@@ -3,7 +3,6 @@ from typing import Union, List
 import os
 import sys
 
-
 class ProjectRoot:
     # Finds the absolute project root path for Core. Must be called inside the project.
 
@@ -15,12 +14,11 @@ class ProjectRoot:
             RETURNS: the parent folder for setup.py, or False if this is not a Core package.
         '''
         path = os.path.abspath(os.path.normpath(f))
-        # print(path)
         if os.path.isfile(os.path.abspath(os.path.normpath(path + os.path.sep + 'setup.py'))):
             return path
         elif path == '/':
             ## the airflow docker container is a special bird where /dags and the project root do not share parent paths
-            if os.path.isfile('/usr/src/app/setup.py'):
+            if os.path.isfile('/usr/src/app/setup.py'):    
                 return '/usr/src/app'
             else:
                 raise Exception("Unable to determine project root: setup.py not found. Are you in Core?")

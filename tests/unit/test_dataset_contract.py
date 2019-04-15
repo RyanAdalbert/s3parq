@@ -58,13 +58,6 @@ def test_valid_partitions(_partitions, _contract):
     assert contract.partitions == p['good'], "partitions not correctly set"
 
 
-def test_invalid_partitions(_partitions, _contract):
-    p = _partitions
-    contract = _contract
-    with pytest.raises(ValueError):
-        contract.partitions = p['bad']
-
-
 @pytest.fixture
 def _contract_type():
     contract = DatasetContract(branch='master',

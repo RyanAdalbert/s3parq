@@ -1,11 +1,8 @@
-from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
-from core.contract import Contract
-
 import pandas as pd
-
-from s3parq import publish,fetch
-
+from s3parq import fetch, publish
 from typing import List
+
+from core.contract import Contract
 
 class DatasetContract(Contract):
     ''' The s3 contract is how we structure our data lake. 
@@ -65,14 +62,7 @@ class DatasetContract(Contract):
                     will be applied in list order
             RETURNS: None
         '''
-        temp_partitions = []
-        for p in partitions:
-            val = s3Name().validate_part(p)
-            if val[0]:
-                temp_partitions.append(p)
-            else:
-                raise ValueError(val[1])
-        self._partitions = temp_partitions
+        self._partitions = partitions
         self._set_contract_type()
 
     @property
@@ -119,6 +109,18 @@ class DatasetContract(Contract):
         self._contract_type = t
 
     # functions for use
+
+    def fetch(self, filters: List[dict])->pd.DataFrame:
+        if self.contract_type != "dataset":
+            raise ValueError(
+                f"contract.fetch() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
+        
+        self.logger.info(
+            f'Fetching dataframe from s3 location {self.get_s3_path()}.')
+        
+        return fetch(   bucket = self.env,
+                        key = self.get_key(),
+                        filters = filters )
 
     def publish(self, dataframe: pd.DataFrame, partitions: List[str])->None:
         if self.contract_type != "dataset":
