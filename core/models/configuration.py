@@ -93,30 +93,6 @@ class Brand(UniversalWithPrimary, Base):
         "PharmaceuticalCompany", back_populates='brands')
     pipelines = relationship("Pipeline", back_populates='brand')
 
-"""
-class ExtractConfiguration(UniversalWithPrimary, Base):
-    __tablename__ = 'extract_configurations'
-    transformation_id = Column(Integer, ForeignKey(
-        'transformations.id'), nullable=False)
-    filesystem_path = Column(String)
-    prefix = Column(String)
-    secret_type_of = Column(String, nullable=False)
-    secret_name = Column(String, nullable=False)
-    ##transformation = relationship(
-      ##  "ExtractTransformation", back_populates='extract_configurations')
-
-class InitialIngestConfiguration(UniversalWithPrimary, Base):
-    __tablename__ = 'initial_ingest_configurations'
-    transformation_id = Column(Integer, ForeignKey(
-        'transformations.id'), nullable=False)
-    delimiter = Column(String, nullable=False, default=",")
-    skip_rows = Column(Integer, nullable=False, default=0)
-    encoding = Column(String, nullable=False, default="utf-8")
-    input_file_prefix = Column(String)
-    dataset_name = Column(String)
-   ## transformation = relationship(
-     ##   "InitialIngestTransformation", back_populates='initial_ingest_configurations')
-"""
 
 class PharmaceuticalCompany(UniversalWithPrimary, Base):
     __tablename__ = 'pharmaceutical_companies'
@@ -233,20 +209,9 @@ class Transformation(UniversalWithPrimary, Base):
 class TransformationVariable(UniversalWithPrimary, Base):
     __tablename__ = 'transformation_variables'
     transformation_id = Column(Integer, ForeignKey('transformations.id'), nullable=False)
-    name = Column(String, nullable=False)
     value = Column(String)
     transformation = relationship('Transformation')
-
-    ## validate the variable is defined in the variable_structures for this transform template
-    @validates('name')
-    def validate_name(self, key, name):
-        struct = json.loads(self.transformation.transformation_template.variable_structures)
-        if name in struct.keys():
-            return name
-        else:
-            template_name = self.transformation.transformation_template.name
-            raise ExtraTransformationVariableError(f"{name} is not a valid variable for transformation template {template_name}")
-
+    name = Column(String, nullable=False)
 
 class ExtraTransformationVariableError(ValueError):
     """ This is specifically for cases when variables 
