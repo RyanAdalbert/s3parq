@@ -1,10 +1,8 @@
-import Dashboard from 'Views/Dashboard/Dashboard';
+import Dashboard from '../Views/Dashboard/Dashboard';
 
 const Routes = [
   {
-    path: '/dashboard',
-    name: 'Dashboard',
-    icon: 'pe-7s-graph',
+    path: './Components/Dashboard/Dashboard',
     component: Dashboard
   }
 ];

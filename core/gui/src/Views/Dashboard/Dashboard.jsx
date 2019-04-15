@@ -1,9 +1,20 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-class Dashboard extends Component {
-  render() {
-    <div>This is the Dashboard</div>;
+import styled from 'styled-components';
+
+const Wrapper = styled.div`
+  display: flex;
+  background-color: green;
+
+  p {
+    color: #000;
   }
-}
+`;
+
+const Dashboard = () => (
+  <Wrapper>
+    <p>This is the Dashboard.</p>
+  </Wrapper>
+);
 
 export default Dashboard;
