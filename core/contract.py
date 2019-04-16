@@ -27,7 +27,7 @@ class Contract(LoggerMixin):
             this is generally the customer (and it is aliased as such) but can be IntegriChain for internal sources,
             or another aggregator for future-proofing
         CHILD - The sub level source identifier, generally the brand (and is aliased as such) 
-        STATE - One of: raw, ingest, master, enhance, Enrich, Metrics 
+        STATE - One of: raw, ingest, master, enhance, enrich, metrics 
     '''
     DEV = DEV_BUCKET
     PROD = PROD_BUCKET
@@ -40,8 +40,6 @@ class Contract(LoggerMixin):
             Default file name, dataset and partitions to empty (they are not required in a contract). 
             Does not support customer / brand aliases
         '''
-        attributes = ('branch', 'parent', 'child', 'state',
-                      'dataset', 'partitions', 'partition_size')
 
         self.parent = parent
         self.child = child
@@ -173,10 +171,10 @@ class Contract(LoggerMixin):
                 f"contract.fetch() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
         
         self.logger.info(
-            f'Fetching dataframe from s3 location {self.get_s3_path()}.')
+            f'Fetching dataframe from s3 location {self.s3_path}.')
         
         return fetch(   bucket = self.env,
-                        key = self.get_key(),
+                        key = self.key,
                         filters = filters )
 
     def publish(self, dataframe: pd.DataFrame, partitions: List[str])->None:
@@ -185,48 +183,48 @@ class Contract(LoggerMixin):
                 f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
 
         self.logger.info(
-            f'Publishing dataframe to s3 location {self.get_s3_path()}.')
+            f'Publishing dataframe to s3 location {self.s3_path}.')
 
         publish(
             bucket=self.env,
-            key=self.get_key(),
+            key=self.key,
             dataframe=dataframe,
             partitions=partitions
         )
 
     def publish_raw_file(self, local_file_path: str) ->None:
         '''accepts a local path to a file, publishes it as-is to s3 as long as state == raw.'''
-        if self.get_state() != 'raw':
+        if self.state != 'raw':
             raise ValueError(
                 'publish_raw_file may only be used on raw contracts.')
 
         s3_client = boto3.client('s3')
 
         filename = os.path.split(local_file_path)[1]
-        key = self.get_key()+filename
-        self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.get_s3_path()+filename}.')
+        key = self.key+filename
+        self.logger.info(f'Publishing a local file at {local_file_path} to s3 location {self.s3_path+filename}.')
 
         with open(local_file_path, 'rb') as file_data:
             extra_args = {'source_modified_time': str(
                 float(os.stat(local_file_path).st_mtime))}
-            resp = s3_client.upload_fileobj(file_data, Bucket=self.get_bucket(
-            ), Key=key, ExtraArgs={"Metadata": extra_args})
+            resp = s3_client.upload_fileobj(file_data, Bucket=self.bucket
+            , Key=key, ExtraArgs={"Metadata": extra_args})
 
     def get_raw_file_metadata(self, local_file_path: str) ->None:
         # If file exists, return its metadata
         s3_client = boto3.client('s3')
 
         filename = os.path.split(local_file_path)[1]
-        key = self.get_key()+filename
-        return s3_client.head_object(Bucket=self.get_bucket(),Key=key)
+        key = self.key+filename
+        return s3_client.head_object(Bucket=self.bucket,Key=key)
 
 
     def list_files(self, file_prefix='') -> List[str]:
-        key = self.get_key()
+        key = self.key
         keyfix = key+file_prefix
         try:
             s3 = boto3.resource('s3')
-            bucket = s3.Bucket(self.get_bucket())
+            bucket = s3.Bucket(self.bucket)
             objects = [obj.key for obj in bucket.objects.filter(Prefix=keyfix)]
 
             return objects
@@ -238,7 +236,7 @@ class Contract(LoggerMixin):
 
     def download_raw_file(self, filename):
         with tempfile.TemporaryDirectory() as tmp_dir:
-            download_path = download_s3_object(self.get_bucket(), self.get_key()+filename, tmp_dir)
+            download_path = download_s3_object(self.bucket, self.key+filename, tmp_dir)
             yield download_path
 
 

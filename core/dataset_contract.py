@@ -26,7 +26,7 @@ class DatasetContract(Contract):
         SUB-PARTITION - for datasets, the sub-partitions add additional partitioning with additional prefixes
     '''
 
-    def __init__(self, parent: str, child: str, state: str, dataset: str, partitions: List[str] = [], partition_size: int = 100, branch=None):
+    def __init__(self, parent: str, child: str, state: str, dataset: str, partitions: List[str] = [], branch=None):
         ''' Set the initial vals to None.
             Calls the common attributes to super, though some are 
             Default file name, dataset and partitions to empty (they are not required in a contract). 
@@ -36,8 +36,6 @@ class DatasetContract(Contract):
 
         self.partitions = partitions
         self.dataset = dataset
-        self.partition_size = partition_size
-
 
     @property
     def dataset(self)->str:

@@ -1,4 +1,5 @@
 import pytest
+import os
 import dfmock 
 import pandas as pd
 from unittest.mock import patch
@@ -17,7 +18,7 @@ def _contract():
             child="Wonder_Drug",
             state="ingest"
     )
-    return contract
+    yield contract
 
 
 def test_set_env_valid(_contract):
@@ -66,17 +67,9 @@ def test_alias_customer(_contract):
     assert contract.customer == customer.lower(), "customer alias not set"
     assert contract.parent == customer.lower(), "customer does not alias to parent"
 
-@pytest.fixture
-def _contract_type():
-    contract = Contract(branch='master',
-                        parent='Merck',
-                        child='Wonder_Drug',
-                        state='ingest'
-                        )
-    return contract
 
-def test_contract_type(_contract_type):
-    contract = _contract_type
+def test_contract_type(_contract):
+    contract = _contract
     assert contract.contract_type == 'state', 'returned wrong type for state contract'
 
 
@@ -105,33 +98,15 @@ def test_next_state_from_dimensional(_contract):
     assert contract.next_state == None, 'next state for dimensinal'
 
 
-def test_get_partition_size():
-    contract = Contract()
-    size = 1
-    contract.set_partition_size(size)
-    assert contract.get_partition_size() == size, 'partition size not correctly set'
-
-
 def _s3_mock_setup():
     s3_client = boto3.client('s3')
     s3_client.create_bucket(Bucket=f'{ENV_BUCKET}')
     return s3_client
 
-
-def _contract_setup():
-    #contract = Contract()
-    contract = Contract(branch='master',
-                        parent='Merck',
-                        child='Wonder_Drug',
-                        state='raw'
-                        )
-    return contract
-
-
 @moto.mock_s3()
-def test_publish_raw_valid():
+def test_publish_raw_valid(_contract):
     client = _s3_mock_setup()
-    contract = _contract_setup()
+    contract = _contract
     # _s3_mock_setup()
     _file = tempfile.NamedTemporaryFile()
     text = b"Here's some money. Go see a Star War"
@@ -148,10 +123,10 @@ def test_publish_raw_valid():
 
 
 @moto.mock_s3()
-def test_publish_raw_invalid():
+def test_publish_raw_invalid(_contract):
     client = _s3_mock_setup()
-    contract = _contract_setup()
-    contract.set_state('enrich')
+    contract = _contract
+    contract.state = 'enrich'
 
     _file = tempfile.NamedTemporaryFile()
     text = b"Here's some money. Go see a Star War"
@@ -166,7 +141,7 @@ def test_publish_raw_invalid():
 @moto.mock_s3()
 def test_publish_raw_metadata():
     client = _s3_mock_setup()
-    contract = _contract_setup()
+    contract = _contract
 
     with tempfile.NamedTemporaryFile() as _file:
         text = b"Here's some money. Go see a Star War"
@@ -184,14 +159,14 @@ def test_publish_raw_metadata():
 def test_fetch_from_s3():
     with patch('core.contract.fetch', autospec=True) as fetch:
         fetch.return_value = pd.DataFrame()
-        contract = Contract()
-        contract.set_branch('master')
-        contract.set_parent('Merck')
-        contract.set_child('Wonder_Drug')
-        contract.set_state('ingest')
-        contract.set_dataset('valid_dataset')
+        contract = _contract
+        contract.branch = 'master'
+        contract.parent ='Merck'
+        contract.child = 'Wonder_Drug'
+        contract.state = 'ingest'
+        contract.dataset = 'valid_dataset'
 
-        key = contract.get_key()
+        key = contract.key
         filters = {"partition":"hamburger",
                     "comparison":"==",
                     "values":['McDonalds']}
@@ -205,19 +180,19 @@ def test_fetch_from_s3():
 
         assert isinstance(fake_df, pd.DataFrame)
 
-def test_publish_to_s3():
+def test_publish_to_s3(_contract):
     with patch('core.contract.publish', autospec=True) as publish:
         df = dfmock.DFMock(count = 100, columns = {"fake":"boolean","partition":"string","option":{"option_count":4,"option_type":"string"}})
         df.generate_dataframe()
         patch.return_value = None
-        contract = Contract()
-        contract.set_branch('master')
-        contract.set_parent('Merck')
-        contract.set_child('Wonder_Drug')
-        contract.set_state('ingest')
-        contract.set_dataset('valid_dataset')
+        contract = _contract
+        contract.branch = 'master'
+        contract.parent = 'Merck'
+        contract.child = 'Wonder_Drug'
+        contract.state = 'ingest'
+        contract.dataset = 'valid_dataset'
 
-        key = contract.get_key()
+        key = contract.key
         fake_parts = ["fake=True","partition=faker"]
 
         pub = contract.publish(dataframe=df.dataframe,partitions=fake_parts)
@@ -231,9 +206,10 @@ def test_publish_to_s3():
         assert pub is None
 
 @moto.mock_s3()
-def test_list_files():
+def test_list_files(_contract):
     client = _s3_mock_setup()
-    contract = _contract_setup()
+    contract = _contract
+    contract.state = 'raw'
 
     with tempfile.NamedTemporaryFile(prefix="imb4") as _file:
         text = b"Here's some money. Go see a Star War"
