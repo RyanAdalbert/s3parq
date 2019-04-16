@@ -12,7 +12,9 @@ We develop in a docker-compose orchestrated environment. We work in containers, 
 2. `cd` into the repo root (`/core` in most cases)
 3. start your development environment with the `script/dev_env` command. This will create all the containers, network them, start all the services, and give you a shell prompt into the container of your choosing. 
 
-**Select a container with flags**
+*note*: `script/dev_env` will not build new images unless you use the `--build` flag. This makes testing fast, but can mean using stale docker. Buyer beware.
+
+**Select a container shell with flags**
 `--flask` gives you the flask api container
 `--gui` gives you the gui container
 `--notebook` gives you the notebook container (this is also the default workspace if no flag is set)
@@ -22,8 +24,8 @@ example:
     ## I want to work in the react container
     cd /home/user/repos/core
     script/dev_env --gui
-
-    ### much logging of the container building later...
+    
+    ## core starts all the containers and.... 
     $core: ## prompt from _inside_ the container
 
 
@@ -35,7 +37,19 @@ _the containers_:
 - `configurationpg` container serves the configuration application postgres database (not exposed)
 - `flask_api` container serves the flask api
 
+_important notes_:
+- when `docker-compose.yml` or any of the files in `dockerfiles/` are updated, you will need to run the `--build` flag to create a new base image. Example:
  
+    ## I want new containers built from the updated docker files
+    cd /home/user/repos/core
+    script/dev_env --build
+    
+    ### probably 5-10 min later 'cus building images is expensive
+    $core: ## prompt from inside the container
+- if you suddenly get weird errors (usually sqlalchemy related) for no reason when building, your docker may be out of memory from all the stale images. Clean it up!
+To do so run `docker images prune` 
+- python testing can be done with coverage and debugging using the `script/test` bash script from _inside_ any of the shells. This will run the py.test suite. for debugging add the `--log` flag. For line numbers of uncovered code add the `--line` flag.   
+
 ### AWS Credentials and Accounts
 There are two AWS accounts here at Integrichain, one is `sandbox` and the other is `main`. Basically, `sandbox` is dev and `main` houses both `prod` and `uat`. You should have 2 separate sets of AWS Access key pairs, but only have 1 key pair in the `credentials` file at a time. If you want to switch accounts, just copy the appropriate credentials file over `credentials`.
 
