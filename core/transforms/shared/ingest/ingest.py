@@ -30,7 +30,7 @@ class InitialIngestTransform(LoggerMixin):
                 filename = path.basename(file)
                 with input_contract.download_raw_file(filename) as f:
                     df = self.ingest_file(f, filename)
-                    self.output_contract.write_with_metadata(config.dataset, df, run_timestamp)
+                    self.output_contract.write_with_metadata(df, run_timestamp)
 
     def ingest_file(self, f, filename):
         input_s3_url = self.input_contract.get_s3_url(filename)

@@ -29,7 +29,7 @@ def test_with_partitions(_contract):
     contract = _contract
     contract.partitions = ['partition_1', 'partition_2']
     path = contract.s3_path
-    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/', 'path was incorrectly built with partitions.'
+    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/', 'path was incorrectly built with partitions.'
 
 
 def test_quick_set(_contract):
@@ -43,19 +43,10 @@ def test_quick_set(_contract):
     assert contract.dataset == 'valid_dataset', 'failed to set parent'
 
 
-@pytest.fixture
-def _partitions():
-    p = dict()
-    p['good'] = ['date', 'segment']
-    p['bad'] = ['b@d$$%Partition', 'good_partition_name']
-    return p
-
-
-def test_valid_partitions(_partitions, _contract):
-    p = _partitions
+def test_valid_partitions(_contract):
     contract = _contract
-    contract.partitions = p['good']
-    assert contract.partitions == p['good'], "partitions not correctly set"
+    contract.partitions = ['date', 'segment']
+    assert contract.partitions == ['date', 'segment'], "partitions not correctly set"
 
 
 @pytest.fixture

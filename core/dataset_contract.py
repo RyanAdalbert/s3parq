@@ -47,7 +47,7 @@ class DatasetContract(Contract):
     @dataset.setter
     def dataset(self, dataset: str)->None:
         # leave in natural case for datasets
-        self._dataset = self._validate_part(dataset)
+        self._dataset = dataset
         self._set_contract_type()
 
     @property
@@ -90,10 +90,6 @@ class DatasetContract(Contract):
 
         if len(self.dataset) > 0:
             path += f'{self.dataset}/'
-
-            # no partitions without a data set
-            for p in self.partitions:
-                path += f'{p}/'
 
         return path
 
@@ -148,7 +144,7 @@ class DatasetContract(Contract):
         df = df.astype(str)
         return (df, partitions)
 
-    def write_with_metadata(self, dataset, df, run_timestamp):
+    def write_with_metadata(self, df, run_timestamp):
         df, partitions = self.set_metadata(df=df,run_timestamp=run_timestamp)
         print (partitions)
         print (df.head())
