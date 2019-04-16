@@ -60,18 +60,13 @@ class Contract(LoggerMixin):
     def branch(self)->str:
         return self._branch
 
-<<<<<<< HEAD
     @branch.setter
     def branch(self, branch: str)->None:
         self._branch = self._validate_part(branch)
-=======
+
     @property
     def env(self)->str:
         return self._env
-
-    def get_branch(self)->str:
-        return self.branch
->>>>>>> 1737ec98bbf6c97c6d46ba295499e721315f2467
 
     @property
     def parent(self)->str:
@@ -85,21 +80,12 @@ class Contract(LoggerMixin):
     def state(self)->str:
         return self._state
 
-<<<<<<< HEAD
     @state.setter
     def state(self, state: str)->None:
         if state in self.STATES:
             self._state = state
         else:
             raise ValueError(f'{state} is not a valid state')
-=======
-    def get_env(self)->str:
-        self.logger.warning("get_env is depricated. Use env instead.")
-        return self._env
-
-    def get_dataset(self)->str:
-        return self.dataset
->>>>>>> 1737ec98bbf6c97c6d46ba295499e721315f2467
 
     @property
     def child(self)->str:
@@ -181,8 +167,6 @@ class Contract(LoggerMixin):
 
         return path
 
-<<<<<<< HEAD
-=======
     def fetch(self, filters: List[dict])->pd.DataFrame:
         if self.contract_type != "dataset":
             raise ValueError(
@@ -252,14 +236,12 @@ class Contract(LoggerMixin):
             else:
                 raise
 
-    @contextmanager
     def download_raw_file(self, filename):
         with tempfile.TemporaryDirectory() as tmp_dir:
             download_path = download_s3_object(self.get_bucket(), self.get_key()+filename, tmp_dir)
             yield download_path
 
 
->>>>>>> 1737ec98bbf6c97c6d46ba295499e721315f2467
     # aliases
 
     @property

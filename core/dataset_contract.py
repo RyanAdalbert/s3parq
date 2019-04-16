@@ -1,4 +1,4 @@
-from core.helpers.s3_naming_helper import S3NamingHelper as s3Name
+from s3parq.s3_naming_helper import S3NamingHelper as s3Name
 from core.contract import Contract
 
 from typing import List

@@ -119,7 +119,7 @@ def _s3_mock_setup():
 
 
 def _contract_setup():
-    contract = Contract()
+    #contract = Contract()
     contract = Contract(branch='master',
                         parent='Merck',
                         child='Wonder_Drug',
