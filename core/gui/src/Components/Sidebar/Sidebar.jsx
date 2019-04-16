@@ -9,9 +9,9 @@ const SidebarWrapper = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  background-color: #fff;
-  padding: 10px 10px 0 10px;
   height: 99vh;
+  padding: 10px 10px 0 10px;
+  background-color: #fff;
 
   img {
     width: 100%;
