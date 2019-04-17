@@ -7,7 +7,7 @@ while [ -n "$1" ]; do
  
     case "$1" in
  
-    -h) echo '
+    --h) echo '
           _       __________________  _________ _______  _______ _________ _______  _ 
 |\     /|( (    /|\__   __/\__   __/  \__   __/(  ____ \(  ____ \\\__   __/( ___ _ \( )
 | )   ( ||  \  ( |   ) (      ) (        ) (   | (    \/| (    \/   ) (   | (    \/| |
@@ -20,9 +20,9 @@ while [ -n "$1" ]; do
 test yo stuff! options:\n-log\tprints stdout during py.test runs (this includes debug logs).\n-line\tadds the coverage missed lines to the coverage report.\n' 
         exit 0 ;;
  
-    -log) LOG="-s" ;;
+    --log) LOG="-s" ;;
  
-    -line) LINE="-m" ;;
+    --line) LINE="-m" ;;
  
     *) echo "Option $1 not recognized. try '-h' for help." 
        exit 0 ;; 
