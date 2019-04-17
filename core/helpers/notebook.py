@@ -1,9 +1,12 @@
+from datetime import datetime
 import papermill
 from core.helpers import project_root
 from core.constants import ENV_BUCKET
 from core.helpers.session_helper import SessionHelper
 from core.models import configuration
 from core.dataset_contract import DatasetContract
+from core.contract import Contract
+from core.logging import LoggerMixin
 
 root = project_root.ProjectRoot().get_path()
 
@@ -32,7 +35,9 @@ def run_transform(transform_id:int) -> str:
 # TODO: figure out how else we're going to separate the notebook 
 def output_path(output_contract: str) -> str:
     s3_prefix = f"s3://{ENV_BUCKET}/notebooks"
-    return f"{s3_prefix}/{output_contract}.ipynb"
+    day = datetime.now().strftime('%Y-%m-%d')
+    time = datetime.now().strftime('%H-%M-%S.%f')
+    return f"{s3_prefix}/{output_contract}/{day}/{time}.ipynb"
 
 def output_url(output_path: str) -> str:
     s3_prefix = "s3://{ENV_BUCKET}/notebooks"
