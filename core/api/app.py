@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from datetime import datetime
-import json, requests, os
+import json, requests, os, sqlalchemy.orm
 from flask import Flask, request, session
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 from core.models.configuration import (
@@ -42,12 +42,13 @@ def authorize(token, fsess):
     data = resp.json()
     email = data['email']
     sess = mocker.get_session()
-    query = sess.query(Administrator).all()
-    for admin in query:
-        if email == admin.email_address:
-            fsess['token'] = token
-            return True
-    return False
+    query = sess.query(Administrator).filter(Administrator.email_address==email)
+    try:
+        query.one()
+        fsess['token'] = token
+        return True
+    except NoResultFound:
+        return False
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(16)
