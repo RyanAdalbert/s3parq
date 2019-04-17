@@ -57,11 +57,11 @@ mocker = CMock()
 mocker.generate_mocks()
 #app.register_blueprint(routes)
 
-@app.route('/api')
+@app.route('/config_api')
 def index():
     return "No request specified. Did you mean /api/login?"
 
-@app.route('/api/login', methods=['GET', 'POST'])
+@app.route('/config_api/login', methods=['GET', 'POST'])
 def login():
     if request.method != 'POST':
         return "Error: Login token not specified."
