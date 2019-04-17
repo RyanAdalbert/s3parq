@@ -24,6 +24,7 @@ class ConfigurationMocker(LoggerMixin):
         return self.session
 
     def generate_mocks(self)-> None:
+        self._mock_administrators()
         self._mock_pharmaceutical_companies()
         self._mock_brands()
         self._mock_segments()
@@ -35,6 +36,16 @@ class ConfigurationMocker(LoggerMixin):
         self._mock_transformations()
         self._mock_transformation_variables()
     
+    def _mock_administrators(self)->None:
+        self.logger.debug('Generating administrator mocks.')
+        a = config.Administrator
+        self.session.add_all([
+            a(id=1, first_name = "Fox", last_name = "Mulder", email_address="fwm@integrichain.com"),
+            a(id=2, first_name = "Dana", last_name = "Skully", email_address="dks@integrichain.com")
+        ])
+        self.session.commit()
+        self.logger.debug('Done generating administrator mocks.')
+        
     def _mock_brands(self)-> None:
         self.logger.debug('Generating brand mocks.')
         b = config.Brand

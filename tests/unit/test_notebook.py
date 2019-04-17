@@ -7,6 +7,7 @@ from core.constants import ENV_BUCKET
 import os
 from io import TextIOWrapper
 from core.helpers import notebook
+import re
 
 
 @moto.mock_s3
@@ -20,7 +21,8 @@ class Test:
         output_contract = "asdf/1234/merp/boomboom"
         output_path = notebook.output_path(
             output_contract)
-        assert output_path == f"s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/boomboom.ipynb"
+        prefix = f"s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/boomboom"
+        assert re.match(f"^{prefix}.*$", output_path)
 
     def test_output_url(self):
         self.setup()
