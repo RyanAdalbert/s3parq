@@ -3,23 +3,27 @@ import React from 'react';
 import styled from 'styled-components';
 
 // Styles
-const Wrapper = styled.div`
+const HeaderSec = styled.section`
   display: flex;
-  padding: 6px 5%;
   justify-content: flex-end;
+  padding: 6px 5%;
   background: #004cae;
   color: #fff;
+
+  p {
+    color: #fff;
+  }
 `;
 
 const User = 'Alec';
 
 const Header = () => (
-  <Wrapper>
+  <HeaderSec>
     <p>
       Welcome,
-      {` ${User}`}
+      {`${User}`}
     </p>
-  </Wrapper>
+  </HeaderSec>
 );
 
 export default Header;

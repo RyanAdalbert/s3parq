@@ -14,7 +14,7 @@ const Wrapper = styled.div`
 
 const Dashboard = () => (
   <Wrapper>
-    <p>This is the Dashboard.</p>
+    <p>Dashboard.</p>
   </Wrapper>
 );
 

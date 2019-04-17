@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Logo from '../../Assets/integrichain-logo.svg';
 
 // Styles
-const Wrapper = styled.div`
+const LoginWrapper = styled.div`
   display: flex;
   height: 99vh;
   width: 100%;
@@ -21,6 +21,7 @@ const Wrapper = styled.div`
     border: 1px solid #e4e4e4;
     border-radius: 4px;
     background-color: #f7f7f7;
+    box-shadow: 0px 3px 3px 0px #999999;
 
     .ButtonWrapper {
       margin: 10px 0 0 0;
@@ -35,7 +36,7 @@ const responseGoogle = response => {
 };
 
 const Login = () => (
-  <Wrapper className="App">
+  <LoginWrapper>
     <div className="LoginContainer">
       <img src={Logo} alt="Integrichain Logo" />
       <p>Data Transform Admin Panel</p>
@@ -48,7 +49,7 @@ const Login = () => (
         />
       </div>
     </div>
-  </Wrapper>
+  </LoginWrapper>
 );
 
 export default Login;
