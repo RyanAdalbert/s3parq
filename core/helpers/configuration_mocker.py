@@ -41,7 +41,8 @@ class ConfigurationMocker(LoggerMixin):
         a = config.Administrator
         self.session.add_all([
             a(id=1, first_name = "Fox", last_name = "Mulder", email_address="fwm@integrichain.com"),
-            a(id=2, first_name = "Dana", last_name = "Skully", email_address="dks@integrichain.com")
+            a(id=2, first_name = "Dana", last_name = "Skully", email_address="dks@integrichain.com"),
+            a(id=3, first_name = "Alec", last_name="Wertheimer", email_address="ajw@integrichain.com")
         ])
         self.session.commit()
         self.logger.debug('Done generating administrator mocks.')
