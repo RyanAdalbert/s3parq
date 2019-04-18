@@ -176,6 +176,8 @@ class TransformationTemplate(UniversalWithPrimary, Base):
     __tablename__ = 'transformation_templates'
     name = Column(String, nullable=False)
     variable_structures = Column(String)
+    valid_state_type_id = Column(Integer, ForeignKey('pipeline_state_types.id'), nullable=False)
+    state = relationship('PipelineStateType')
 
     @validates('variable_structures')
     def validate_variable_structures(self, key, variable_structures):
