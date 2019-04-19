@@ -1,24 +1,22 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 import styled from 'styled-components';
 
 import AdminPage from '../Containers/AdminPage/AdminPage';
 import LoginPage from '../Containers/LoginPage/LoginPage';
 
-//Component fro Private Route
+// Styles
+const AppContainer = styled.section`
+  display: block;
+`;
 
-// Routes
-
-const routes = [
-  {
-    path: '/admin',
-    compontent: AdminPage
-  },
-  {
-    path: '/login',
-    component: LoginPage
-  }
-];
-const App = () => <LoginPage />;
+const App = () => (
+  <AppContainer>
+    <Switch>
+      <Route exact path="/" component={LoginPage} />
+      <Route path="/admin" component={AdminPage} />
+    </Switch>
+  </AppContainer>
+);
 
 export default App;

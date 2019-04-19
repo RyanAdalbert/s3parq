@@ -1,6 +1,7 @@
 import React from 'react';
 import { GoogleLogin } from 'react-google-login';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 import UserAuth from '../../Utils/UserAuth/UserAuth';
 
@@ -51,6 +52,7 @@ class LoginPage extends React.Component {
               onFailure={responseGoogle}
             />
           </div>
+          <Link to="/admin">Admin</Link>
         </div>
       </LoginWrapper>
     );

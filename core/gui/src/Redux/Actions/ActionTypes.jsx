@@ -1,0 +1,3 @@
+const STORE_TOKEN = 'STORE_TOKEN';
+const ADD_PIPE = 'ADD_PIPE';
+const REMOVE_PIPE = 'REMOVE_PIPE';

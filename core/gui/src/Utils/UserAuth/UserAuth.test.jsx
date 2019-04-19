@@ -2,13 +2,18 @@ import React from 'React';
 import { shallow } from 'enzyme';
 import UserAuth from './UserAuth';
 
-const MarvObj = {
-  User: Nova,
-  AccessToken: '1234sfdaf2q34rq342134qwd'
-};
+import mockGoogleObj from '../../../__mocks__/mockGoogleObj';
 
-//Gets Response from Login Component
-it('Gets User Object from Google Login Component', () => {});
-//Posts Auth Token to Flask API
+describe('UserAuth', () => {
+  const results = UserAuth(mockGoogleObj);
 
-//Gets Response back from Flask
+  it('Pulls Access Token out of User Object', () => {
+    results.expect(USER_TOKEN).toBe('12345');
+  });
+
+  it('Stores Access Token in Redux', () => {});
+
+  it('POSTs Access Token to Flask API', {});
+
+  it('Sends Returns Response From Flask', () => {});
+});

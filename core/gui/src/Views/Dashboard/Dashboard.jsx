@@ -3,9 +3,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 // Styles
-const Wrapper = styled.div`
+const DashboardContainer = styled.div`
   display: flex;
-  background-color: green;
 
   p {
     color: #000;
@@ -13,9 +12,9 @@ const Wrapper = styled.div`
 `;
 
 const Dashboard = () => (
-  <Wrapper>
+  <DashboardContainer>
     <p>Dashboard.</p>
-  </Wrapper>
+  </DashboardContainer>
 );
 
 export default Dashboard;
