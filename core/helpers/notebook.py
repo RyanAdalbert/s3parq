@@ -4,6 +4,7 @@ from core.helpers import project_root
 from core.constants import ENV_BUCKET
 from core.helpers.session_helper import SessionHelper
 from core.models import configuration
+from core.dataset_contract import DatasetContract
 from core.contract import Contract
 from core.logging import LoggerMixin
 
@@ -13,7 +14,7 @@ def run_transform(transform_id:int) -> str:
     ## notebook name == transform_template.name
     t_configs = get_transform(transform_id)
     notebook = t_configs.transformation_template.name
-    output_contract = Contract(
+    output_contract = DatasetContract(
                         parent = t_configs.pipeline_state.pipeline.brand.pharmaceutical_company.name,
                         child = t_configs.pipeline_state.pipeline.brand.name,
                         state = t_configs.pipeline_state.pipeline_state_type.name,
@@ -24,12 +25,12 @@ def run_transform(transform_id:int) -> str:
     path = f"{root}/transforms/{notebook}.ipynb"
     papermill.execute_notebook(
         path,
-        output_path(output_contract.get_key()),       
-        parameters = dict(id=transform_id),
+        output_path(output_contract.key),       
+        parameters = dict(transform_id=transform_id),
         cwd=root
     )
 
-    return output_url(output_path(output_contract.get_key()))
+    return output_url(output_path(output_contract.key))
 
 # TODO: figure out how else we're going to separate the notebook 
 def output_path(output_contract: str) -> str:
