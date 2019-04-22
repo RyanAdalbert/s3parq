@@ -1,0 +1,22 @@
+import React from 'React';
+import { shallow } from 'enzyme';
+import UserAuth from './UserAuth';
+
+import * as actions from '../../actions/AuthActions';
+import * as types from '../../Redux/Constants/ActionTypes';
+
+import mockGoogleObj from '../../../__mocks__/mockGoogleObj';
+
+describe('UserAuth', () => {
+  const results = UserAuth(mockGoogleObj);
+
+  it('Pulls Access Token out of User Object', () => {
+    results.expect(types.LOGIN_USER).toBe('12345');
+  });
+
+  it('Stores Access Token in Redux', () => {});
+
+  it('POSTs Access Token to Flask API', {});
+
+  it('Sends Returns Response From Flask', () => {});
+});
