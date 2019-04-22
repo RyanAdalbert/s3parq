@@ -3,8 +3,6 @@ import { GoogleLogin } from 'react-google-login';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
-import UserAuth from '../../Utils/UserAuth/UserAuth';
-
 import Logo from '../../Assets/integrichain-logo.svg';
 
 // Styles

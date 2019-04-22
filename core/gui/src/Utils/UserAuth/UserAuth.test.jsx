@@ -2,13 +2,16 @@ import React from 'React';
 import { shallow } from 'enzyme';
 import UserAuth from './UserAuth';
 
+import * as actions from '../../actions/AuthActions';
+import * as types from '../../Redux/Constants/ActionTypes';
+
 import mockGoogleObj from '../../../__mocks__/mockGoogleObj';
 
 describe('UserAuth', () => {
   const results = UserAuth(mockGoogleObj);
 
   it('Pulls Access Token out of User Object', () => {
-    results.expect(USER_TOKEN).toBe('12345');
+    results.expect(types.LOGIN_USER).toBe('12345');
   });
 
   it('Stores Access Token in Redux', () => {});
