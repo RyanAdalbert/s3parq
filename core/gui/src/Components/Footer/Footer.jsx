@@ -16,8 +16,8 @@ const Footer = () => (
   <FooterSec>
     <p>
       &copy; {new Date().getFullYear()}{' '}
-      <a href="https://www.integrichain.com/">IntegriChain</a> Incorporated. All
-      Rights Reserved.
+      <a href="https://www.integrichain.com/">IntegriChain</a> Inc. All Rights
+      Reserved.
     </p>
   </FooterSec>
 );
