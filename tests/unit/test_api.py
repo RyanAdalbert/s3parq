@@ -24,7 +24,7 @@ def test_bad_login(client, mocker):
 def test_no_login(client):
     url = root + "login"
     response = client.get(url)
-    assert response.status_code == 400
+    assert response.status_code == 405
 
 def test_valid_cookie(client, mocker):
     mocker.patch("core.api.auth.parse_oauth", return_value="njb@integrichain.com")
@@ -47,4 +47,4 @@ def test_no_cookie(client):
     url2 = root + "validate"
     client.post(url, data=dict(token=access))
     response = client.get(url2)
-    assert response.status_code == 400
+    assert response.status_code == 405
