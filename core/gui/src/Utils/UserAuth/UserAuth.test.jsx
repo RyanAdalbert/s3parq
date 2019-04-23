@@ -1,13 +1,13 @@
 import React from 'React';
 import { shallow } from 'enzyme';
-import UserAuth from './UserAuth';
+import userAuth from './userAuth';
 
 import mockGoogleObj from '../../../__mocks__/mockGoogleObj';
 
-describe('UserAuth', () => {
-  const results = UserAuth(mockGoogleObj);
+describe('userAuth', () => {
+  const results = userAuth(mockGoogleObj);
 
-  it('Pulls Access Token out of User Object', () => {
+  it('Gets access Token from Google User Object', () => {
     results.expect(types.LOGIN_USER).toBe('12345');
   });
 

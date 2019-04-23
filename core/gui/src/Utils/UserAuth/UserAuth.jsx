@@ -1,4 +1,6 @@
 // Function that Authorizes Google Response
-export default function UserAuth(responseGoogle) {
-  console.log(responseGoogle);
+import { storeToken } from '../../Redux/Actions/index';
+
+export default function userAuth(responseGoogle, dispatch) {
+  dispatch(storeToken(responseGoogle.accessToken));
 }
