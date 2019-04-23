@@ -18,7 +18,7 @@ def parse_oauth(url):
     email = data['email']
     return email
 
-def authorize(token, session_helper):
+def authorize(token, session_helper): # the token passed here needs to be generated elsewhere, e.g. a React frontend
     base = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token="
     url = base + token
     try:
@@ -33,7 +33,7 @@ def authorize(token, session_helper):
     except sqlalchemy.orm.exc.NoResultFound:
         return False
 
-def validate(token):
+def validate(token): # checks for session cookie
     try:
         return token == session['token']
     except KeyError:
