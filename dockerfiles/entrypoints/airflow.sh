@@ -6,6 +6,18 @@ TRY_LOOP="20"
 : "${REDIS_PORT:="6379"}"
 : "${REDIS_PASSWORD:=""}"
 
+: "${MYSQL_HOST:="dummy-host"}"
+: "${MYSQL_PORT:="dummy-port"}"
+: "${MYSQL_USER:="dummy-user"}"
+: "${MYSQL_PASSWORD:="dummy-password"}"
+: "${MYSQL_DB:="dummy-db"}"
+
+: "${POSTGRES_HOST:="airflowpg"}"
+: "${POSTGRES_PORT:="5432"}"
+: "${POSTGRES_USER:="airflow"}"
+: "${POSTGRES_PASSWORD:="airflow"}"
+: "${POSTGRES_DB:="airflow"}"
+
 # Defaults and back-compat
 : "${AIRFLOW__CORE__FERNET_KEY:=${FERNET_KEY:=$(python -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)")}}"
 : "${AIRFLOW__CORE__EXECUTOR:=${EXECUTOR:-Local}Executor}"
@@ -51,9 +63,8 @@ wait_for_port() {
 export AIRFLOW__CORE__BASE_LOG_FOLDER=/usr/local/airflow/logs
 
 if [ "$AIRFLOW__CORE__EXECUTOR" != "SequentialExecutor" ]; then
-  AIRFLOW__CORE__SQL_ALCHEMY_CONN="postgresql+psycopg2://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME"
-  AIRFLOW__CELERY__RESULT_BACKEND="db+postgresql://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME"
-  wait_for_port "$DB_TYPE" "$DB_HOST" "$DB_PORT"
+  AIRFLOW__CORE__SQL_ALCHEMY_CONN="postgresql+psycopg2://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB"
+  AIRFLOW__CELERY__RESULT_BACKEND="db+postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB"
 fi
 
 if [ "$AIRFLOW__CORE__EXECUTOR" = "CeleryExecutor" ]; then
