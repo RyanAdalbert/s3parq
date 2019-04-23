@@ -1,5 +1,11 @@
-import * as types from '../Constants/ActionTypes';
+// Constants
+export const STORE_TOKEN = 'STORE_TOKEN';
+export const LOGIN_USER = 'LOGIN_USER';
 
+export const ADD_PIPE = 'ADD_PIPE';
+export const REMOVE_PIPE = 'REMOVE_PIPE';
+
+// Action Creators
 export function storeToken(text) {
-  return { type: types };
+  return { type: STORE_TOKEN, text };
 }

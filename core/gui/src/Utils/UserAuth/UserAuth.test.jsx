@@ -2,9 +2,6 @@ import React from 'React';
 import { shallow } from 'enzyme';
 import UserAuth from './UserAuth';
 
-import * as actions from '../../actions/AuthActions';
-import * as types from '../../Redux/Constants/ActionTypes';
-
 import mockGoogleObj from '../../../__mocks__/mockGoogleObj';
 
 describe('UserAuth', () => {

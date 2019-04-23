@@ -3,7 +3,7 @@ import { GoogleLogin } from 'react-google-login';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
-import UserAuth from '../../Utils/UserAuth/UserAuth';
+import userAuth from '../../Utils/UserAuth/userAuth';
 
 import Logo from '../../Assets/integrichain-logo.svg';
 
@@ -34,7 +34,7 @@ const LoginWrapper = styled.div`
 `;
 
 const responseGoogle = response => {
-  UserAuth(response);
+  userAuth(response);
 };
 
 class LoginPage extends React.Component {

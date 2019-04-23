@@ -1,8 +1,10 @@
-import { createStore, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
+import { createStore } from 'redux';
+import transformGui from './reducer';
 
-import reducer from './Reducers/index';
+import { storeToken } from './actions';
 
-export default function Store(initialState = {}) {
-  return createStore(reducer, initialState, applyMiddleware(thunk));
-}
+const store = createStore(transformGui);
+
+console.log(store.getState());
+
+export default store;
