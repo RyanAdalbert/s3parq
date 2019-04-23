@@ -3,30 +3,9 @@ from datetime import datetime
 import json, requests, os, sqlalchemy.orm
 from flask import Flask, Blueprint, request, session
 from core.api import auth
-try:
-    from core.constants import BRANCH_NAME
-    b = BRANCH_NAME
-except Exception as e:
-    b = e
+from core.constants import BRANCH_NAME
 
-def jsonify(self): # takes a defined db data class and serializes it into json
-    data = self.__dict__.copy()
-    del data['_sa_instance_state']
-    for key, value in data.items():
-        if(isinstance(value, datetime)):
-            data[key] = value.strftime("%m/%d/%Y %H:%M")
-    return json.dumps(data)
-
-'''
-def queryjson(self):
-    jstring = "{\n"
-    for obj in query:
-        key = obj.id
-        val = jsonify(obj)
-        jstring += "\"" + key + "\":" + val + ",\n"
-'''
-
-def create_app():
+def create_app()->Flask:
     app = Flask(__name__)
     app.secret_key = b'\xb6\xcf:v_\xffh\xfe\xa2\x82\xac\x8b\xd7qL\x07'
     app.register_blueprint(auth.bp)

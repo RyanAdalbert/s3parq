@@ -33,7 +33,7 @@ def authorize(token, session_helper): # the token passed here needs to be genera
     except sqlalchemy.orm.exc.NoResultFound:
         return False
 
-def validate(token): # checks for session cookie
+def check_cookie(token): # checks for session cookie
     try:
         return token == session['token']
     except KeyError:
@@ -43,7 +43,7 @@ def validate(token): # checks for session cookie
 def index():
     return "No request specified. Did you mean /config_api/login?"
 
-@bp.route('/config_api/login', methods=['GET', 'POST'])
+@bp.route('/config_api/login', methods=['GET', 'POST']) # Tokens must be submitted as form data in a POST request
 def login():
     helper = SHelp()
     if request.method != 'POST':
@@ -58,14 +58,14 @@ def login():
     else:
         return "Bad login", 403
 
-@bp.route('/config_api/validate', methods=['GET', 'POST'])
+@bp.route('/config_api/validate', methods=['GET', 'POST']) # Tokens must be submitted as form data in a POST request
 def test_cookie():
     if request.method != 'POST':
         return "No session cookie found!", 400
     data = request.form
     if not "token" in data:
         return "No session cookie found!", 400
-    if validate(data['token']):
+    if check_cookie(data['token']):
         return "Session token validated."
     else:
         return "Invalid session token.", 403
