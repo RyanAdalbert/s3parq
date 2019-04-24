@@ -1,2 +1,3 @@
 -r common.txt
 flask==1.0.2
+requests==2.21
