@@ -1,10 +1,7 @@
 from core.helpers.session_helper import SessionHelper as SHelp
-import requests
-import sqlalchemy.orm
+import requests, sqlalchemy.orm
 from flask import Flask, Blueprint, request, session
-from core.models.configuration import (
-    Administrator
-)
+from core.models.configuration import Administrator
 
 bp = Blueprint('auth', __name__)
 

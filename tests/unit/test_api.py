@@ -1,7 +1,8 @@
 import pytest
 from core.api import app
-access = "doesn't matter"
+access = "doesn't matter, oauth validation is mock.patched"
 root = "/config_api/"
+oauth = "core.api.routes.auth.parse_oauth" # patch target
 
 @pytest.fixture
 def client(mocker):
@@ -10,13 +11,13 @@ def client(mocker):
     yield client
 
 def test_good_login(client, mocker):
-    mocker.patch("core.api.auth.parse_oauth", return_value="njb@integrichain.com")
+    mocker.patch(oauth, return_value="njb@integrichain.com")
     url = root + "login"
     response = client.post(url, data=dict(token=access))
     assert response.status_code == 200
 
 def test_bad_login(client, mocker):
-    mocker.patch("core.api.auth.parse_oauth", return_value="badlogin@integrichain.com")
+    mocker.patch(oauth, return_value="badlogin@integrichain.com")
     url = root + "login"
     response = client.post(url, data=dict(token="foo"))
     assert response.status_code == 403
@@ -27,7 +28,7 @@ def test_no_login(client):
     assert response.status_code == 405
 
 def test_valid_cookie(client, mocker):
-    mocker.patch("core.api.auth.parse_oauth", return_value="njb@integrichain.com")
+    mocker.patch(oauth, return_value="njb@integrichain.com")
     url = root + "login"
     url2 = root + "validate"
     client.post(url, data=dict(token=access))
@@ -35,7 +36,7 @@ def test_valid_cookie(client, mocker):
     assert response.status_code == 200
 
 def test_invalid_cookie(client, mocker):
-    mocker.patch("core.api.auth.parse_oauth", return_value="badlogin@integrichain.com")
+    mocker.patch(oauth, return_value="badlogin@integrichain.com")
     url = root + "login"
     url2 = root + "validate"
     client.post(url, data=dict(token=access))

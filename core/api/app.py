@@ -2,7 +2,7 @@
 from datetime import datetime
 import json, requests, os, sqlalchemy.orm
 from flask import Flask, Blueprint, request, session
-from core.api import auth
+from core.api.routes import auth
 from core.constants import BRANCH_NAME
 
 def create_app()->Flask:
@@ -11,7 +11,6 @@ def create_app()->Flask:
     app.register_blueprint(auth.bp)
     #app.register_blueprint(routes)
     return app
-
 
 if __name__ == '__main__':
     app = create_app()
