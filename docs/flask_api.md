@@ -18,10 +18,10 @@ This API works as an interface between the React frontend and the configuration 
 	- Function: Validates the passed session token against Flask's session variable (containing the token after successful login)
 	- Postcondition: Returns a 200 OK Response if the token matches Flask's session token. Returns a 403 Forbidden if the token does not match Flask's session token. Returns a 400 Bad Request if the login token is not properly specified.
 
-* config_api/index
+* /config_api/index
  	- Precondition: Successfully login using a valid access token. Pass that access token in a POST request as form data
  	- Function: Queries all pipelines in the Configuration DB. Constructs a nested dict to be returned as a nested JSON object of various attributes of each pipeline in the query.
- 	- Postcondition: Response code 405 if method is invalid. Response code 400 if no token is found in request. Response code 403 if passed token does not match the token stored in the server session. With a valid request, returns a 200 OK Response along with a JSON-formatted string object. This is a nested JSON object with each key matching the primary key of the Pipeline table. Each value in this string is another JSON object with key/value pairs containing various data about the pipeline. The key/value pairs of this inner JSON object are as follows:
+ 	- Postcondition: Response code 405 if method is invalid. Response code 400 if no token is found in request. Response code 403 if passed token does not match the token stored in the server session. With a valid request, returns a 200 OK Response along with a JSON-formatted string object. This is a nested JSON object with each key matching the primary key of the Pipeline table. Each value in this string is another JSON object with `key`/value pairs containing various data about the pipeline. The key/value pairs of this inner JSON object are as follows:
  		- `name`: name of the pipeline
  		- `brand`: name of the brand a pipeline belongs to
  		- `pharma_company`: name of the pharmaceutical company a pipeline belongs to
