@@ -29,11 +29,20 @@ def index():
         pl_data['name'] = pl.name
         pl_data['brand'] = pl.brand.name
         pl_data['pharma_company'] = pl.brand.pharmaceutical_company.name
+        pl_data['type'] = pl.pipeline_type.name
         if pl.is_active:
             pl_data['status'] = "Active"
         else:
             pl_data['status'] = "Inactive"
         pl_data['description'] = pl.description
         pl_data['run_freq'] = pl.run_frequency
+        states = []
+        transforms = []
+        for state in pl.pipeline_states:
+            states.append(state.pipeline_state_type.name)
+            for transform in state.transformations:
+                transforms.append(transform.transformation_template.name)
+        pl_data['states'] = states
+        pl_data['transformations'] = transforms
         toJSON[key] = pl_data
     return json.dumps(toJSON), 200
