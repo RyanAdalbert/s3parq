@@ -40,11 +40,9 @@ def check_cookie(token): # checks for session cookie
 def index():
     return "No request specified. Did you mean /config_api/login?"
 
-@bp.route('/login', methods=['GET', 'POST']) # Tokens must be submitted as form data in a POST request
+@bp.route('/login', methods=['POST']) # Tokens must be submitted as form data in a POST request
 def login():
     helper = SHelp()
-    if request.method != 'POST':
-        return "Error: Only POST requests supported. Pass the token along as form data in your request.", 405
     data = request.form 
     if not "token" in data:
         return "Login token not specified.", 400
@@ -55,10 +53,8 @@ def login():
     else:
         return "Bad login", 403
 
-@bp.route('/validate', methods=['GET', 'POST']) # Tokens must be submitted as form data in a POST request
+@bp.route('/validate', methods=['POST']) # Tokens must be submitted as form data in a POST request
 def validate():
-    if request.method != 'POST':
-        return "Error: Only POST requests supported. Pass the token along as form data in your request.", 405
     data = request.form
     if not "token" in data:
         return "No session cookie found!", 400
