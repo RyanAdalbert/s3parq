@@ -152,6 +152,9 @@ class TransformationTemplate(UniversalWithPrimary, Base):
     __tablename__ = 'transformation_templates'
     name = Column(String, nullable=False)
     variable_structures = Column(String)
+    tags = relationship("TransformationTemplateTag", back_populates = "transformation_template")
+    pipeline_state_type_id = Column(Integer, ForeignKey('pipeline_state_types.id'))
+    pipeline_state_type = relationship("PipelineStateType")
 
     @validates('variable_structures')
     def validate_variable_structures(self, key, variable_structures):
@@ -212,6 +215,19 @@ class TransformationVariable(UniversalWithPrimary, Base):
     value = Column(String)
     transformation = relationship('Transformation')
     name = Column(String, nullable=False)
+
+class Tag(UniversalWithPrimary, Base):
+    __tablename__ = 'tags'
+    value = Column(String, nullable=False)
+    transformation_templates = relationship("TransformationTemplateTag", back_populates = "tag")
+
+class TransformationTemplateTag(UniversalMixin, Base):
+    __tablename__ = 'transformation_templates_tags'
+    transformation_template_id = Column(Integer, ForeignKey('transformation_templates.id'), primary_key =True)
+    tag_id = Column(Integer, ForeignKey('tags.id'), primary_key=True)
+    transformation_template = relationship("TransformationTemplate", back_populates = "tags")
+    tag = relationship("Tag", back_populates = "transformation_templates")
+
 
 class ExtraTransformationVariableError(ValueError):
     """ This is specifically for cases when variables 
