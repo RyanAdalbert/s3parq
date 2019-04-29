@@ -18,10 +18,12 @@ def contract_from_id(t_id: int):
     state = transform.pipeline_state.name
     child = transform.pipeline_state.pipeline.brand.name
     return DatasetContract(parent=parent, child=child, state=state, dataset=dataset)
-    
+
+''' waiting for Ethan's changes to config
 def contract_from_name(t_name: str, contract:DatasetContract):
     sess = SHelp.session
     template = sess.query(TransformationTemplate).filter(TransformationTemplate.name)
     dataset = template.name
     #state = template.state
     #return DatasetContract(parent=contract.parent, child=contract.child, state=state, dataset=dataset)
+'''
