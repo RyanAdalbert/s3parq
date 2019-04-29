@@ -153,6 +153,9 @@ class TransformationTemplate(UniversalWithPrimary, Base):
     name = Column(String, nullable=False)
     variable_structures = Column(String)
     tags = relationship("TransformationTemplateTag", back_populates = "transformation_template")
+    pipeline_state_type_id = Column(Integer, ForeignKey('pipeline_state_types.id'))
+    pipeline_state_type = relationship("PipelineStateType")
+
     @validates('variable_structures')
     def validate_variable_structures(self, key, variable_structures):
         assert json.loads(variable_structures)
@@ -169,6 +172,7 @@ class Transformation(UniversalWithPrimary, Base):
     pipeline_state = relationship("PipelineState", back_populates='transformations')
     graph_order = Column(Integer, nullable=False, server_default=text('0'))
     _raw_variables = relationship("TransformationVariable", back_populates='transformation')
+
     @property
     def variables(self):
         structure = json.loads(self.transformation_template.variable_structures)

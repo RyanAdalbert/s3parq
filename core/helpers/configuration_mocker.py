@@ -206,8 +206,10 @@ class ConfigurationMocker(LoggerMixin):
         tt = config.TransformationTemplate
         self.session.add_all([
             tt(id=1, name='extract_from_ftp',
+                pipeline_state_type_id = 1,
                 variable_structures = '{"filesystem_name":"string","secret_name":"string","prefix":"string","secret_type_of":"string"}'), 
             tt(id=2, name='initial_ingest',
+                pipeline_state_type_id = 2, 
                 variable_structures = '{"another_test_attribute":"string","yet_another_test_attribute":"float"}')
         ])
         self.session.commit()
