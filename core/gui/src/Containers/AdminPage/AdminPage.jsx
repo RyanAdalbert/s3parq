@@ -2,10 +2,10 @@ import React from 'react';
 
 import styled from 'styled-components';
 
-import Sidebar from '../../Components/Sidebar/Sidebar';
-import Header from '../../Components/Header/Header';
-import Footer from '../../Components/Footer/Footer';
-import Dashboard from '../../Views/Dashboard/Dashboard';
+import Sidebar from '../../components/Sidebar/Sidebar';
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
+import Dashboard from '../../views/Dashboard/Dashboard';
 
 // Styles
 const AdminWrapper = styled.div`

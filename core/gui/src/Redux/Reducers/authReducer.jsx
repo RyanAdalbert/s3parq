@@ -1,4 +1,4 @@
-const authReducer = (state = { token: '' }, action) => {
+const authReducer = (state = {}, action) => {
   switch (action.type) {
     case 'STORE_TOKEN':
       return [

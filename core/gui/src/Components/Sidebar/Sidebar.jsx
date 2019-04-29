@@ -2,7 +2,7 @@ import React from 'react';
 
 import styled from 'styled-components';
 
-import logo from '../../Assets/integrichain-logo.svg';
+import logo from '../../assets/integrichain-logo.svg';
 
 // Styles
 const SidebarWrapper = styled.div`

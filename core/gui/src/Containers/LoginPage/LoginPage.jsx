@@ -1,11 +1,10 @@
 import React from 'react';
 import { GoogleLogin } from 'react-google-login';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import Logo from '../../assets/integrichain-logo.svg';
 
-import userAuth from '../../Utils/UserAuth/userAuth';
-
-import Logo from '../../Assets/integrichain-logo.svg';
+import { storeToken } from '../../redux/actions';
 
 // Styles
 const LoginWrapper = styled.div`
@@ -33,12 +32,15 @@ const LoginWrapper = styled.div`
   }
 `;
 
-const responseGoogle = response => {
-  userAuth(response);
-};
-
 class LoginPage extends React.Component {
   render() {
+    const { dispatch } = this.props;
+
+    // Get Response from Google and store it in state
+    const responseGoogle = response => {
+      dispatch(storeToken(response.accessToken));
+    };
+
     return (
       <LoginWrapper>
         <div className="LoginContainer">
@@ -52,11 +54,10 @@ class LoginPage extends React.Component {
               onFailure={responseGoogle}
             />
           </div>
-          <Link to="/admin">Admin</Link>
         </div>
       </LoginWrapper>
     );
   }
 }
 
-export default LoginPage;
+export default connect()(LoginPage);

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
 import styled from 'styled-components';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-import AdminPage from '../Containers/AdminPage/AdminPage';
-import LoginPage from '../Containers/LoginPage/LoginPage';
+import AdminPage from '../containers/AdminPage/AdminPage';
+import LoginPage from '../containers/LoginPage/LoginPage';
 
 // Styles
 const AppContainer = styled.section`
@@ -12,10 +12,10 @@ const AppContainer = styled.section`
 
 const App = () => (
   <AppContainer>
-    <Switch>
+    <Router>
       <Route exact path="/" component={LoginPage} />
       <Route path="/admin" component={AdminPage} />
-    </Switch>
+    </Router>
   </AppContainer>
 );
 
