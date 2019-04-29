@@ -1,8 +1,7 @@
 from core.dataset_contract import DatasetContract
 from core.helpers.session_helper import SessionHelper as SHelp
-from core.helpers import contract_creator
-from core.constants import ENVIRONMENT, DEV_BUCKET, PROD_BUCKET, UAT_BUCKET, BRANCH_NAME
-from s3parq import fetch_diff
+import core.helpers.contract_creator as contract_creator
+import s3parq.fetch_parq as fetcher
 import pandas as pd
 
 class DatasetDiff():
@@ -17,5 +16,5 @@ class DatasetDiff():
         delta = contract_creator.contract_from_name(t_name=transform_name, contract=self.contract)
         bucket = self.contract.bucket
         key = self.contract.key
-        return fetch_diff(input_bucket=bucket, input_key=key, comparison_bucket=delta.bucket, comparison_key=delta.key, partition=partition)
+        return fetcher.fetch_diff(input_bucket=bucket, input_key=key, comparison_bucket=delta.bucket, comparison_key=delta.key, partition=partition)
         
