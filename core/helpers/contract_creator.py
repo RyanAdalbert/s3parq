@@ -27,5 +27,5 @@ def contract_from_name(t_name: str, contract:DatasetContract):
     if template is None:
         raise KeyError("Error: No transform found with name " + t_name)
     dataset = template.name
-    state = contract.state #should be taken from the transform, waiting 
+    state = template.pipeline_state_type.name #should be taken from the transform, waiting 
     return DatasetContract(parent=contract.parent, child=contract.child, state=state, dataset=dataset)

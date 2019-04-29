@@ -11,7 +11,7 @@ class DatasetDiff():
         return
     
     def get_diff(self, transform_name: str, partition="__metadata_run_timestamp")->pd.DataFrame:
-        if not hasattr(self, 'contract'):
+        if not hasattr(self, 'contract') or type(self.contract) != DatasetContract:
             raise NameError("Error: First transform not found!")
         delta = contract_creator.contract_from_name(t_name=transform_name, contract=self.contract)
         bucket = self.contract.bucket
