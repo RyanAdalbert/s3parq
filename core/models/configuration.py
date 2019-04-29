@@ -152,7 +152,7 @@ class TransformationTemplate(UniversalWithPrimary, Base):
     __tablename__ = 'transformation_templates'
     name = Column(String, nullable=False)
     variable_structures = Column(String)
-
+    tags = relationship("TransformationTemplateTag", back_populates = "transformation_template")
     @validates('variable_structures')
     def validate_variable_structures(self, key, variable_structures):
         assert json.loads(variable_structures)
@@ -169,7 +169,6 @@ class Transformation(UniversalWithPrimary, Base):
     pipeline_state = relationship("PipelineState", back_populates='transformations')
     graph_order = Column(Integer, nullable=False, server_default=text('0'))
     _raw_variables = relationship("TransformationVariable", back_populates='transformation')
-
     @property
     def variables(self):
         structure = json.loads(self.transformation_template.variable_structures)
@@ -212,6 +211,19 @@ class TransformationVariable(UniversalWithPrimary, Base):
     value = Column(String)
     transformation = relationship('Transformation')
     name = Column(String, nullable=False)
+
+class Tag(UniversalWithPrimary, Base):
+    __tablename__ = 'tags'
+    value = Column(String, nullable=False)
+    transformation_templates = relationship("TransformationTemplateTag", back_populates = "tag")
+
+class TransformationTemplateTag(UniversalMixin, Base):
+    __tablename__ = 'transformation_templates_tags'
+    transformation_template_id = Column(Integer, ForeignKey('transformation_templates.id'), primary_key =True)
+    tag_id = Column(Integer, ForeignKey('tags.id'), primary_key=True)
+    transformation_template = relationship("TransformationTemplate", back_populates = "tags")
+    tag = relationship("Tag", back_populates = "transformation_templates")
+
 
 class ExtraTransformationVariableError(ValueError):
     """ This is specifically for cases when variables 
