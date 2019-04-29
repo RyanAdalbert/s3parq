@@ -32,7 +32,7 @@ def authorize(token, session_helper): # the token passed here needs to be genera
 
 def check_cookie(token): # checks for session cookie
     try:
-        return token == session['token']
+        return token == session['Authorization']
     except KeyError:
         return False
 
@@ -40,25 +40,23 @@ def check_cookie(token): # checks for session cookie
 def index():
     return "No request specified. Did you mean /config_api/login?"
 
-@bp.route('/login', methods=['POST']) # Tokens must be submitted as form data in a POST request
+@bp.route('/login', methods=['GET']) # Tokens must be submitted as form data in a POST request
 def login():
     helper = SHelp()
-    data = request.form 
-    if not "token" in data:
-        return "Login token not specified.", 400
-    token = data['token']
+    if not "Authorization" in request.headers:
+        return "Login token not specified.", 401
+    token = request.headers.get('Authorization')
     if authorize(token, helper):
-        session['token'] = token
+        session['Authorization'] = token
         return "Login accepted"
     else:
         return "Bad login", 403
 
-@bp.route('/validate', methods=['POST']) # Tokens must be submitted as form data in a POST request
+@bp.route('/validate', methods=['GET']) # Tokens must be submitted as form data in a POST request
 def validate():
-    data = request.form
-    if not "token" in data:
-        return "No session cookie found!", 400
-    if check_cookie(data['token']):
+    if not "Authorization" in request.headers:
+        return "Login token not specified.", 401
+    if check_cookie(request.headers.get('Authorization')):
         return "Session token validated."
     else:
         return "Invalid session token.", 403

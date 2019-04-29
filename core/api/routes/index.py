@@ -10,14 +10,11 @@ from core.models.configuration import (
 
 bp = Blueprint('index', __name__)
 
-@bp.route('/index', methods=['GET', 'POST'])
+@bp.route('/index', methods=['GET'])
 def index():
-    if request.method != "POST":
-        return "Error: Only POST requests supported. Pass the token along as form data in your request.", 405
-    data = request.form
-    if not "token" in data:
-        return "No session cookie found!", 400
-    if not auth.check_cookie(data['token']):
+    if not "Authorization" in request.headers:
+        return "Login token not specified.", 401
+    if not auth.check_cookie(request.headers.get('Authorization')):
         return "Invalid session token.", 403
     helper = SHelp()
     sess = helper.session
