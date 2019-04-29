@@ -1,12 +1,13 @@
-const authReducer = (state = {}, action) => {
+export const INITIAL_STATE = {
+  token: ''
+};
+const authReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case 'STORE_TOKEN':
-      return [
+    case 'GOOGLE_LOGIN_RESPONSE':
+      return {
         state,
-        {
-          token: action.token
-        }
-      ];
+        token: action.token
+      };
     default:
       return state;
   }
