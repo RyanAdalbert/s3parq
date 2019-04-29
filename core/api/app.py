@@ -2,16 +2,15 @@
 from datetime import datetime
 import json, requests, os, sqlalchemy.orm
 from flask import Flask, Blueprint, request, session
-from core.api import auth
+from core.api.routes import auth, index
 from core.constants import BRANCH_NAME
 
 def create_app()->Flask:
     app = Flask(__name__)
     app.secret_key = b'\xb6\xcf:v_\xffh\xfe\xa2\x82\xac\x8b\xd7qL\x07'
-    app.register_blueprint(auth.bp)
-    #app.register_blueprint(routes)
+    app.register_blueprint(auth.bp, url_prefix="/config_api")
+    app.register_blueprint(index.bp, url_prefix="/config_api")
     return app
-
 
 if __name__ == '__main__':
     app = create_app()
