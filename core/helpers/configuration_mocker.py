@@ -32,9 +32,33 @@ class ConfigurationMocker(LoggerMixin):
         self._mock_pipelines()
         self._mock_pipeline_state_types()
         self._mock_pipeline_states()
+        self._mock_tags()
         self._mock_transformation_templates()
+        self._mock_transformation_templates_tags()
         self._mock_transformations()
         self._mock_transformation_variables()
+
+    def _mock_transformation_templates_tags(self)->None:
+        self.logger.debug('Generating bridge table mocks for transformation_templates <=> tags.')
+        t = config.TransformationTemplateTag
+        self.session.add_all([
+            t(transformation_template_id = 1, tag_id = 1),
+            t(transformation_template_id = 2, tag_id = 1),
+            t(transformation_template_id = 1, tag_id = 2)
+        ])
+        self.session.commit()
+        self.logger.debug('Done generating transformation_templates_tags mocks.')
+
+    def _mock_tags(self)->None:
+        self.logger.debug('Generating tag mocks.')
+        t = config.Tag
+        self.session.add_all([
+            t(id=1, value = 'current'),
+            t(id=2, value = 'deprecated'),
+            t(id=3, value = 'beta')
+        ])
+        self.session.commit()
+        self.logger.debug('Done generating tag mocks.')
     
     def _mock_administrators(self)->None:
         self.logger.debug('Generating administrator mocks.')
@@ -182,8 +206,10 @@ class ConfigurationMocker(LoggerMixin):
         tt = config.TransformationTemplate
         self.session.add_all([
             tt(id=1, name='extract_from_ftp',
+                pipeline_state_type_id = 1,
                 variable_structures = '{"filesystem_name":"string","secret_name":"string","prefix":"string","secret_type_of":"string"}'), 
             tt(id=2, name='initial_ingest',
+                pipeline_state_type_id = 2, 
                 variable_structures = '{"another_test_attribute":"string","yet_another_test_attribute":"float"}')
         ])
         self.session.commit()
