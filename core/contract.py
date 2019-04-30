@@ -27,7 +27,7 @@ class Contract(LoggerMixin):
             this is generally the customer (and it is aliased as such) but can be IntegriChain for internal sources,
             or another aggregator for future-proofing
         CHILD - The sub level source identifier, generally the brand (and is aliased as such) 
-        STATE - One of: raw, ingest, master, enhance, Enrich, Metrics 
+        STATE - One of: raw, ingest, master, enhance, enrich, metrics 
     '''
     DEV = DEV_BUCKET
     PROD = PROD_BUCKET
@@ -40,8 +40,6 @@ class Contract(LoggerMixin):
             Default file name, dataset and partitions to empty (they are not required in a contract). 
             Does not support customer / brand aliases
         '''
-        attributes = ('branch', 'parent', 'child', 'state',
-                      'dataset', 'partitions', 'partition_size')
 
         self.parent = parent
         self.child = child
@@ -63,6 +61,10 @@ class Contract(LoggerMixin):
     @branch.setter
     def branch(self, branch: str)->None:
         self._branch = self._validate_part(branch)
+
+    @property
+    def env(self)->str:
+        return self._env
 
     @property
     def parent(self)->str:

@@ -1,6 +1,7 @@
 from datetime import datetime
 import pandas as pd
 from s3parq import fetch, publish
+
 from typing import List
 
 from core.constants import CORE_VERSION
@@ -39,7 +40,6 @@ class DatasetContract(Contract):
 
         self.partitions = partitions
         self.dataset = dataset
-
 
     @property
     def dataset(self)->str:

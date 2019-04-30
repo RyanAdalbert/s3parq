@@ -3,6 +3,8 @@ from unittest.mock import patch
 from core.dataset_contract import DatasetContract
 import boto3
 from core.constants import ENVIRONMENT, ENV_BUCKET
+import pandas as pd
+import dfmock
 import moto
 
 
@@ -82,3 +84,53 @@ def test_get_partition_size():
     size = 1
     contract.partition_size = size
     assert contract.partition_size == size, 'partition size not correctly set'
+
+
+def test_fetch_from_s3(_contract):
+    with patch('core.contract.fetch', autospec=True) as fetch:
+        fetch.return_value = pd.DataFrame()
+        contract = _contract
+        contract.branch = 'master'
+        contract.parent ='Merck'
+        contract.child = 'Wonder_Drug'
+        contract.state = 'ingest'
+        contract.dataset = 'valid_dataset'
+
+        key = contract.key
+        filters = {"partition":"hamburger",
+                    "comparison":"==",
+                    "values":['McDonalds']}
+
+        fake_df = contract.fetch(filters)
+
+        fetch.assert_called_once_with(
+            bucket=f'{ENV_BUCKET}',
+            key=key,
+            filters=filters)
+
+        assert isinstance(fake_df, pd.DataFrame)
+
+def test_publish_to_s3(_contract):
+    with patch('core.contract.publish', autospec=True) as publish:
+        df = dfmock.DFMock(count = 100, columns = {"fake":"boolean","partition":"string","option":{"option_count":4,"option_type":"string"}})
+        df.generate_dataframe()
+        patch.return_value = None
+        contract = _contract
+        contract.branch = 'master'
+        contract.parent = 'Merck'
+        contract.child = 'Wonder_Drug'
+        contract.state = 'ingest'
+        contract.dataset = 'valid_dataset'
+
+        key = contract.key
+        fake_parts = ["fake=True","partition=faker"]
+
+        pub = contract.publish(dataframe=df.dataframe,partitions=fake_parts)
+
+        publish.assert_called_once_with(
+            bucket=f'{ENV_BUCKET}',
+            dataframe=df.dataframe,
+            key=key,
+            partitions=fake_parts
+            )
+        assert pub is None

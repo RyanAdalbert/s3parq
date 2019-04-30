@@ -1,4 +1,5 @@
 import pytest
+import os
 import dfmock 
 import pandas as pd
 from unittest.mock import patch
@@ -17,7 +18,7 @@ def _contract():
             child="Wonder_Drug",
             state="ingest"
     )
-    return contract
+    yield contract
 
 
 def test_set_env_valid(_contract):
@@ -66,17 +67,9 @@ def test_alias_customer(_contract):
     assert contract.customer == customer.lower(), "customer alias not set"
     assert contract.parent == customer.lower(), "customer does not alias to parent"
 
-@pytest.fixture
-def _contract_type():
-    contract = Contract(branch='master',
-                        parent='Merck',
-                        child='Wonder_Drug',
-                        state='ingest'
-                        )
-    return contract
 
-def test_contract_type(_contract_type):
-    contract = _contract_type
+def test_contract_type(_contract):
+    contract = _contract
     assert contract.contract_type == 'state', 'returned wrong type for state contract'
 
 

@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-from flask import Flask
-#from core.constants import BRANCH_NAME
+from datetime import datetime
+import json, requests, os, sqlalchemy.orm
+from flask import Flask, Blueprint, request, session
+from core.api.routes import auth, index
+from core.constants import BRANCH_NAME
 
-app = Flask(__name__)
+def create_app()->Flask:
+    app = Flask(__name__)
+    app.secret_key = b'\xb6\xcf:v_\xffh\xfe\xa2\x82\xac\x8b\xd7qL\x07'
+    app.register_blueprint(auth.bp, url_prefix="/config_api")
+    app.register_blueprint(index.bp, url_prefix="/config_api")
+    return app
 
-try:
-    from core.constants import BRANCH_NAME
-    b = BRANCH_NAME
-except Exception as e:
-    b = e
-
-@app.route('/')
-def hello_world():
-    return f"hello CORE world! {b}"
 if __name__ == '__main__':
+    app = create_app()
     app.run(debug=True, host='0.0.0.0', port=5000)
