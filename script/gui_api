@@ -1,0 +1,5 @@
+#!/bin/sh
+cd ~/Repos/core
+docker-compose exec flaskapi /bin/bash -c "python3 /core/core/api/app.py"
+echo $TYPE
+
