@@ -3,6 +3,3 @@ boto3==1.9.83
 GitPython==2.1.11
 sqlalchemy==1.2.16
 psycopg2==2.7.6.1
-flask==1.0.2
-requests==2.21
-pytest-mock==1.10.4
