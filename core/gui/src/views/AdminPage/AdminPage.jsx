@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
-import Dashboard from '../../views/Dashboard/Dashboard';
+import PipelineDash from '../../views/PipelineDash/PipelineDash';
 
 // Styles
 const AdminWrapper = styled.div`
@@ -23,7 +23,7 @@ const AdminPage = () => (
     <Sidebar />
     <Main>
       <Header />
-      <Dashboard />
+      <PipelineDash />
       <Footer />
     </Main>
   </AdminWrapper>

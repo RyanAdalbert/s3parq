@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-import AdminPage from '../containers/AdminPage/AdminPage';
-import LoginPage from '../containers/LoginPage/LoginPage';
+import AdminPage from '../views/AdminPage/AdminPage';
+import LoginPage from '../views/LoginPage/LoginPage';
 
 // Styles
 const AppContainer = styled.section`

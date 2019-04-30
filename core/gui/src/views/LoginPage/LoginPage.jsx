@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import Logo from '../../assets/integrichain-logo.svg';
 
-import { storeToken } from '../../redux/actions';
+import { googleResponseSuccess } from '../../redux/actions/userActions';
 
 // Styles
 const LoginWrapper = styled.div`
@@ -38,7 +38,9 @@ class LoginPage extends React.Component {
 
     // Get Response from Google and store it in state
     const responseGoogle = response => {
-      dispatch(storeToken(response.accessToken));
+      const { accessToken } = response;
+      const { givenName } = response.profileObj;
+      dispatch(googleResponseSuccess(accessToken, givenName));
     };
 
     return (
