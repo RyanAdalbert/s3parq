@@ -7,7 +7,7 @@ while [ -n "$1" ]; do
  
     case "$1" in
  
-    -h) echo '
+    --h) echo '
           _       __________________  _________ _______  _______ _________ _______  _ 
 |\     /|( (    /|\__   __/\__   __/  \__   __/(  ____ \(  ____ \\\__   __/( ___ _ \( )
 | )   ( ||  \  ( |   ) (      ) (        ) (   | (    \/| (    \/   ) (   | (    \/| |
@@ -20,9 +20,9 @@ while [ -n "$1" ]; do
 test yo stuff! options:\n-log\tprints stdout during py.test runs (this includes debug logs).\n-line\tadds the coverage missed lines to the coverage report.\n' 
         exit 0 ;;
  
-    -log) LOG="-s" ;;
+    --log) LOG="-s" ;;
  
-    -line) LINE="-m" ;;
+    --line) LINE="-m" ;;
  
     *) echo "Option $1 not recognized. try '-h' for help." 
        exit 0 ;; 
@@ -33,18 +33,4 @@ test yo stuff! options:\n-log\tprints stdout during py.test runs (this includes 
  
 done
 
-. script/script_setup
-echo $DIR
-
-docker build -t ichain/core:test -f ./dockerfiles/core.dockerfile .;
-
-# Mount the entire repo and run only the unit tests
-AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-docker run --rm \
-  -e AWS_ACCESS_KEY_ID \
-  -e AWS_SECRET_ACCESS_KEY \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -w /usr/src/app \
-  ichain/core:test \
-  bash -c "coverage run --source core /usr/local/bin/pytest $LOG tests/unit && coverage report $LINE"
+coverage run --source core /usr/local/bin/pytest $LOG tests/unit && coverage report $LINE
