@@ -26,5 +26,6 @@ class DatasetDiff():
         delta = _contract_from_dataset_name(t_name=transform_name, contract=self.contract)
         bucket = self.contract.bucket
         key = self.contract.key
+        print(bucket, key, delta.bucket, delta.key, partition)
         return fetcher.fetch_diff(input_bucket=bucket, input_key=key, comparison_bucket=delta.bucket, comparison_key=delta.key, partition=partition)
         

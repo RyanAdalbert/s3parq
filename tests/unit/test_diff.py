@@ -4,10 +4,10 @@ from core.dataset_diff import DatasetDiff
 from core.dataset_contract import DatasetContract
 
 fetch_diff = "s3parq.fetch_parq.fetch_diff" # patch target
-c_from_name = "core.helpers.contract_creator.contract_from_name"
+c_from_name = "core.helpers.contract_creator.contract_from_dataset_name"
 
 def test_good_diff(mocker):
-    mocker.patch("s3parq.fetch_parq.fetch_diff", return_value=DataFrame())
+    mocker.patch(fetch_diff, return_value=DataFrame())
     diff = DatasetDiff(12)
     retval = diff.get_diff("extract_from_ftp")
     assert type(retval) == DataFrame and retval.empty
