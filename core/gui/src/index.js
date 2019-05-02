@@ -10,8 +10,12 @@ import App from './app/App';
 import rootReducer from './redux/reducers';
 
 const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-
 const store = createStore(rootReducer, composeEnhancer(applyMiddleware(thunk)));
+
+//Store Token
+store.subscribe(() => {
+  localStorage.setItem('TOKEN', store.getState().userReducer.oAuthToken);
+});
 
 ReactDOM.render(
   <Provider store={store}>

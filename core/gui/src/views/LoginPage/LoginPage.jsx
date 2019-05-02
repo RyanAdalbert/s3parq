@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import Logo from '../../assets/integrichain-logo.svg';
 
-import { googleResponseSuccess } from '../../redux/actions/userActions';
+import { login } from '../../redux/actions/userActions';
 
 // Styles
 const LoginWrapper = styled.div`
@@ -40,7 +40,8 @@ class LoginPage extends React.Component {
     const responseGoogle = response => {
       const { accessToken } = response;
       const { givenName } = response.profileObj;
-      dispatch(googleResponseSuccess(accessToken, givenName));
+
+      dispatch(login(accessToken, givenName));
     };
 
     return (
@@ -62,4 +63,10 @@ class LoginPage extends React.Component {
   }
 }
 
-export default connect()(LoginPage);
+const mapStateToProps = state => {
+  return {
+    oAuthToken: state.oAuthToken
+  };
+};
+
+export default connect(mapStateToProps)(LoginPage);
