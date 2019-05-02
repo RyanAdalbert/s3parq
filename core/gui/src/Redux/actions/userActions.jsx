@@ -45,15 +45,20 @@ export const loginRequest = oAuthToken => {
 //login action creator
 export const login = userData => {
   return dispatch =>
-    fetch(`core_flaskapi_1:5000/config_api/login`, {
-      method: 'post',
-      headers: {
-        Authorization: userData.oAuthToken
-      },
-      body: JSON.stringify({
-        token: userData.oAuthToken
-      })
-    })
+    fetch(
+      `http://core_flaskapi_1/${
+        process.env.REACT_APP_ICHAIN_API_HOST
+      }/5000/config_api/login`,
+      {
+        method: 'post',
+        headers: {
+          Authorization: userData.oAuthToken
+        },
+        body: JSON.stringify({
+          token: userData.oAuthToken
+        })
+      }
+    )
       .then(response => {
         if (response.status === 200) {
           console.log(response);
