@@ -86,7 +86,7 @@ services:
         depends_on:
             - flaskapi
         environment:
-            - ICHAIN_API_HOST=flaskapi_1
+            - REACT_APP_ICHAIN_API_HOST=flaskapi_1
         volumes:
             - ./core/gui:/usr/src/gui
         ports:
