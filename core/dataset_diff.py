@@ -23,7 +23,7 @@ class DatasetDiff():
     def get_diff(self, transform_name: str, partition="__metadata_run_timestamp")->pd.DataFrame:
         if not hasattr(self, 'contract') or type(self.contract) != DatasetContract:
             raise NameError("No source contract set. Did you pass a valid transform id when creating the class?")
-        delta = _contract_from_dataset_name(t_name=transform_name, contract=self.contract)
+        delta = contract_creator.get_relative_contract(t_name=transform_name, contract=self.contract)
         bucket = self.contract.bucket
         key = self.contract.key
         print(bucket, key, delta.bucket, delta.key, partition)
