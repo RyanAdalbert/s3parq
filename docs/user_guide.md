@@ -1,0 +1,1 @@
+The Core Pipeline User Guide can be found [here](https://integrichain.atlassian.net/wiki/spaces/Core/pages/722895090/User+Manual).

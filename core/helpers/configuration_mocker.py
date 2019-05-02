@@ -198,7 +198,9 @@ class ConfigurationMocker(LoggerMixin):
             t(id=11, transformation_template_id=1,
               pipeline_state_id=2, graph_order=0),
             t(id=13, transformation_template_id=2,
-              pipeline_state_id=2, graph_order=0)
+              pipeline_state_id=2, graph_order=0),
+            t(id=12, transformation_template_id=2,
+              pipeline_state_id=1, graph_order=1)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation mocks.')
