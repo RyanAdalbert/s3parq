@@ -22,8 +22,13 @@ def contract_from_transformation_id(t_id: int)->DatasetContract:
     child = transform.pipeline_state.pipeline.brand.name
     return DatasetContract(parent=parent, child=child, state=state, dataset=dataset)
 
-# Returns a contract corresponding to a specified transformation name relative to an existing contract.
-# The parent/child (pharma/brand) info for the returned contract is populated from the extant contract, typically the one used to construct a DatasetDiff.
+    """ creates a contract for a given transformation (dataset) name, relative to another (relative) contract. 
+            contract building attributes such as environment, parent, child etc are assumed from the relative contract.
+            ARGS: 
+                - t_name (str) the name of the transformation (ie datatset) that we want a contract for
+                - contract (DatasetContract) the existing dataset contract we want to create a contract relative to
+            RETURNS: DatasetContract object
+    """
 def get_relative_contract(t_name: str, contract:DatasetContract)->DatasetContract:
     sess = SHelp().session
     template = sess.query(TransformationTemplate).filter(TransformationTemplate.name==t_name).first()
