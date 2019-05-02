@@ -90,14 +90,14 @@ class DatasetContract(Contract):
             raise ValueError(
                 's3_path requires all contract params to be set.')
 
-        path = f's3://{self.env}/{self.branch}/{self.parent}/{self.child}/{self.state}/'
+        path = f's3://{self.env}/{self.branch}/{self.parent}/{self.child}/{self.state}'
 
         if len(self.dataset) > 0:
-            path += f'{self.dataset}/'
+            path += f'/{self.dataset}'
 
             # no partitions without a data set
             for p in self.partitions:
-                path += f'{p}/'
+                path += f'/{p}'
 
         return path
 
