@@ -50,7 +50,7 @@ class RawContract(Contract):
         STATE - One of: raw or ingest
     '''
 
-    def __init__(self, parent: str, child: str, state: str, branch: str = None):
+    def __init__(self, parent: str, child: str, state: str = "raw", branch: str = None):
         ''' Initialize with the key params
             Calls them all up to super as the common attributes
         '''

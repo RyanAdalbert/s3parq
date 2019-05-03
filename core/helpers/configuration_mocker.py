@@ -220,8 +220,7 @@ class ConfigurationMocker(LoggerMixin):
                 variable_structures = ''' {"delimiter":{"datatype": "string", "description": "the input file delimiter"},
                 "skip_rows":{"datatype":"int","description":"the number of rows to skip at the top of the file"},
                 "encoding":{"datatype":"string","description":"the encoding of the input file"},
-                "input_file_prefix":{"datatype":"string","description":"the prefix of the selected input files"},
-                "file_transform":{"datatype":"string","description":"the name of the transform state that got the files"}
+                "input_file_prefix":{"datatype":"string","description":"the prefix of the selected input files"}
                 }''',
                 pipeline_state_type_id=2)
         ])

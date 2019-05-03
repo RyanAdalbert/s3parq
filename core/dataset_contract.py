@@ -119,7 +119,7 @@ class DatasetContract(Contract):
             f'Fetching dataframe from s3 location {self.s3_path}.')
         
         return fetch(   bucket = self.env,
-                        key = self.get_key(),
+                        key = self.key,
                         filters = filters )
 
     def publish(self, dataframe: pd.DataFrame)->None:
