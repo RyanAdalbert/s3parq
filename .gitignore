@@ -7,3 +7,5 @@ build
 htmlcov/
 *.swp
 .terraform
+*.DS_Store
+dist/

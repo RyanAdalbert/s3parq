@@ -1,65 +1,52 @@
-import papermill as pm
+from datetime import datetime
+import papermill
 from core.helpers import project_root
 from core.constants import ENV_BUCKET
 from core.helpers.session_helper import SessionHelper
 from core.models import configuration
-from core import contract
+from core.dataset_contract import DatasetContract
+from core.contract import Contract
+from core.logging import LoggerMixin
 
-root = project_root.ProjectRoot()
+root = project_root.ProjectRoot().get_path()
 
-def run_transform(id: int, state: str, branch: str, parent: str, child: str, name: str ="shared.raw.extract") -> str:
-    # First you would look up the ID and get the name of the transform so you
-    # know what notebook to run. Once the core transform code has been finalized and
-    # you can reach out to a db to pull the name this hard-coding will be replaced.
+def run_transform(transform_id:int) -> str:
+    ## notebook name == transform_template.name
+    t_configs = get_transform(transform_id)
+    notebook = t_configs.transformation_template.name
+    output_contract = DatasetContract(
+                        parent = t_configs.pipeline_state.pipeline.brand.pharmaceutical_company.name,
+                        child = t_configs.pipeline_state.pipeline.brand.name,
+                        state = t_configs.pipeline_state.pipeline_state_type.name,
+                        dataset = notebook)
+
 
     #Then run the notebook
-    output_kontract = get_contract(state=state,branch=branch,parent=parent,child=child)
-    output_contract = output_kontract.get_key()
-    output_s3_path = output_path(output_contract, name)
-    path = f"{root.get_path()}/transforms/{name.replace('.', '/')}.ipynb"
-    pm.execute_notebook(
-       path,
-       output_s3_path,
-       parameters = dict(id=id, branch=branch, parent=parent, child=child, state=state),
-       cwd=root.get_path()
+    path = f"{root}/transforms/{notebook}.ipynb"
+    papermill.execute_notebook(
+        path,
+        output_path(output_contract.key),       
+        parameters = dict(transform_id=transform_id),
+        cwd=root
     )
 
-    return output_url(output_s3_path)
+    return output_url(output_path(output_contract.key))
 
 # TODO: figure out how else we're going to separate the notebook 
-def output_path(output_contract: str, transformation_name: str) -> str:
+def output_path(output_contract: str) -> str:
     s3_prefix = f"s3://{ENV_BUCKET}/notebooks"
-    return f"{s3_prefix}/{output_contract}/{transformation_name}.ipynb"
+    day = datetime.now().strftime('%Y-%m-%d')
+    time = datetime.now().strftime('%H-%M-%S.%f')
+    return f"{s3_prefix}/{output_contract}/{day}/{time}.ipynb"
 
 def output_url(output_path: str) -> str:
     s3_prefix = "s3://{ENV_BUCKET}/notebooks"
     url_prefix = "http://notebook.integrichain.net/view"
     return output_path.replace(s3_prefix, url_prefix)
 
-def get_input_contract(output_contract: contract.Contract, state, branch, parent, child) -> contract.Contract:
-    if (output_contract.get_previous_state()==None):
-        input_contract = None
-    else:
-        input_contract = get_contract(branch=branch,
-                                    parent=parent,
-                                    child=child,
-                                    state=output_contract.get_previous_state())
-
-    return input_contract
-
-def get_contract(state, branch, parent, child):
-    kontract = contract.Contract(state=state,
-                                 branch=branch,
-                                 parent=parent,
-                                 child=child
-                                 )
-    return kontract
-
 def get_transform(transform_id):
     session = SessionHelper().session
-
     transform_config = configuration.Transformation
-
-    # Start querying the extract configs
+    # Start querying the extract config
     transform = session.query(transform_config).filter(transform_config.id == transform_id).one()
     return transform

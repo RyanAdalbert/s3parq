@@ -1,0 +1,5 @@
+-r common.txt
+flask==1.0.2
+requests==2.21.0
+pytest-mock==1.10.4
+flask-cors==3.0.7

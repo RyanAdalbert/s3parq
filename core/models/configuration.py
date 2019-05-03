@@ -1,12 +1,13 @@
-from sqlalchemy import *
-from sqlalchemy.orm import *
-from sqlalchemy import engine, create_engine, Column, Integer, String, Boolean, TIMESTAMP, text, ForeignKey, func
+from sqlalchemy import engine, create_engine, Column, Integer, String, Boolean, TIMESTAMP, text, ForeignKey, func, JSON
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import session, sessionmaker, relationship
+from sqlalchemy.orm import session, sessionmaker, relationship, validates
 from core.constants import DEV_CONFIGURATION_APPLICATION_CONN_STRING, ENVIRONMENT
 from core.secret import Secret
 from core.logging import LoggerMixin
-
+import json
+from types import SimpleNamespace
+from datetime import datetime
+from typing import Any
 Base = declarative_base()
 
 
@@ -27,12 +28,7 @@ class Session():
 class GenerateEngine(LoggerMixin):
     """ abstract defining connections here. Local assumes a psql instance in a local docker container. """
 
-    def __init__(self, in_memory: bool = True) -> None:
-        """ So the default development configuration database is an in-memory sqlite instance. 
-            This is fast and easy and atomic (resets after every execution) but it is NOT exactly the same as 
-            the prod PG instance. When we want an identical configuration environment, setting in_memory to False 
-            gives you the local docker container PG. """
-
+    def __init__(self, in_memory: bool = False) -> None:
         if ENVIRONMENT == "dev":
             if in_memory:
                 self._url = "sqlite://"
@@ -59,7 +55,6 @@ class GenerateEngine(LoggerMixin):
             conn_string = f"postgresql://{secret.user}:{secret.password}@{secret.host}/{secret.database}"
         else:
             m = "Only postgres databases are supported for configuration_application at this time."
-            self.logger.critical(m)
             raise NotImplementedError(m)
         return conn_string
 
@@ -98,29 +93,6 @@ class Brand(UniversalWithPrimary, Base):
         "PharmaceuticalCompany", back_populates='brands')
     pipelines = relationship("Pipeline", back_populates='brand')
 
-
-class ExtractConfiguration(UniversalWithPrimary, Base):
-    __tablename__ = 'extract_configurations'
-    transformation_id = Column(Integer, ForeignKey(
-        'transformations.id'), nullable=False)
-    filesystem_path = Column(String)
-    prefix = Column(String)
-    secret_type_of = Column(String, nullable=False)
-    secret_name = Column(String, nullable=False)
-    transformation = relationship(
-        "ExtractTransformation", back_populates='extract_configurations')
-
-class InitialIngestConfiguration(UniversalWithPrimary, Base):
-    __tablename__ = 'initial_ingest_configurations'
-    transformation_id = Column(Integer, ForeignKey(
-        'transformations.id'), nullable=False)
-    delimiter = Column(String, nullable=False, default=",")
-    skip_rows = Column(Integer, nullable=False, default=0)
-    encoding = Column(String, nullable=False, default="utf-8")
-    input_file_prefix = Column(String)
-    dataset_name = Column(String)
-    transformation = relationship(
-        "InitialIngestTransformation", back_populates='initial_ingest_configurations')
 
 class PharmaceuticalCompany(UniversalWithPrimary, Base):
     __tablename__ = 'pharmaceutical_companies'
@@ -173,8 +145,21 @@ class Segment(UniversalWithPrimary, Base):
 
 
 class TransformationTemplate(UniversalWithPrimary, Base):
+    """ The variable_structures store is intended to be JSON.
+        At this moment supporting JSON column type means cascading changes to test env etc.
+        So for now a varchar column will work fine.
+    """
     __tablename__ = 'transformation_templates'
     name = Column(String, nullable=False)
+    variable_structures = Column(String)
+    tags = relationship("TransformationTemplateTag", back_populates = "transformation_template")
+    pipeline_state_type_id = Column(Integer, ForeignKey('pipeline_state_types.id'))
+    pipeline_state_type = relationship("PipelineStateType")
+
+    @validates('variable_structures')
+    def validate_variable_structures(self, key, variable_structures):
+        assert json.loads(variable_structures)
+        return variable_structures
 
 
 class Transformation(UniversalWithPrimary, Base):
@@ -186,21 +171,81 @@ class Transformation(UniversalWithPrimary, Base):
         'pipeline_states.id'), nullable=False)
     pipeline_state = relationship("PipelineState", back_populates='transformations')
     graph_order = Column(Integer, nullable=False, server_default=text('0'))
+    _raw_variables = relationship("TransformationVariable", back_populates='transformation')
 
-    type_name = column_property(select([TransformationTemplate.name]).where(
-        TransformationTemplate.id == transformation_template_id).as_scalar())
-    __mapper_args__ = {'polymorphic_identity': 'a', 'polymorphic_on': type_name}
+    @property
+    def variables(self):
+        structure = json.loads(self.transformation_template.variable_structures)
+        typed = {}
+
+        for variable in self._raw_variables:
+            ## make sure there are no extra vars
+            if variable.name not in structure.keys():
+                message = f"{variable.name} is not a valid variable, but was set for tranformation {self.id}"
+                raise ExtraTransformationVariableError(message)
+            
+            typed[variable.name] = self._apply_type(variable.value, structure[variable.name]["datatype"])
+        dot_notated = SimpleNamespace(**typed)
+        ## make sure there are no missing variables
+        for key in structure.keys():
+            try:
+                typed[key]
+            except:
+                message = f"Missing transform variable {key} in Transformation {self.id}."
+                raise MissingTransformationVariableError(message)    
+
+        return dot_notated
+
+    def _apply_type(self,value:str,typestring:str)->Any:
+        """ takes a value string and a type string and returns the value typed to the type string"""
+        typestring = typestring.lower()
+        if typestring in ("str","string","char","varchar", "text"):
+            return str(value)
+        if typestring in ("datetime","date"):
+            return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+        if typestring in ("int","integer"):
+            return int(value)
+        if typestring in ("float","decimal","number", "double"):
+            return float(value)
+        
+
+class TransformationVariable(UniversalWithPrimary, Base):
+    __tablename__ = 'transformation_variables'
+    transformation_id = Column(Integer, ForeignKey('transformations.id'), nullable=False)
+    value = Column(String)
+    transformation = relationship('Transformation')
+    name = Column(String, nullable=False)
+
+class Tag(UniversalWithPrimary, Base):
+    __tablename__ = 'tags'
+    value = Column(String, nullable=False)
+    transformation_templates = relationship("TransformationTemplateTag", back_populates = "tag")
+
+class TransformationTemplateTag(UniversalMixin, Base):
+    __tablename__ = 'transformation_templates_tags'
+    transformation_template_id = Column(Integer, ForeignKey('transformation_templates.id'), primary_key =True)
+    tag_id = Column(Integer, ForeignKey('tags.id'), primary_key=True)
+    transformation_template = relationship("TransformationTemplate", back_populates = "tags")
+    tag = relationship("Tag", back_populates = "transformation_templates")
 
 
-class ExtractTransformation(Transformation):
-    extract_configurations = relationship(
-        "ExtractConfiguration", order_by=ExtractConfiguration.id, back_populates='transformation')
+class ExtraTransformationVariableError(ValueError):
+    """ This is specifically for cases when variables 
+        defined in the variable_structures are not present.
+    """
+    pass
+class Administrator(UniversalWithPrimary, Base):
+    __tablename__ = 'administrators'
+    email_address = Column(String, nullable=False)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
 
-    __mapper_args__ = {'polymorphic_identity': 'extract_from_ftp'}
+
+class MissingTransformationVariableError(ValueError):
+    """ This is specifically for cases when variables 
+        defined in the variable_structures are not present.
+    """
+    pass
 
 
-class InitialIngestTransformation(Transformation):
-    initial_ingest_configurations = relationship(
-        "InitialIngestConfiguration", order_by=InitialIngestConfiguration.id, back_populates='transformation')
 
-    __mapper_args__ = {'polymorphic_identity': 'initial_ingest'}

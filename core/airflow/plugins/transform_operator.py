@@ -27,17 +27,13 @@ class TransformOperator(AWSBatchOperator):
         params = self._generate_contract_params()
 
         job_def_name = get_core_job_def_name()
-        job_name = f'{params.parent}_{params.child}_{params.state}'
+        job_name = f'{params.parent}_{params.child}_{params.state}_{params.dataset}'
         job_queue = BATCH_JOB_QUEUE
 
         run_command = [
             'corebot',
             'run',
-            f'{transform_id}',
-            f'--branch={params.branch}',
-            f'--parent={params.parent}',
-            f'--child={params.child}',
-            f'--state={params.state}'
+            f'{transform_id}'
         ]
         self.__logger.debug(f"Corebot run command string: {run_command}.")
         job_container_overrides = {
@@ -88,10 +84,11 @@ class TransformOperator(AWSBatchOperator):
         parent = transform.pipeline_state.pipeline.brand.pharmaceutical_company.name.lower()
         child = transform.pipeline_state.pipeline.brand.name.lower()
         state = transform.pipeline_state.pipeline_state_type.name.lower()
+        dataset = transform.transformation_template.name.lower()
         self.__logger.debug(
-            f"Named contract params:: branch = {BRANCH_NAME}, parent = {parent}, child = {child}, state = {state}")
+            f"Named contract params:: branch = {BRANCH_NAME}, parent = {parent}, child = {child}, state = {state}, dataset = {dataset}")
         contract_tuple = namedtuple(
-            "params", ["branch", "parent", "child", "state"])
-        contract_params = contract_tuple(BRANCH_NAME, parent, child, state)
+            "params", ["branch", "parent", "child", "state","dataset"])
+        contract_params = contract_tuple(BRANCH_NAME, parent, child, state, dataset)
 
         return contract_params

@@ -7,6 +7,7 @@ from core.constants import ENV_BUCKET
 import os
 from io import TextIOWrapper
 from core.helpers import notebook
+import re
 
 
 @moto.mock_s3
@@ -17,11 +18,11 @@ class Test:
 
     def test_output_path(self):
         self.setup()
-        output_contract = "asdf/1234/merp"
-        transformation_name = "shared.raw.extract"
+        output_contract = "asdf/1234/merp/boomboom"
         output_path = notebook.output_path(
-            output_contract, transformation_name)
-        assert output_path == f"s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/shared.raw.extract.ipynb"
+            output_contract)
+        prefix = f"s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/boomboom"
+        assert re.match(f"^{prefix}.*$", output_path)
 
     def test_output_url(self):
         self.setup()
@@ -29,19 +30,19 @@ class Test:
         output_url = notebook.output_url(output_path)
         assert output_url == "http://notebook.integrichain.net/view/asdf/1234/merp/shared.raw.extract.ipynb"
 
-    @patch("core.helpers.notebook.pm")
+    @patch("core.helpers.notebook.papermill")
     def test_run_transform(self,mock_papermill):
         self.setup()
         s3 = boto3.resource('s3')
     
         bucket = ENV_BUCKET
         key = "notebooks/dev/important_business/raw/extract/shared.test.hello_world.ipynb"
-        tid=2,
+        tid=2
         tbranch="test_branch"
         tstate="raw"
         tparent="merck"
         tchild="prilosec"
-        notebook_url = notebook.run_transform(id=tid, branch=tbranch, parent=tparent, child=tchild, state=tstate)
+        notebook_url = notebook.run_transform(transform_id=tid)
 
         mock_papermill.execute_notebook.assert_called
         """

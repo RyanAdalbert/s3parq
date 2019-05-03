@@ -1,3 +1,5 @@
+## dataclasses will be included in python3.7 as soon as Jupyter supports it
+dataclasses 
 awscli==1.16.93
 pytest==4.1.1
 python-coveralls==2.9.1
@@ -14,4 +16,11 @@ alembic==1.0.6
 papermill==0.17.1
 jupyter==1.0.0
 jupyterlab==0.35.4
+
+###TEST RESOURCES
+s3parq==0.0.1
+dfmock==0.0.14
 paramiko
+flask==1.0.2
+requests==2.21
+pytest-mock==1.10.4

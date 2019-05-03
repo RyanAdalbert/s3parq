@@ -3,21 +3,16 @@ from sqlalchemy import create_engine
 import core.models.configuration as config
 from core.logging import LoggerMixin
 
-from core.models.configuration import (
-    PharmaceuticalCompany, 
-    Brand, 
-    Pipeline, 
-    PipelineType, 
-    Segment
-)
 
 class ConfigurationMocker(LoggerMixin):
-    ''' for development, creates in-memory database instance and a matching session.
-        optionally gives you a bunch of mocked data.
-    '''
+    """ for development, creates in-memory database instance and a matching session and 
+        gives you a bunch of mocked data.
+        NOTE: This generates the models directly from the core.models.configuration.py model classes, 
+        and could potentially differ from alembic migrations. 
+    """
 
     def __init__(self)-> None:
-        engine = config.GenerateEngine().get_engine()
+        engine = config.GenerateEngine(in_memory=True).get_engine()
 
         # this instansiates the in-memory sqlite instance
         config.Base.metadata.create_all(engine)
@@ -29,6 +24,7 @@ class ConfigurationMocker(LoggerMixin):
         return self.session
 
     def generate_mocks(self)-> None:
+        self._mock_administrators()
         self._mock_pharmaceutical_companies()
         self._mock_brands()
         self._mock_segments()
@@ -36,10 +32,46 @@ class ConfigurationMocker(LoggerMixin):
         self._mock_pipelines()
         self._mock_pipeline_state_types()
         self._mock_pipeline_states()
+        self._mock_tags()
         self._mock_transformation_templates()
+        self._mock_transformation_templates_tags()
         self._mock_transformations()
-        self._mock_extract_configurations()
+        self._mock_transformation_variables()
 
+    def _mock_transformation_templates_tags(self)->None:
+        self.logger.debug('Generating bridge table mocks for transformation_templates <=> tags.')
+        t = config.TransformationTemplateTag
+        self.session.add_all([
+            t(transformation_template_id = 1, tag_id = 1),
+            t(transformation_template_id = 2, tag_id = 1),
+            t(transformation_template_id = 1, tag_id = 2)
+        ])
+        self.session.commit()
+        self.logger.debug('Done generating transformation_templates_tags mocks.')
+
+    def _mock_tags(self)->None:
+        self.logger.debug('Generating tag mocks.')
+        t = config.Tag
+        self.session.add_all([
+            t(id=1, value = 'current'),
+            t(id=2, value = 'deprecated'),
+            t(id=3, value = 'beta')
+        ])
+        self.session.commit()
+        self.logger.debug('Done generating tag mocks.')
+    
+    def _mock_administrators(self)->None:
+        self.logger.debug('Generating administrator mocks.')
+        a = config.Administrator
+        self.session.add_all([
+            a(id=1, first_name = "Fox", last_name = "Mulder", email_address="fwm@integrichain.com"),
+            a(id=2, first_name = "Dana", last_name = "Skully", email_address="dks@integrichain.com"),
+            a(id=3, first_name = "Alec", last_name="Wertheimer", email_address="ajw@integrichain.com"),
+            a(id=4, first_name = "Natie", last_name="Bohnel", email_address="njb@integrichain.com")
+        ])
+        self.session.commit()
+        self.logger.debug('Done generating administrator mocks.')
+        
     def _mock_brands(self)-> None:
         self.logger.debug('Generating brand mocks.')
         b = config.Brand
@@ -110,13 +142,13 @@ class ConfigurationMocker(LoggerMixin):
         self.logger.debug('Generating pipeline state type mocks.')
         p = config.PipelineStateType
         self.session.add_all([
-            p(id=1, name="Raw"),
-            p(id=2, name="Ingest"),
-            p(id=3, name="Master"),
-            p(id=4, name="Enhance"),
-            p(id=5, name="Enrich"),
-            p(id=6, name="Metrics"),
-            p(id=7, name="Dimensional")])
+            p(id=1, name="raw"),
+            p(id=2, name="ingest"),
+            p(id=3, name="master"),
+            p(id=4, name="enhance"),
+            p(id=5, name="enrich"),
+            p(id=6, name="metrics"),
+            p(id=7, name="dimensional")])
         self.session.commit()
         self.logger.debug('Done generating pipeline state type mocks.')
 
@@ -141,7 +173,7 @@ class ConfigurationMocker(LoggerMixin):
 
     def _mock_transformations(self)-> None:
         self.logger.debug('Generating transformation mocks.')
-        t = config.ExtractTransformation
+        t = config.Transformation
         self.session.add_all([
             t(id=1, transformation_template_id=1,
               pipeline_state_id=1, graph_order=0),
@@ -164,7 +196,9 @@ class ConfigurationMocker(LoggerMixin):
             t(id=8, transformation_template_id=1,
               pipeline_state_id=4, graph_order=2),
             t(id=11, transformation_template_id=1,
-              pipeline_state_id=2, graph_order=0)
+              pipeline_state_id=2, graph_order=0),
+            t(id=12, transformation_template_id=2,
+              pipeline_state_id=1, graph_order=1)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation mocks.')
@@ -173,11 +207,53 @@ class ConfigurationMocker(LoggerMixin):
         self.logger.debug('Generating transformation_template mocks.')
         tt = config.TransformationTemplate
         self.session.add_all([
-            tt(id=1, name='extract_from_ftp'),
-            tt(id=2, name='initial_ingest')
+            tt(id=1, name='extract_from_ftp',
+                pipeline_state_type_id = 1,
+                variable_structures = '{"filesystem_name":"string","secret_name":"string","prefix":"string","secret_type_of":"string"}'), 
+            tt(id=2, name='initial_ingest',
+                pipeline_state_type_id = 2, 
+                variable_structures = '{"another_test_attribute":"string","yet_another_test_attribute":"float"}')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')
+
+
+    def _mock_transformation_variables(self)->None:
+        self.logger.debug('Generating transformation_variables mocks')
+        tv = config.TransformationVariable
+        self.session.add_all([
+            tv(id=5, name='filesystem_path', transformation_id=2, value='banana_stand_data'),
+            tv(id=6, name='prefix', transformation_id=2, value='gob'),
+            tv(id=1, name='secret_name', transformation_id=2, value='dev-sftp'),
+            tv(id=2, name='secret_type_of', transformation_id=2, value='FTP'),
+
+            tv(id=3, name='filesystem_path', transformation_id=3, value='sudden_valley_holdings'),
+            tv(id=4, name='secret_name', transformation_id=3, value='dev-sftp'),
+            tv(id=12, name='prefix', transformation_id=3, value=''),
+            tv(id=11, name='secret_type_of', transformation_id=3, value='FTP'),
+
+            tv(id=7, name='filesystem_path', transformation_id=9, value=''),
+            tv(id=8, name='prefix', transformation_id=9, value=''),
+            tv(id=9, name='secret_name', transformation_id=9, value='dev-sftp'),
+            tv(id=10, name='secret_type_of', transformation_id=9, value='FTP'),
+
+            tv(id=13, name='filesystem_path', transformation_id=1, value='/incoming'),
+            tv(id=14, name='prefix', transformation_id=1, value=''),
+            tv(id=15, name='secret_name', transformation_id=1, value='dev-sftp'),
+            tv(id=16, name='secret_type_of', transformation_id=1, value='FTP'),
+
+            tv(id=17, name='filesystem_path', transformation_id=10, value='/incoming'),
+            tv(id=18, name='prefix', transformation_id=10, value='test-extract-root-prefix'),
+            tv(id=19, name='secret_name', transformation_id=10, value='dev-sftp'),
+            tv(id=20, name='secret_type_of', transformation_id=10, value='FTP'),
+
+            tv(id=21, name='filesystem_path', transformation_id=10, value='/incoming/testing_extract'),
+            tv(id=22, name='prefix', transformation_id=11, value=''),
+            tv(id=23, name='secret_name', transformation_id=11, value='dev-sftp'),
+            tv(id=24, name='secret_type_of', transformation_id=11, value='FTP')
+        ])
+        self.session.commit()
+        self.logger.debug('Done generating transformation_variables mocks.')
 
 def setup_base_session():
     mock = ConfigurationMocker()
