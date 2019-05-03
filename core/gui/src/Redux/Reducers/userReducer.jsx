@@ -1,4 +1,4 @@
-import { userConstants } from '../actions/userActions';
+import { userConstants } from '../actions/userAuthActions';
 
 export const INITIAL_STATE = {
   oAuthToken: '',
@@ -6,35 +6,38 @@ export const INITIAL_STATE = {
   userName: ''
 };
 
-const { LOGIN_ATTEMPT, LOGIN_SUCCESS, LOGIN_FAIL } = userConstants;
+const { LOGIN_ATTEMPT, LOGIN_SUCCESS, LOGIN_FAIL, STORE_TOKEN } = userConstants;
 
 const userReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    // case userConstants.GOOGLE_RESPONSE_SUCCESS:
-    //   const { oAuthToken, refreshToken, userName } = action.payload;
-    //   return {
-    //     state,
-    //     oAuthToken,
-    //     refreshToken,
-    //     userName
-    //   };
     case LOGIN_ATTEMPT:
-      return state.merge({
+      return {
+        state,
         isLoggingIn: true,
         isLoggedIn: false
-      });
+      };
     case LOGIN_FAIL:
-      return state.merge({
+      return {
+        state,
         error: action.error,
         isLoggingIn: false,
         isLoggedIn: false
-      });
+      };
     case LOGIN_SUCCESS:
-      return state.merge({
+      return {
+        state,
         error: null,
         isLoggingIn: false,
         isLoggedIn: true
-      });
+      };
+    case STORE_TOKEN:
+      const { oAuthToken, refreshToken, userName } = action.payload;
+      return {
+        state,
+        oAuthToken,
+        refreshToken,
+        userName
+      };
     default:
       return state;
   }

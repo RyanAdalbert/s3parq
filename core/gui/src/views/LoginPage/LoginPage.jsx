@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import Logo from '../../assets/integrichain-logo.svg';
 
-import { login } from '../../redux/actions/userActions';
+import { login } from '../../redux/actions/userAuthActions';
 
 // Styles
 const LoginWrapper = styled.div`
@@ -28,6 +28,10 @@ const LoginWrapper = styled.div`
     .ButtonWrapper {
       margin: 10px 0 0 0;
       border: none;
+    }
+
+    .login-subtext {
+      font-size: 10px;
     }
   }
 `;
@@ -57,6 +61,7 @@ class LoginPage extends React.Component {
               onFailure={responseGoogle}
             />
           </div>
+          <p className="login-subtext">Powered by core</p>
         </div>
       </LoginWrapper>
     );

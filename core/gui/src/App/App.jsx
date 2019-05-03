@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { Router, Route } from 'react-router-dom';
 
 import AdminPage from '../views/AdminPage/AdminPage';
 import LoginPage from '../views/LoginPage/LoginPage';
+import history from '../utils/history';
 
 // Styles
 const AppContainer = styled.section`
@@ -12,7 +13,7 @@ const AppContainer = styled.section`
 
 const App = () => (
   <AppContainer>
-    <Router>
+    <Router history={history}>
       <Route exact path="/" component={LoginPage} />
       <Route path="/admin" component={AdminPage} />
     </Router>

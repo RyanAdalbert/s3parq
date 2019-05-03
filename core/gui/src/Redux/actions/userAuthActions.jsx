@@ -44,11 +44,11 @@ export const loginRequest = oAuthToken => {
 
 //login action creator
 export const login = userData => {
+  const HOST = 'localhost:5000';
   return dispatch =>
     fetch(
-      `http://core_flaskapi_1/${
-        process.env.REACT_APP_ICHAIN_API_HOST
-      }/5000/config_api/login`,
+      `http://${HOST}/config_api`,
+      { mode: 'cors' },
       {
         method: 'post',
         headers: {
