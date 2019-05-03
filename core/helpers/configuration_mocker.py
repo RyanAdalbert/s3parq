@@ -78,30 +78,9 @@ class ConfigurationMocker(LoggerMixin):
         self.session.add_all([
             b(id=1, name="Teamocil", display_name="Teamocil",
               pharmaceutical_company_id=1),
-            b(id=2, name="Cornballer2", display_name="Corn Baller", pharmaceutical_company_id=2)])
+            b(id=2, name="Cornballer", display_name="Corn Baller", pharmaceutical_company_id=2)])
         self.session.commit()
         self.logger.debug('Done generating brand mocks.')
-
-
-    def _mock_extract_configurations(self)-> None:
-        self.logger.debug('Generating extract_configuation mocks.')
-        ex = config.ExtractConfiguration
-        self.session.add_all([
-            ex(id=1, transformation_id=2, filesystem_path='',
-               prefix='', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=2, transformation_id=2, filesystem_path='banana_stand_data',
-               prefix='gob', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=3, transformation_id=3, filesystem_path='sudden_valley_holdings',
-               prefix='', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=4, transformation_id=1, filesystem_path='/incoming',
-               prefix='', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=5, transformation_id=1, filesystem_path='/incoming',
-               prefix='test-extract-root-prefix', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=6, transformation_id=1, filesystem_path='/incoming/testing_extract',
-               prefix='', secret_name='dev-sftp', secret_type_of='FTP')
-        ])
-        self.session.commit()
-        self.logger.debug('Done generating extract_configuration mocks.')
 
     def _mock_pharmaceutical_companies(self)-> None:
         self.logger.debug('Generating pharmaceutical company mocks.')
@@ -264,8 +243,7 @@ class ConfigurationMocker(LoggerMixin):
             tv(id=25, name='delimiter', transformation_id=13, value='|'),
             tv(id=26, name='skip_rows', transformation_id=13, value=1),
             tv(id=27, name='encoding', transformation_id=13, value='iso8859'),
-            tv(id=28, name='input_file_prefix', transformation_id=13, value='rommsa.SUN.INTEGRICHAIN_SUN_MCKESSON'),
-            tv(id=29, name='file_transform', transformation_id=13, value="extract_from_ftp")
+            tv(id=28, name='input_file_prefix', transformation_id=13, value='some-extracted-file')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_variables mocks.')
