@@ -3,9 +3,9 @@ services:
     airflowpg:
         image: postgres:9.6
         environment:
-            - DB_USER=airflow
-            - DB_PASSWORD=airflow
-            - DB_NAME=airflow
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
 
     airflow:
         build:
@@ -86,7 +86,7 @@ services:
         depends_on:
             - flaskapi
         environment:
-            - ICHAIN_API_HOST=flaskapi_1
+            - REACT_APP_ICHAIN_API_HOST=localhost
         volumes:
             - ./core/gui:/usr/src/gui
         ports:

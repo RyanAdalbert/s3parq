@@ -48,7 +48,7 @@ def upgrade():
     sa.Column('last_actor', sa.String(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('variable_structures',sa.JSON()),
+    sa.Column('variable_structures',sa.String()),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('brands',

@@ -1,21 +1,34 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
-
-import App from './App/App';
-import Store from './Redux/Store';
-
 import * as serviceWorker from './serviceWorker';
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware, compose } from 'redux';
+import thunk from 'redux-thunk';
+import { loadState, saveState } from './utils/localStorage';
+
 import './index.css';
+import App from './app/App';
+import rootReducer from './redux/reducers';
+
+const presistedState = loadState();
+const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const store = createStore(
+  rootReducer,
+  presistedState,
+  composeEnhancer(applyMiddleware(thunk))
+);
+
+//Store Token
+store.subscribe(() => {
+  if (store.getState().userReducer.oAuthToken !== '') {
+    saveState(store.getState().userReducer.state.oAuthToken);
+  }
+});
 
 ReactDOM.render(
-  <Provider store={Store()}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+  <Provider store={store}>
+    <App />
   </Provider>,
-
   document.getElementById('root')
 );
 

@@ -28,7 +28,7 @@ def upgrade():
                  COMMENT ON TABLE pipeline_state_types IS 'An abstract grouping of pipeline states, one of: raw, ingest, master, enrich, enhance, metrics, dimensional.';
                  COMMENT ON TABLE transformations IS 'A single instance of a transformation template, ie abc_unblind would be a transformation_template, abc_unblind_veritrol would be a transformation.';
                  COMMENT ON TABLE transformation_templates IS 'An abstract group of transformations, usually 1:1 with a Jupyter Notebook, ie abc_unblind would be a transformation_template, abc_unblind_veritrol would be a transformation.';
-
+                 COMMENT ON TABLE transformation_variables IS 'A value to be injected into the transformation at runtime. Variable names and convertable data types MUST match the variable_structures for the corresponding transformation_template.';
 
                 -- COLUMNS 
                    

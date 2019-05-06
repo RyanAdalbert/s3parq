@@ -4,6 +4,6 @@ import { shallow } from 'enzyme';
 
 const wrapper = shallow(<App />);
 
-it('Renders', () => {
+it('renders', () => {
   expect(wrapper.exists()).toBe(true);
 });

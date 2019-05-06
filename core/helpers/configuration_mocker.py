@@ -32,16 +32,42 @@ class ConfigurationMocker(LoggerMixin):
         self._mock_pipelines()
         self._mock_pipeline_state_types()
         self._mock_pipeline_states()
+        self._mock_tags()
         self._mock_transformation_templates()
+        self._mock_transformation_templates_tags()
         self._mock_transformations()
         self._mock_transformation_variables()
+
+    def _mock_transformation_templates_tags(self)->None:
+        self.logger.debug('Generating bridge table mocks for transformation_templates <=> tags.')
+        t = config.TransformationTemplateTag
+        self.session.add_all([
+            t(transformation_template_id = 1, tag_id = 1),
+            t(transformation_template_id = 2, tag_id = 1),
+            t(transformation_template_id = 1, tag_id = 2)
+        ])
+        self.session.commit()
+        self.logger.debug('Done generating transformation_templates_tags mocks.')
+
+    def _mock_tags(self)->None:
+        self.logger.debug('Generating tag mocks.')
+        t = config.Tag
+        self.session.add_all([
+            t(id=1, value = 'current'),
+            t(id=2, value = 'deprecated'),
+            t(id=3, value = 'beta')
+        ])
+        self.session.commit()
+        self.logger.debug('Done generating tag mocks.')
     
     def _mock_administrators(self)->None:
         self.logger.debug('Generating administrator mocks.')
         a = config.Administrator
         self.session.add_all([
             a(id=1, first_name = "Fox", last_name = "Mulder", email_address="fwm@integrichain.com"),
-            a(id=2, first_name = "Dana", last_name = "Skully", email_address="dks@integrichain.com")
+            a(id=2, first_name = "Dana", last_name = "Skully", email_address="dks@integrichain.com"),
+            a(id=3, first_name = "Alec", last_name="Wertheimer", email_address="ajw@integrichain.com"),
+            a(id=4, first_name = "Natie", last_name="Bohnel", email_address="njb@integrichain.com")
         ])
         self.session.commit()
         self.logger.debug('Done generating administrator mocks.')
@@ -52,30 +78,9 @@ class ConfigurationMocker(LoggerMixin):
         self.session.add_all([
             b(id=1, name="Teamocil", display_name="Teamocil",
               pharmaceutical_company_id=1),
-            b(id=2, name="Cornballer2", display_name="Corn Baller", pharmaceutical_company_id=2)])
+            b(id=2, name="Cornballer", display_name="Corn Baller", pharmaceutical_company_id=2)])
         self.session.commit()
         self.logger.debug('Done generating brand mocks.')
-
-
-    def _mock_extract_configurations(self)-> None:
-        self.logger.debug('Generating extract_configuation mocks.')
-        ex = config.ExtractConfiguration
-        self.session.add_all([
-            ex(id=1, transformation_id=2, filesystem_path='',
-               prefix='', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=2, transformation_id=2, filesystem_path='banana_stand_data',
-               prefix='gob', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=3, transformation_id=3, filesystem_path='sudden_valley_holdings',
-               prefix='', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=4, transformation_id=1, filesystem_path='/incoming',
-               prefix='', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=5, transformation_id=1, filesystem_path='/incoming',
-               prefix='test-extract-root-prefix', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=6, transformation_id=1, filesystem_path='/incoming/testing_extract',
-               prefix='', secret_name='dev-sftp', secret_type_of='FTP')
-        ])
-        self.session.commit()
-        self.logger.debug('Done generating extract_configuration mocks.')
 
     def _mock_pharmaceutical_companies(self)-> None:
         self.logger.debug('Generating pharmaceutical company mocks.')
@@ -170,7 +175,11 @@ class ConfigurationMocker(LoggerMixin):
             t(id=8, transformation_template_id=1,
               pipeline_state_id=4, graph_order=2),
             t(id=11, transformation_template_id=1,
-              pipeline_state_id=2, graph_order=0)
+              pipeline_state_id=2, graph_order=0),
+            t(id=13, transformation_template_id=2,
+              pipeline_state_id=2, graph_order=0),
+            t(id=12, transformation_template_id=2,
+              pipeline_state_id=1, graph_order=1)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation mocks.')
@@ -180,13 +189,22 @@ class ConfigurationMocker(LoggerMixin):
         tt = config.TransformationTemplate
         self.session.add_all([
             tt(id=1, name='extract_from_ftp',
-                variable_structures = '{"filesystem_name":"string","secret_name":"string","prefix":"string","secret_type_of":"string"}'), 
+                  variable_structures = ''' {"filesystem_path":{"datatype": "string", "description": "the remote path to the files"},
+                          "secret_name":{"datatype":"string","description":"the name of the secret in secret manager"},
+                          "prefix":{"datatype":"string","description":"the prefix of the files to get on the remote filesystem"},
+                          "secret_type_of":{"datatype":"string","description":"the type of the remote server, used in the secret path"}
+                          }''',
+                          pipeline_state_type_id=1),
             tt(id=2, name='initial_ingest',
-                variable_structures = '{"another_test_attribute":"string","yet_another_test_attribute":"float"}')
+                variable_structures = ''' {"delimiter":{"datatype": "string", "description": "the input file delimiter"},
+                "skip_rows":{"datatype":"int","description":"the number of rows to skip at the top of the file"},
+                "encoding":{"datatype":"string","description":"the encoding of the input file"},
+                "input_file_prefix":{"datatype":"string","description":"the prefix of the selected input files"}
+                }''',
+                pipeline_state_type_id=2)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')
-
 
     def _mock_transformation_variables(self)->None:
         self.logger.debug('Generating transformation_variables mocks')
@@ -220,7 +238,12 @@ class ConfigurationMocker(LoggerMixin):
             tv(id=21, name='filesystem_path', transformation_id=10, value='/incoming/testing_extract'),
             tv(id=22, name='prefix', transformation_id=11, value=''),
             tv(id=23, name='secret_name', transformation_id=11, value='dev-sftp'),
-            tv(id=24, name='secret_type_of', transformation_id=11, value='FTP')
+            tv(id=24, name='secret_type_of', transformation_id=11, value='FTP'),
+
+            tv(id=25, name='delimiter', transformation_id=13, value='|'),
+            tv(id=26, name='skip_rows', transformation_id=13, value=1),
+            tv(id=27, name='encoding', transformation_id=13, value='iso8859'),
+            tv(id=28, name='input_file_prefix', transformation_id=13, value='some-extracted-file')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_variables mocks.')

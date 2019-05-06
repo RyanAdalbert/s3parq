@@ -55,7 +55,6 @@ class GenerateEngine(LoggerMixin):
             conn_string = f"postgresql://{secret.user}:{secret.password}@{secret.host}/{secret.database}"
         else:
             m = "Only postgres databases are supported for configuration_application at this time."
-            self.logger.critical(m)
             raise NotImplementedError(m)
         return conn_string
 
@@ -94,30 +93,6 @@ class Brand(UniversalWithPrimary, Base):
         "PharmaceuticalCompany", back_populates='brands')
     pipelines = relationship("Pipeline", back_populates='brand')
 
-'''
-class ExtractConfiguration(UniversalWithPrimary, Base):
-    __tablename__ = 'extract_configurations'
-    transformation_id = Column(Integer, ForeignKey(
-        'transformations.id'), nullable=False)
-    filesystem_path = Column(String)
-    prefix = Column(String)
-    secret_type_of = Column(String, nullable=False)
-    secret_name = Column(String, nullable=False)
-    ##transformation = relationship(
-      ##  "ExtractTransformation", back_populates='extract_configurations')
-
-class InitialIngestConfiguration(UniversalWithPrimary, Base):
-    __tablename__ = 'initial_ingest_configurations'
-    transformation_id = Column(Integer, ForeignKey(
-        'transformations.id'), nullable=False)
-    delimiter = Column(String, nullable=False, default=",")
-    skip_rows = Column(Integer, nullable=False, default=0)
-    encoding = Column(String, nullable=False, default="utf-8")
-    input_file_prefix = Column(String)
-    dataset_name = Column(String)
-   ## transformation = relationship(
-     ##   "InitialIngestTransformation", back_populates='initial_ingest_configurations')
-'''
 
 class PharmaceuticalCompany(UniversalWithPrimary, Base):
     __tablename__ = 'pharmaceutical_companies'
@@ -177,6 +152,9 @@ class TransformationTemplate(UniversalWithPrimary, Base):
     __tablename__ = 'transformation_templates'
     name = Column(String, nullable=False)
     variable_structures = Column(String)
+    tags = relationship("TransformationTemplateTag", back_populates = "transformation_template")
+    pipeline_state_type_id = Column(Integer, ForeignKey('pipeline_state_types.id'))
+    pipeline_state_type = relationship("PipelineStateType")
 
     @validates('variable_structures')
     def validate_variable_structures(self, key, variable_structures):
@@ -199,9 +177,23 @@ class Transformation(UniversalWithPrimary, Base):
     def variables(self):
         structure = json.loads(self.transformation_template.variable_structures)
         typed = {}
+
         for variable in self._raw_variables:
+            ## make sure there are no extra vars
+            if variable.name not in structure.keys():
+                message = f"{variable.name} is not a valid variable, but was set for tranformation {self.id}"
+                raise ExtraTransformationVariableError(message)
+            
             typed[variable.name] = self._apply_type(variable.value, structure[variable.name]["datatype"])
         dot_notated = SimpleNamespace(**typed)
+        ## make sure there are no missing variables
+        for key in structure.keys():
+            try:
+                typed[key]
+            except:
+                message = f"Missing transform variable {key} in Transformation {self.id}."
+                raise MissingTransformationVariableError(message)    
+
         return dot_notated
 
     def _apply_type(self,value:str,typestring:str)->Any:
@@ -220,10 +212,29 @@ class Transformation(UniversalWithPrimary, Base):
 class TransformationVariable(UniversalWithPrimary, Base):
     __tablename__ = 'transformation_variables'
     transformation_id = Column(Integer, ForeignKey('transformations.id'), nullable=False)
-    name = Column(String, nullable=False)
     value = Column(String)
     transformation = relationship('Transformation')
+    name = Column(String, nullable=False)
 
+class Tag(UniversalWithPrimary, Base):
+    __tablename__ = 'tags'
+    value = Column(String, nullable=False)
+    transformation_templates = relationship("TransformationTemplateTag", back_populates = "tag")
+
+class TransformationTemplateTag(UniversalMixin, Base):
+    __tablename__ = 'transformation_templates_tags'
+    transformation_template_id = Column(Integer, ForeignKey('transformation_templates.id'), primary_key =True)
+    tag_id = Column(Integer, ForeignKey('tags.id'), primary_key=True)
+    transformation_template = relationship("TransformationTemplate", back_populates = "tags")
+    tag = relationship("Tag", back_populates = "transformation_templates")
+
+
+class ExtraTransformationVariableError(ValueError):
+    """ This is specifically for cases when variables 
+        defined in the variable_structures are not present.
+    """
+    pass
+    
 class Administrator(UniversalWithPrimary, Base):
     __tablename__ = 'administrators'
     email_address = Column(String, nullable=False)
@@ -231,17 +242,11 @@ class Administrator(UniversalWithPrimary, Base):
     last_name = Column(String, nullable=False)
 
 
-"""
-class ExtractTransformation(Transformation):
-    extract_configurations = relationship(
-        "ExtractConfiguration", order_by=ExtractConfiguration.id, back_populates='transformation')
+class MissingTransformationVariableError(ValueError):
+    """ This is specifically for cases when variables 
+        defined in the variable_structures are not present.
+    """
+    pass
 
-    __mapper_args__ = {'polymorphic_identity': 'extract_from_ftp'}
 
 
-class InitialIngestTransformation(Transformation):
-    initial_ingest_configurations = relationship(
-        "InitialIngestConfiguration", order_by=InitialIngestConfiguration.id, back_populates='transformation')
-
-    __mapper_args__ = {'polymorphic_identity': 'initial_ingest'}
-"""
