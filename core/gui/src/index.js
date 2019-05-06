@@ -20,7 +20,9 @@ const store = createStore(
 
 //Store Token
 store.subscribe(() => {
-  saveState(store.getState());
+  if (store.getState().userReducer.oAuthToken !== '') {
+    saveState(store.getState().userReducer.state.oAuthToken);
+  }
 });
 
 ReactDOM.render(
