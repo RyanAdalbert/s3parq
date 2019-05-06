@@ -86,7 +86,7 @@ services:
         depends_on:
             - flaskapi
         environment:
-            - REACT_APP_ICHAIN_API_HOST=localhost:5000
+            - REACT_APP_ICHAIN_API_HOST=localhost
         volumes:
             - ./core/gui:/usr/src/gui
         ports:
