@@ -10,6 +10,10 @@ const FooterSec = styled.section`
   p {
     margin: 10px;
   }
+
+  a {
+    color: #fff;
+  }
 `;
 
 const Footer = () => (

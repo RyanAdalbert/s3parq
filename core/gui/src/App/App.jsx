@@ -1,9 +1,11 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
 import styled from 'styled-components';
+import { Router, Route } from 'react-router-dom';
 
-import AdminPage from '../Containers/AdminPage/AdminPage';
-import LoginPage from '../Containers/LoginPage/LoginPage';
+import AdminPage from '../views/AdminPage/AdminPage';
+import LoginPage from '../views/LoginPage/LoginPage';
+import history from '../utils/history';
+import PrivateRoute from './PrivateRoute';
 
 // Styles
 const AppContainer = styled.section`
@@ -12,10 +14,10 @@ const AppContainer = styled.section`
 
 const App = () => (
   <AppContainer>
-    <Switch>
+    <Router history={history}>
       <Route exact path="/" component={LoginPage} />
-      <Route path="/admin" component={AdminPage} />
-    </Switch>
+      <PrivateRoute path="/admin" component={AdminPage} />
+    </Router>
   </AppContainer>
 );
 
