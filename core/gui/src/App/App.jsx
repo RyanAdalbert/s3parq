@@ -5,6 +5,7 @@ import { Router, Route } from 'react-router-dom';
 import AdminPage from '../views/AdminPage/AdminPage';
 import LoginPage from '../views/LoginPage/LoginPage';
 import history from '../utils/history';
+import PrivateRoute from '../utils/PrivateRoute';
 
 // Styles
 const AppContainer = styled.section`
@@ -15,7 +16,7 @@ const App = () => (
   <AppContainer>
     <Router history={history}>
       <Route exact path="/" component={LoginPage} />
-      <Route path="/admin" component={AdminPage} />
+      <PrivateRoute path="/admin" component={AdminPage} />
     </Router>
   </AppContainer>
 );

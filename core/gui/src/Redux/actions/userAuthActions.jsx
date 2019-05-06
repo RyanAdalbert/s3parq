@@ -25,11 +25,12 @@ export const loginError = error => {
   };
 };
 
-export const loginSuccess = response => {
+export const loginSuccess = (response, userData) => {
   return dispatch => {
     dispatch({
       type: 'LOGIN_SUCCESS',
-      response
+      response,
+      userData
     });
     history.push('/admin');
   };
@@ -44,10 +45,10 @@ export const loginRequest = oAuthToken => {
 
 //login action creator
 export const login = userData => {
-  const HOST = 'localhost:5000';
+  const HOST = 'localhost';
   return dispatch =>
     fetch(
-      `http://${HOST}/config_api`,
+      `http://${HOST}:5000/config_api`,
       { mode: 'cors' },
       {
         method: 'post',
@@ -63,7 +64,6 @@ export const login = userData => {
         if (response.status === 200) {
           console.log(response);
           dispatch(loginSuccess(response));
-          dispatch(storeToken(userData.oAuthToken, userData.userName));
         } else {
           const error = new Error(response.statusText);
           error.response = response;

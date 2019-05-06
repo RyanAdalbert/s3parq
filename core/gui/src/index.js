@@ -14,7 +14,7 @@ const store = createStore(rootReducer, composeEnhancer(applyMiddleware(thunk)));
 
 //Store Token
 store.subscribe(() => {
-  localStorage.setItem('TOKEN', store.getState().userReducer.oAuthToken);
+  localStorage.setItem('TOKEN', store.getState().userReducer.state.oAuthToken);
 });
 
 ReactDOM.render(

@@ -2,7 +2,6 @@ import { userConstants } from '../actions/userAuthActions';
 
 export const INITIAL_STATE = {
   oAuthToken: '',
-  refreshToken: '',
   userName: ''
 };
 
@@ -31,11 +30,10 @@ const userReducer = (state = INITIAL_STATE, action) => {
         isLoggedIn: true
       };
     case STORE_TOKEN:
-      const { oAuthToken, refreshToken, userName } = action.payload;
+      const { oAuthToken, userName } = action.payload;
       return {
         state,
         oAuthToken,
-        refreshToken,
         userName
       };
     default:

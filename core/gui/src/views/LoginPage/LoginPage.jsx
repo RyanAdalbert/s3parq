@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import Logo from '../../assets/integrichain-logo.svg';
 
-import { login } from '../../redux/actions/userAuthActions';
+import { login, storeToken } from '../../redux/actions/userAuthActions';
 
 // Styles
 const LoginWrapper = styled.div`
@@ -45,7 +45,8 @@ class LoginPage extends React.Component {
       const { accessToken } = response;
       const { givenName } = response.profileObj;
 
-      dispatch(login(accessToken, givenName));
+      dispatch(storeToken(accessToken, givenName));
+      dispatch(login(accessToken));
     };
 
     return (
