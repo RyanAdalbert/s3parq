@@ -103,7 +103,10 @@ class DatasetContract(Contract):
     def _set_dataset_metadata(self, df):
         run_timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         df['__metadata_app_version'] = CORE_VERSION
-        df['__metadata_run_timestamp'] = run_timestamp
+        
+        if not "__metadata_run_timestamp" in df.columns:
+            df['__metadata_run_timestamp'] = run_timestamp
+
         df['__metadata_output_contract'] = self.s3_path
         partitions = ['__metadata_run_timestamp']
         return (df, partitions)
