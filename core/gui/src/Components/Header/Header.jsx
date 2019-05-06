@@ -13,6 +13,16 @@ const HeaderSec = styled.section`
   p {
     color: #fff;
   }
+
+  .user-info {
+    h3 {
+      margin-bottom: 5px;
+    }
+    p {
+      margin-top: 5px;
+      cursor: pointer;
+    }
+  }
 `;
 
 export default class Header extends PureComponent {
@@ -20,10 +30,10 @@ export default class Header extends PureComponent {
     const { logOutHandler } = this.props;
     return (
       <HeaderSec>
-        <ul>
-          <li>Welcome, Alec</li>
-          <li onClick={logOutHandler}>Log out</li>
-        </ul>
+        <div className="user-info">
+          <h3>Welcome, Alec</h3>
+          <p onClick={logOutHandler}>Log out</p>
+        </div>
       </HeaderSec>
     );
   }

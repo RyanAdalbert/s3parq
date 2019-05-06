@@ -47,19 +47,12 @@ export const loginRequest = oAuthToken => {
 export const login = userData => {
   const HOST = 'localhost';
   return dispatch =>
-    fetch(
-      `http://${HOST}:5000/config_api`,
-      { mode: 'cors' },
-      {
-        method: 'post',
-        headers: {
-          Authorization: userData.oAuthToken
-        },
-        body: JSON.stringify({
-          token: userData.oAuthToken
-        })
+    fetch(`http://${HOST}:5000/config_api/login`, {
+      method: 'GET',
+      headers: {
+        Authorization: userData.oAuthToken
       }
-    )
+    })
       .then(response => {
         if (response.status === 200) {
           console.log(response);
