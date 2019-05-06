@@ -11,13 +11,11 @@ const userReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case LOGIN_ATTEMPT:
       return {
-        state,
         isLoggingIn: true,
         isLoggedIn: false
       };
     case LOGIN_FAIL:
       return {
-        state,
         error: action.error,
         isLoggingIn: false,
         isLoggedIn: false

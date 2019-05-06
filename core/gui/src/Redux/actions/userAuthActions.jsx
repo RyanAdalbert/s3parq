@@ -5,7 +5,8 @@ export const userConstants = {
   STORE_TOKEN: 'STORE_TOKEN',
   LOGIN_ATTEMPT: 'LOGIN_ATTEMPT',
   LOGIN_FAIL: 'LOGIN_FAIL',
-  LOGIN_SUCCESS: 'LOGIN_SUCCESS'
+  LOGIN_SUCCESS: 'LOGIN_SUCCESS',
+  USER_LOGOUT: 'USER_LOGOUT'
 };
 
 // store token action creator
@@ -25,12 +26,11 @@ export const loginError = error => {
   };
 };
 
-export const loginSuccess = (response, userData) => {
+export const loginSuccess = response => {
   return dispatch => {
     dispatch({
       type: 'LOGIN_SUCCESS',
-      response,
-      userData
+      response
     });
     history.push('/admin');
   };
@@ -74,4 +74,10 @@ export const login = userData => {
       .catch(error => {
         console.log('request failed', error);
       });
+};
+
+export const logOut = () => {
+  return {
+    type: 'USER_LOGOUT'
+  };
 };

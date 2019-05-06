@@ -37,6 +37,10 @@ const LoginWrapper = styled.div`
 `;
 
 class LoginPage extends React.Component {
+  componentDidMount() {
+    localStorage.clear();
+  }
+
   render() {
     const { dispatch } = this.props;
 
@@ -71,7 +75,7 @@ class LoginPage extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    oAuthToken: state.oAuthToken
+    oAuthToken: state.userReducer.oAuthToken
   };
 };
 

@@ -1,11 +1,12 @@
 import React from 'react';
-
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import Sidebar from '../../components/Sidebar/Sidebar';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import PipelineDash from '../../views/PipelineDash/PipelineDash';
+import { logOut } from '../../redux/actions/userAuthActions';
 
 // Styles
 const AdminWrapper = styled.div`
@@ -18,15 +19,37 @@ const Main = styled.div`
   flex: 5;
 `;
 
-const AdminPage = () => (
-  <AdminWrapper>
-    <Sidebar />
-    <Main>
-      <Header />
-      <PipelineDash />
-      <Footer />
-    </Main>
-  </AdminWrapper>
-);
+class AdminPage extends React.Component {
+  render() {
+    const { logOutHandler } = this.props;
 
-export default AdminPage;
+    return (
+      <AdminWrapper>
+        <Sidebar />
+        <Main>
+          <Header logOutHandler={logOutHandler} />
+          <PipelineDash />
+          <Footer />
+        </Main>
+      </AdminWrapper>
+    );
+  }
+}
+
+const mapStateToProps = state => {
+  return {
+    oAuthToken: state.userReducer.state.oAuthToken,
+    userName: state.userReducer.state.userName
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    logOutHandler: () => dispatch(logOut())
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AdminPage);

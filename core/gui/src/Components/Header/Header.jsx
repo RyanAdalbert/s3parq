@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 
 import styled from 'styled-components';
 
@@ -15,15 +15,16 @@ const HeaderSec = styled.section`
   }
 `;
 
-const User = 'Alec';
-
-const Header = () => (
-  <HeaderSec>
-    <p>
-      Welcome,
-      {`${User}`}
-    </p>
-  </HeaderSec>
-);
-
-export default Header;
+export default class Header extends PureComponent {
+  render() {
+    const { logOutHandler } = this.props;
+    return (
+      <HeaderSec>
+        <ul>
+          <li>Welcome, Alec</li>
+          <li onClick={logOutHandler}>Log out</li>
+        </ul>
+      </HeaderSec>
+    );
+  }
+}
