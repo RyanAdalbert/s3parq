@@ -1,22 +1,31 @@
-import paramiko
-import stat
 import os
-from typing import NamedTuple
+import paramiko
 import re
+import stat
+from typing import NamedTuple
+
+from core.logging import LoggerMixin
+
 
 class FileDestination(NamedTuple):
     regex: str
     file_type: str
 
 
-class FileMover():
+class FileMover(LoggerMixin):
     def __init__(self,secret):
         user = secret.user
         password = secret.password
         host = secret.host
         port = secret.port
         mode = secret.mode
-        self.transport = paramiko.Transport(host, port)
+        self.logger.debug(f"Connecting to host: {host} on port: {port}")
+        
+        if port is None:
+            self.transport = paramiko.Transport((host), default_window_size=paramiko.common.MAX_WINDOW_SIZE)
+        else:
+            self.transport = paramiko.Transport((host, port), default_window_size=paramiko.common.MAX_WINDOW_SIZE)
+        
         self.transport.connect(username=user, password=password)
         self.sftp = paramiko.SFTPClient.from_transport(self.transport)
 
@@ -63,7 +72,7 @@ def get_files(tmp_dir:str,prefix: str, remote_path: str, secret):
             if not (fm.is_dir(remote_file)) and (fm.get_file_type(remote_file.filename, files_dest)!='dont_move'):
                 remote_file_path = remote_path + "/" + remote_file.filename
                 # Set file name to include the path, in case of duplicate file names in different locations
-                local_file_name = remote_file_path.replace("/",".")[1:]
+                local_file_name = remote_file_path.replace("/",".")
                 local_file_path = os.path.join(tmp_dir, local_file_name)
                 
                 fm.get_file(remote_file_path, local_file_path)
