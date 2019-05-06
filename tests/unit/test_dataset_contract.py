@@ -24,14 +24,14 @@ def test_dataset_only(_contract):
     contract = _contract
     path = contract.s3_path
 
-    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/', 'path was incorrectly built.'
+    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset', 'path was incorrectly built.'
 
 
 def test_with_partitions(_contract):
     contract = _contract
     contract.partitions = ['partition_1', 'partition_2']
     path = contract.s3_path
-    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset/partition_1/partition_2/', 'path was incorrectly built with partitions.'
+    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset', 'path was incorrectly built with partitions.'
 
 
 def test_quick_set(_contract):
@@ -45,26 +45,10 @@ def test_quick_set(_contract):
     assert contract.dataset == 'valid_dataset', 'failed to set parent'
 
 
-@pytest.fixture
-def _partitions():
-    p = dict()
-    p['good'] = ['date', 'segment']
-    p['bad'] = ['b@d$$%Partition', 'good_partition_name']
-    return p
-
-
-def test_valid_partitions(_partitions, _contract):
-    p = _partitions
+def test_valid_partitions(_contract):
     contract = _contract
-    contract.partitions = p['good']
-    assert contract.partitions == p['good'], "partitions not correctly set"
-
-
-def test_invalid_partitions(_partitions, _contract):
-    p = _partitions
-    contract = _contract
-    with pytest.raises(ValueError):
-        contract.partitions = p['bad']
+    contract.partitions = ['date', 'segment']
+    assert contract.partitions == ['date', 'segment'], "partitions not correctly set"
 
 
 @pytest.fixture
@@ -89,12 +73,6 @@ def test_contract_type_dataset(_contract_type):
     assert contract.contract_type == 'dataset', 'returned wrong type for dataset contract'
 
 
-def test_contract_type_partitions(_contract_type):
-    contract = _contract_type
-    contract.partitions = ['test_par']
-    assert contract.contract_type == 'partition', 'returned wrong type for partition contract'
-
-
 def test_get_partition_size():
     contract = _contract
     size = 1
@@ -103,7 +81,7 @@ def test_get_partition_size():
 
 
 def test_fetch_from_s3(_contract):
-    with patch('core.contract.fetch', autospec=True) as fetch:
+    with patch('core.dataset_contract.fetch', autospec=True) as fetch:
         fetch.return_value = pd.DataFrame()
         contract = _contract
         contract.branch = 'master'
@@ -113,9 +91,9 @@ def test_fetch_from_s3(_contract):
         contract.dataset = 'valid_dataset'
 
         key = contract.key
-        filters = {"partition":"hamburger",
+        filters = [{"partition":"hamburger",
                     "comparison":"==",
-                    "values":['McDonalds']}
+                    "values":['McDonalds']}]
 
         fake_df = contract.fetch(filters)
 
@@ -127,7 +105,7 @@ def test_fetch_from_s3(_contract):
         assert isinstance(fake_df, pd.DataFrame)
 
 def test_publish_to_s3(_contract):
-    with patch('core.contract.publish', autospec=True) as publish:
+    with patch('core.dataset_contract.publish', autospec=True) as publish:
         df = dfmock.DFMock(count = 100, columns = {"fake":"boolean","partition":"string","option":{"option_count":4,"option_type":"string"}})
         df.generate_dataframe()
         patch.return_value = None
@@ -139,9 +117,10 @@ def test_publish_to_s3(_contract):
         contract.dataset = 'valid_dataset'
 
         key = contract.key
-        fake_parts = ["fake=True","partition=faker"]
+        fake_parts = ["fake","option"]
+        contract.partitions = fake_parts
 
-        pub = contract.publish(dataframe=df.dataframe,partitions=fake_parts)
+        pub = contract.publish(dataframe=df.dataframe)
 
         publish.assert_called_once_with(
             bucket=f'{ENV_BUCKET}',

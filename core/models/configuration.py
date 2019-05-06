@@ -234,6 +234,7 @@ class ExtraTransformationVariableError(ValueError):
         defined in the variable_structures are not present.
     """
     pass
+    
 class Administrator(UniversalWithPrimary, Base):
     __tablename__ = 'administrators'
     email_address = Column(String, nullable=False)
