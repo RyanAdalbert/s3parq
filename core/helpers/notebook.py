@@ -5,7 +5,6 @@ from core.constants import ENV_BUCKET
 from core.helpers.session_helper import SessionHelper
 from core.models import configuration
 from core.dataset_contract import DatasetContract
-from core.contract import Contract
 from core.logging import LoggerMixin
 
 root = project_root.ProjectRoot().get_path()

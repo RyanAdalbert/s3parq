@@ -1,7 +1,11 @@
-from s3parq.s3_naming_helper import S3NamingHelper as s3Name
-from core.contract import Contract
+from datetime import datetime
+import pandas as pd
+from s3parq import fetch, publish
 
 from typing import List
+
+from core.constants import CORE_VERSION
+from core.contract import Contract
 
 class DatasetContract(Contract):
     ''' The s3 contract is how we structure our data lake. 
@@ -44,7 +48,7 @@ class DatasetContract(Contract):
     @dataset.setter
     def dataset(self, dataset: str)->None:
         # leave in natural case for datasets
-        self._dataset = self._validate_part(dataset)
+        self._dataset = dataset
         self._set_contract_type()
 
     @property
@@ -59,14 +63,7 @@ class DatasetContract(Contract):
                     will be applied in list order
             RETURNS: None
         '''
-        temp_partitions = []
-        for p in partitions:
-            val = s3Name().validate_part(p)
-            if val[0]:
-                temp_partitions.append(p)
-            else:
-                raise ValueError(val[1])
-        self._partitions = temp_partitions
+        self._partitions = partitions
         self._set_contract_type()
 
     @property
@@ -95,31 +92,53 @@ class DatasetContract(Contract):
         if len(self.dataset) > 0:
             path += f'/{self.dataset}'
 
-            # no partitions without a data set
-            for p in self.partitions:
-                path += f'/{p}'
-
         return path
 
     def _set_contract_type(self)->None:
-        ''' INTENT: sets what type of contract this is - file, partition, or dataset
+        ''' INTENT: sets what type of contract this is - raw or dataset
             RETURNS: None
         '''
-        if len(self.partitions) > 0:
-            t = 'partition'
-        else:
-            t = 'dataset'
+        self._contract_type = "dataset"
 
-        self._contract_type = t
-
-    # aliases
-
-    def set_metadata(self, df, run_timestamp):
+    def _set_dataset_metadata(self, df):
+        run_timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         df['__metadata_app_version'] = CORE_VERSION
-        df['__metadata_run_timestamp'] = run_timestamp
-        df['__metadata_output_contract'] = self.get_s3_url()
+        
+        if not "__metadata_run_timestamp" in df.columns:
+            df['__metadata_run_timestamp'] = run_timestamp
+
+        df['__metadata_output_contract'] = self.s3_path
         partitions = ['__metadata_run_timestamp']
         return (df, partitions)
 
-    def write_with_metadata(self, dataset, df, run_timestamp):
-        pass
+    # functions for use
+
+    def fetch(self, filters: List[dict] = None)->pd.DataFrame:
+        if self.contract_type != "dataset":
+            raise ValueError(
+                f"contract.fetch() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
+        
+        self.logger.info(
+            f'Fetching dataframe from s3 location {self.s3_path}.')
+        
+        return fetch(   bucket = self.env,
+                        key = self.key,
+                        filters = filters )
+
+    def publish(self, dataframe: pd.DataFrame)->None:
+        if self.contract_type != "dataset":
+            raise ValueError(
+                f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
+
+        self.logger.info(
+            f'Publishing dataframe to s3 location {self.s3_path}.')
+
+        dataframe, time_partition = self._set_dataset_metadata(df=dataframe)
+        self.partitions.extend(time_partition)
+
+        publish(
+            bucket=self.env,
+            key=self.key,
+            dataframe=dataframe,
+            partitions=self.partitions
+        )

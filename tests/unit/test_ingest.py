@@ -1,3 +1,5 @@
+# TODO: Rewrite to work with the notebook once the integration data stuff is ready
+"""
 from core.models.configuration import (
     PipelineState, 
     PipelineStateType, 
@@ -20,7 +22,7 @@ import time
 import core.contract as contract
 from core.constants import ENV_BUCKET
 import os
-"""
+
 def get_filename_from_path(file):
     return os.path.split(file.name)[1]
 

@@ -78,30 +78,9 @@ class ConfigurationMocker(LoggerMixin):
         self.session.add_all([
             b(id=1, name="Teamocil", display_name="Teamocil",
               pharmaceutical_company_id=1),
-            b(id=2, name="Cornballer2", display_name="Corn Baller", pharmaceutical_company_id=2)])
+            b(id=2, name="Cornballer", display_name="Corn Baller", pharmaceutical_company_id=2)])
         self.session.commit()
         self.logger.debug('Done generating brand mocks.')
-
-
-    def _mock_extract_configurations(self)-> None:
-        self.logger.debug('Generating extract_configuation mocks.')
-        ex = config.ExtractConfiguration
-        self.session.add_all([
-            ex(id=1, transformation_id=2, filesystem_path='',
-               prefix='', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=2, transformation_id=2, filesystem_path='banana_stand_data',
-               prefix='gob', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=3, transformation_id=3, filesystem_path='sudden_valley_holdings',
-               prefix='', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=4, transformation_id=1, filesystem_path='/incoming',
-               prefix='', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=5, transformation_id=1, filesystem_path='/incoming',
-               prefix='test-extract-root-prefix', secret_name='dev-sftp', secret_type_of='FTP'),
-            ex(id=6, transformation_id=1, filesystem_path='/incoming/testing_extract',
-               prefix='', secret_name='dev-sftp', secret_type_of='FTP')
-        ])
-        self.session.commit()
-        self.logger.debug('Done generating extract_configuration mocks.')
 
     def _mock_pharmaceutical_companies(self)-> None:
         self.logger.debug('Generating pharmaceutical company mocks.')
@@ -197,6 +176,8 @@ class ConfigurationMocker(LoggerMixin):
               pipeline_state_id=4, graph_order=2),
             t(id=11, transformation_template_id=1,
               pipeline_state_id=2, graph_order=0),
+            t(id=13, transformation_template_id=2,
+              pipeline_state_id=2, graph_order=0),
             t(id=12, transformation_template_id=2,
               pipeline_state_id=1, graph_order=1)
         ])
@@ -208,15 +189,22 @@ class ConfigurationMocker(LoggerMixin):
         tt = config.TransformationTemplate
         self.session.add_all([
             tt(id=1, name='extract_from_ftp',
-                pipeline_state_type_id = 1,
-                variable_structures = '{"filesystem_name":"string","secret_name":"string","prefix":"string","secret_type_of":"string"}'), 
+                  variable_structures = ''' {"filesystem_path":{"datatype": "string", "description": "the remote path to the files"},
+                          "secret_name":{"datatype":"string","description":"the name of the secret in secret manager"},
+                          "prefix":{"datatype":"string","description":"the prefix of the files to get on the remote filesystem"},
+                          "secret_type_of":{"datatype":"string","description":"the type of the remote server, used in the secret path"}
+                          }''',
+                          pipeline_state_type_id=1),
             tt(id=2, name='initial_ingest',
-                pipeline_state_type_id = 2, 
-                variable_structures = '{"another_test_attribute":"string","yet_another_test_attribute":"float"}')
+                variable_structures = ''' {"delimiter":{"datatype": "string", "description": "the input file delimiter"},
+                "skip_rows":{"datatype":"int","description":"the number of rows to skip at the top of the file"},
+                "encoding":{"datatype":"string","description":"the encoding of the input file"},
+                "input_file_prefix":{"datatype":"string","description":"the prefix of the selected input files"}
+                }''',
+                pipeline_state_type_id=2)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')
-
 
     def _mock_transformation_variables(self)->None:
         self.logger.debug('Generating transformation_variables mocks')
@@ -250,7 +238,12 @@ class ConfigurationMocker(LoggerMixin):
             tv(id=21, name='filesystem_path', transformation_id=10, value='/incoming/testing_extract'),
             tv(id=22, name='prefix', transformation_id=11, value=''),
             tv(id=23, name='secret_name', transformation_id=11, value='dev-sftp'),
-            tv(id=24, name='secret_type_of', transformation_id=11, value='FTP')
+            tv(id=24, name='secret_type_of', transformation_id=11, value='FTP'),
+
+            tv(id=25, name='delimiter', transformation_id=13, value='|'),
+            tv(id=26, name='skip_rows', transformation_id=13, value=1),
+            tv(id=27, name='encoding', transformation_id=13, value='iso8859'),
+            tv(id=28, name='input_file_prefix', transformation_id=13, value='some-extracted-file')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_variables mocks.')

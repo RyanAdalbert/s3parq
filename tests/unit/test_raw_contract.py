@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch
-from core.transforms.shared.raw.raw_contract import RawContract
+from core.raw_contract import RawContract
 import boto3
 import tempfile
 from core.constants import ENVIRONMENT, ENV_BUCKET

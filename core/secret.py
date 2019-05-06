@@ -60,6 +60,7 @@ class Secret(LoggerMixin):
             if not force_env:
                 # look for a universal secret with the same signature
                 try:
+                    self.logger.debug(f"Secret identifier not found, trying 'all/'")
                     raw_secret = self.client.get_secret_value(
                         SecretId='all/' + ('/'.join(identifier.split('/')[1:])))
                 except:
@@ -73,7 +74,10 @@ class Secret(LoggerMixin):
             for val in ('user', 'password', 'host', 'method'):
                 self.__dict__[val] = secret.get(val, None)
             self.connection_mode = secret['mode']
-            self.port = int(secret.get('port', None))
+            if secret.get('port', None) is not None:
+                self.port = int(secret.get('port'))
+            else:
+                self.port = None
 
         elif self.type_of == 'database':
             for val in ('user', 'password', 'rdbms', 'schema', 'role', 'host', 'database'):
