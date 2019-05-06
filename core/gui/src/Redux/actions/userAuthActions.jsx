@@ -44,13 +44,13 @@ export const loginRequest = oAuthToken => {
 };
 
 //login action creator
-export const login = userData => {
+export const login = oAuthToken => {
   const HOST = 'localhost';
   return dispatch =>
     fetch(`http://${HOST}:5000/config_api/login`, {
       method: 'GET',
       headers: {
-        Authorization: userData.oAuthToken
+        Authorization: oAuthToken
       }
     })
       .then(response => {

@@ -22,12 +22,12 @@ const Main = styled.div`
 class AdminPage extends React.Component {
   render() {
     const { logOutHandler } = this.props;
-
+    const { userName } = this.props;
     return (
       <AdminWrapper>
         <Sidebar />
         <Main>
-          <Header logOutHandler={logOutHandler} />
+          <Header logOutHandler={logOutHandler} userName={userName} />
           <PipelineDash />
           <Footer />
         </Main>

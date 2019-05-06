@@ -2,9 +2,11 @@ import React from 'react';
 import { GoogleLogin } from 'react-google-login';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import Logo from '../../assets/integrichain-logo.svg';
 
 import { login, storeToken } from '../../redux/actions/userAuthActions';
+
+import coreLogo from '../../assets/coreLogo.png';
+import Logo from '../../assets/integrichain-logo.svg';
 
 // Styles
 const LoginWrapper = styled.div`
@@ -33,6 +35,22 @@ const LoginWrapper = styled.div`
     .login-subtext {
       font-size: 10px;
     }
+
+    .core-powered {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+
+      h5 {
+        color: #4a4a4a;
+        margin: 10px 0;
+      }
+
+      img {
+        width: 25px;
+        margin: 10px;
+      }
+    }
   }
 `;
 
@@ -48,7 +66,7 @@ class LoginPage extends React.Component {
     const responseGoogle = response => {
       const { accessToken } = response;
       const { givenName } = response.profileObj;
-
+      console.log(response);
       dispatch(storeToken(accessToken, givenName));
       dispatch(login(accessToken));
     };
@@ -66,7 +84,10 @@ class LoginPage extends React.Component {
               onFailure={responseGoogle}
             />
           </div>
-          <p className="login-subtext">Powered by core</p>
+          <div className="core-powered">
+            <h5 className="text">Powered by Core</h5>
+            <img src={coreLogo} alt="Core Logo" />
+          </div>
         </div>
       </LoginWrapper>
     );

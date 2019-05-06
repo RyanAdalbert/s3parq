@@ -27,11 +27,11 @@ const HeaderSec = styled.section`
 
 export default class Header extends PureComponent {
   render() {
-    const { logOutHandler } = this.props;
+    const { logOutHandler, userName } = this.props;
     return (
       <HeaderSec>
         <div className="user-info">
-          <h3>Welcome, Alec</h3>
+          <h3>Welcome, {userName}</h3>
           <p onClick={logOutHandler}>Log out</p>
         </div>
       </HeaderSec>
