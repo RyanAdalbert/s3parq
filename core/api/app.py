@@ -5,9 +5,6 @@ import json, requests, os, sqlalchemy.orm
 from flask import Flask, Blueprint, request, session
 from core.api.routes import auth, index
 from core.constants import BRANCH_NAME
-import sys
-
-print(sys.path)
 
 def create_app()->Flask:
     app = Flask(__name__)
