@@ -7,12 +7,8 @@ node {
     stage('Build') {
         echo "Building..."
     }
-    // stage('Test') {
-    //     echo "Testing..."
-    //     sh "script/ci_test"
-    // }
     stage('Test') {
-        echo "Fake test Please Fix..."
+        echo "Testing..."
         sh "script/ci_test"
     }
     stage ('Deploy') {
