@@ -2,10 +2,10 @@
 
 docker build -t ichain/core:ci -f ./dockerfiles/core.dockerfile .;
 
-docker run --rm \
-  -e BRANCH_NAME \
-  -e ICHAIN_AWS_ACCOUNT \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -w /usr/src/app \
-  ichain/core:ci \
-  bash -c "coverage run --source core /usr/local/bin/pytest tests/integration && coverage run -a --source core /usr/local/bin/pytest tests/unit && coverage report && coveralls"
+# docker run --rm \
+#   -e BRANCH_NAME \
+#   -e ICHAIN_AWS_ACCOUNT \
+#   -v /var/run/docker.sock:/var/run/docker.sock \
+#   -w /usr/src/app \
+#   ichain/core:ci \
+#   bash -c "coverage run --source core /usr/local/bin/pytest tests/integration && coverage run -a --source core /usr/local/bin/pytest tests/unit && coverage report && coveralls"
