@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import pipelineData from '../../containers/PipelineData/PipelineData';
-import PipeLines from '../../components/Pipelines/Pipelines';
+import PipelineData from '../../containers/PipelineData/PipelineData';
+import Pipelines from '../../components/Pipelines/Pipelines';
 
 // Styles
 const DashboardContainer = styled.div`
   display: flex;
+  margin: 50px;
 
   p {
     color: #000;
@@ -14,12 +15,16 @@ const DashboardContainer = styled.div`
 `;
 
 //Wrap our Pipelines component in and HOC to pass the data
-const PipelinesWithData = pipelineData(PipeLines);
+const PipelinesWithData = PipelineData(Pipelines);
 
-const Dashboard = () => (
-  <DashboardContainer>
-    <PipelinesWithData />
-  </DashboardContainer>
-);
+class PipelineDash extends React.Component {
+  render() {
+    return (
+      <DashboardContainer>
+        <PipelinesWithData />
+      </DashboardContainer>
+    );
+  }
+}
 
-export default Dashboard;
+export default PipelineDash;

@@ -15,6 +15,9 @@ const HeaderSec = styled.section`
   }
 
   .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     h3 {
       margin-bottom: 5px;
     }

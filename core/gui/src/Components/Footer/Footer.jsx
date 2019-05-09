@@ -4,15 +4,17 @@ import styled from 'styled-components';
 const FooterSec = styled.section`
   display: flex;
   justify-content: flex-end;
-  background: #ccc;
+  background: #00a131;
   padding: 2px 5%;
 
   p {
     margin: 10px;
+    color: #fff;
   }
 
   a {
     color: #fff;
+    font-weight: 600;
   }
 `;
 

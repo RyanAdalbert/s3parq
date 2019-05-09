@@ -1,4 +1,4 @@
-import history from '../../utils/history';
+import history from '../../../utils/history';
 
 //User Constants
 export const userConstants = {
@@ -9,14 +9,12 @@ export const userConstants = {
   USER_LOGOUT: 'USER_LOGOUT'
 };
 
-// store token action creator
-export const storeToken = (oAuthToken, userName) => ({
-  type: 'STORE_TOKEN',
-  payload: {
-    oAuthToken,
-    userName
-  }
-});
+export const loginRequest = oAuthToken => {
+  return {
+    type: 'LOGIN_ATTEMPT',
+    oAuthToken
+  };
+};
 
 // login flow action creators
 export const loginError = error => {
@@ -36,12 +34,14 @@ export const loginSuccess = response => {
   };
 };
 
-export const loginRequest = oAuthToken => {
-  return {
-    type: 'LOGIN_ATTEMPT',
-    oAuthToken
-  };
-};
+// store token action creator
+export const storeToken = (oAuthToken, userName) => ({
+  type: 'STORE_TOKEN',
+  payload: {
+    oAuthToken,
+    userName
+  }
+});
 
 //login action creator
 export const login = oAuthToken => {
@@ -55,7 +55,6 @@ export const login = oAuthToken => {
     })
       .then(response => {
         if (response.status === 200) {
-          console.log(response);
           dispatch(loginSuccess(response));
         } else {
           const error = new Error(response.statusText);
@@ -69,6 +68,7 @@ export const login = oAuthToken => {
       });
 };
 
+//logout action creator
 export const logOut = () => {
   return {
     type: 'USER_LOGOUT'

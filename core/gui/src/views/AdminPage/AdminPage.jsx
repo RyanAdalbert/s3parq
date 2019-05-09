@@ -6,7 +6,7 @@ import Sidebar from '../../components/Sidebar/Sidebar';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import PipelineDash from '../../views/PipelineDash/PipelineDash';
-import { logOut } from '../../redux/actions/userAuthActions';
+import { logOut } from '../../redux/actions/userAuthActions/userAuthActions';
 
 // Styles
 const AdminWrapper = styled.div`

@@ -1,9 +1,9 @@
 import React from 'react';
 
-class Pipelines extends React.Component {
-  render() {
-    return <p>Pipelines</p>;
-  }
-}
+import PipelinesHeader from '../../components/PipelinesHeader/PipelinesHeader';
+
+const Pipelines = () => {
+  return <PipelinesHeader />;
+};
 
 export default Pipelines;
