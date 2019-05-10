@@ -1,0 +1,49 @@
+node('jenkins-slave'){
+
+    deleteDir()
+    
+    def env_name  =  env.BRANCH_NAME  == 'dev' ? 'master' : env.BRANCH_NAME;
+    def container_name = 'ichain-core-api';
+    def REGION = 'us-east-1';
+    def SERVICE = 'ichain-core-api';
+
+    
+    try {
+
+        stage ('clone') {
+            checkout scm
+        }
+        
+        stage ('build') {
+            //Login in ECR & build image from Dockerfile
+            sh "\$(aws ecr get-login --no-include-email --region us-east-1)"
+            sh "docker build -t $container_name:$env_name -f dockerfiles/flaskapi.dockerfile"
+            sh "echo Container build succesfully executed!!!"
+        }
+
+        stage ('tag') {
+            //tag container image
+            sh "docker tag $container_name:$env_name 687531504312.dkr.ecr.us-east-1.amazonaws.com/$container_name:$env_name"
+            sh "echo Container image succesfully tagged!!!"
+        }
+
+        stage ('push to ECR') {
+            //push container image to ECR
+        
+            sh "docker push 687531504312.dkr.ecr.us-east-1.amazonaws.com/$container_name:$env_name"
+            
+            sh "echo Container pushed to ECR!!"
+
+            //Slack Notification with Author name
+            // def author = sh script: "git show -s --pretty=\"%an\" \$GIT_COMMIT", returnStdout: true
+            // slackSend channel: "sm_projects", color: "good", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was success!! -- Author: $author"
+        }
+    
+    } catch (err) {
+        print(err)
+        // def author = sh script: "git show -s --pretty=\"%an\" \$GIT_COMMIT", returnStdout: true
+        // slackSend  channel: "sm_projects", color: "danger", message: "Author: $author Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} failed with error: $err"
+        currentBuild.result = 'FAILED'
+        }
+
+}
