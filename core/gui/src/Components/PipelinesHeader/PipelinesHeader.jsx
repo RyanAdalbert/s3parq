@@ -22,6 +22,10 @@ const HeaderSec = styled.div`
       &:last-child {
         border-right: none;
       }
+
+      h4 {
+        margin: 10px 0;
+      }
     }
   }
 `;
@@ -32,11 +36,21 @@ export default class PipelineHeader extends PureComponent {
       <HeaderSec>
         <h2>Pipelines</h2>
         <ul>
-          <li>Name</li>
-          <li>Brand</li>
-          <li>Pharma Company</li>
-          <li>Status</li>
-          <li>Run Freq.</li>
+          <li>
+            <h4>Name</h4>
+          </li>
+          <li>
+            <h4>Brand</h4>
+          </li>
+          <li>
+            <h4>Pharma Company</h4>
+          </li>
+          <li>
+            <h4>Status</h4>
+          </li>
+          <li>
+            <h4>Run Freq.</h4>
+          </li>
         </ul>
       </HeaderSec>
     );
