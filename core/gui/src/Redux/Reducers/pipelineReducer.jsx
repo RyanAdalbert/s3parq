@@ -12,24 +12,21 @@ const pipelineReducer = (state = INITIAL_STATE, action) => {
 
   switch (action.type) {
     case STORE_TOKEN:
-      return {
-        state,
+      return Object.assign({}, state, {
         oAuthToken: action.payload.oAuthToken
-      };
+      });
     case REQUEST_PIPELINES:
-      return {
-        ...state,
+      return Object.assign({}, state, {
         isFetching: true,
         didInvalidate: false
-      };
+      });
     case RECEIVE_PIPELINES:
-      return {
-        ...state,
+      return Object.assign({}, state, {
         isFetching: false,
         didInvalidate: false,
-        items: action.pipelines,
+        pipelines: action.pipelines,
         lastUpdated: action.receivedAt
-      };
+      });
     default:
       return state;
   }

@@ -51,7 +51,8 @@ export const login = oAuthToken => {
       method: 'GET',
       headers: {
         Authorization: oAuthToken
-      }
+      },
+      credentials: 'include'
     })
       .then(response => {
         if (response.status === 200) {

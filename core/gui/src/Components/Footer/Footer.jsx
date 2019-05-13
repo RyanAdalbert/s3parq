@@ -4,11 +4,12 @@ import styled from 'styled-components';
 const FooterSec = styled.section`
   display: flex;
   justify-content: flex-end;
+  width: 100%;
   background: #00a131;
-  padding: 2px 5%;
+  grid-area: ft;
 
   p {
-    margin: 10px;
+    margin: 10px 50px;
     color: #fff;
   }
 

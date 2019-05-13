@@ -3,11 +3,16 @@ import styled from 'styled-components';
 
 import PipelineData from '../../containers/PipelineData/PipelineData';
 import Pipelines from '../../components/Pipelines/Pipelines';
-
+import PipelinesHeader from '../../components/PipelinesHeader/PipelinesHeader';
 // Styles
-const DashboardContainer = styled.div`
+const DashboardContainer = styled.section`
   display: flex;
+  flex-direction: column;
   margin: 50px;
+
+  .PipelinesWithData {
+    width: 100%;
+  }
 
   p {
     color: #000;
@@ -21,7 +26,8 @@ class PipelineDash extends React.Component {
   render() {
     return (
       <DashboardContainer>
-        <PipelinesWithData />
+        <PipelinesHeader />
+        <PipelinesWithData className="PipelinesWithData" {...this.props} />
       </DashboardContainer>
     );
   }

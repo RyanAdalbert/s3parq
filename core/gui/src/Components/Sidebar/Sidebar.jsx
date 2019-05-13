@@ -12,6 +12,7 @@ const SidebarWrapper = styled.div`
   height: 99vh;
   padding: 10px 10px 0 10px;
   background-color: #fff;
+  grid-area: sb;
 
   img {
     width: 100%;

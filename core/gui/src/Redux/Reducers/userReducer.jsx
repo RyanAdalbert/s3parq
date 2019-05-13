@@ -11,32 +11,28 @@ const { LOGIN_ATTEMPT, LOGIN_SUCCESS, LOGIN_FAIL, STORE_TOKEN } = userConstants;
 const userReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case LOGIN_ATTEMPT:
-      return {
-        state,
+      return Object.assign({}, state, {
         isLoggingIn: true,
         isLoggedIn: false
-      };
+      });
     case LOGIN_FAIL:
-      return {
-        state,
+      return Object.assign({}, state, {
         error: action.error,
         isLoggingIn: false,
         isLoggedIn: false
-      };
+      });
     case LOGIN_SUCCESS:
-      return {
-        state,
+      return Object.assign({}, state, {
         error: null,
         isLoggingIn: false,
         isLoggedIn: true
-      };
+      });
     case STORE_TOKEN:
       const { oAuthToken, userName } = action.payload;
-      return {
-        state,
+      return Object.assign({}, state, {
         oAuthToken,
         userName
-      };
+      });
     default:
       return state;
   }

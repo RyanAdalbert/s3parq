@@ -8,13 +8,13 @@ import { fetchPipelines } from '../../redux/actions/pipelineActions/pipelineActi
 
 const PipelineData = WrappedComponent => {
   return class extends Component {
-    componentDidMount() {
+    componentWillMount() {
       const { dispatch, oAuthToken } = this.props;
-      return dispatch(fetchPipelines(oAuthToken));
+      dispatch(fetchPipelines(oAuthToken));
     }
 
     render() {
-      return <WrappedComponent />;
+      return <WrappedComponent {...this.props} />;
     }
   };
 };
@@ -22,7 +22,8 @@ const PipelineData = WrappedComponent => {
 const mapStateToProps = state => {
   return {
     oAuthToken: state.pipelineReducer.oAuthToken,
-    isLoggedIn: state.pipelineReducer.isLoggedIn
+    isLoggedIn: state.pipelineReducer.isLoggedIn,
+    pipelines: state.pipelineReducer.pipelines
   };
 };
 

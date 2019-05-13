@@ -1,0 +1,8 @@
+diff a/core/gui/src/index.js b/core/gui/src/index.js	(rejected hunks)
+@@ -24,3 +24,3 @@ store.subscribe(() => {
+-    saveState({
+-      token: store.getState().userReducer.state.oAuthToken,
+-    });
++  saveState({
++    token: store.getState().userReducer.state.oAuthToken
++  });

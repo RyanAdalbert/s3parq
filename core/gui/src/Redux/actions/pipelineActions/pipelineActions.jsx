@@ -13,24 +13,23 @@ export const requestPipelines = pipelines => {
 
 export const receivePipelines = json => {
   return {
-    type: 'RECEIVE_POSTS',
-    pipelines: JSON.data
+    type: 'RECEIVE_PIPELINES',
+    pipelines: json.data.map(pipeline => pipeline)
   };
 };
 
 export const fetchPipelines = oAuthToken => {
   const HOST = 'localhost';
   return dispatch => {
-    console.log(oAuthToken);
-    fetch(`http://${HOST}:5000/config_api/index`, {
+    return fetch(`http://${HOST}:5000/config_api/index`, {
       method: 'GET',
       headers: {
         Authorization: oAuthToken
-      }
+      },
+      credentials: 'include'
     })
-      .then(response => {
-        console.log(response);
-      })
+      .then(response => response.json())
+      .then(json => dispatch(receivePipelines(json)))
       .catch(error => {
         console.log('request failed', error);
       });

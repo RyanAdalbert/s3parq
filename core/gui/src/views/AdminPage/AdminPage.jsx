@@ -17,6 +17,10 @@ const AdminWrapper = styled.div`
 
 const Main = styled.div`
   flex: 5;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 `;
 
 class AdminPage extends React.Component {
@@ -28,7 +32,7 @@ class AdminPage extends React.Component {
         <Sidebar />
         <Main>
           <Header logOutHandler={logOutHandler} userName={userName} />
-          <PipelineDash />
+          <PipelineDash {...this.props} />
           <Footer />
         </Main>
       </AdminWrapper>
@@ -38,8 +42,8 @@ class AdminPage extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    oAuthToken: state.userReducer.state.oAuthToken,
-    userName: state.userReducer.state.userName
+    oAuthToken: state.userReducer.oAuthToken,
+    userName: state.userReducer.userName
   };
 };
 

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 const HeaderSec = styled.section`
   display: flex;
   justify-content: flex-end;
-  padding: 6px 5%;
+  padding: 6px 50px;
   background: #004cae;
   color: #fff;
 
