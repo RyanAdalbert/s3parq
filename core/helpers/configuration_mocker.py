@@ -76,9 +76,10 @@ class ConfigurationMocker(LoggerMixin):
         self.logger.debug('Generating brand mocks.')
         b = config.Brand
         self.session.add_all([
-            b(id=1, name="Teamocil", display_name="Teamocil",
-              pharmaceutical_company_id=1),
-            b(id=2, name="Cornballer", display_name="Corn Baller", pharmaceutical_company_id=2)])
+            b(id=1, name="Teamocil", display_name="Teamocil", pharmaceutical_company_id=1),
+            b(id=2, name="Cornballer", display_name="Corn Baller", pharmaceutical_company_id=2),
+            b(id=3, name="ILUMYA", display_name="ILUMYA", pharmaceutical_company_id=3),
+            b(id=4, name="ODOMZO", display_name="ODOMZO", pharmaceutical_company_id=3)])
         self.session.commit()
         self.logger.debug('Done generating brand mocks.')
 
@@ -104,7 +105,9 @@ class ConfigurationMocker(LoggerMixin):
               pipeline_type_id=1, run_frequency='daily'),
             p(id=500, name="bluth_banana_regression_deprecated", brand_id=2,
               pipeline_type_id=1, is_active=False, run_frequency='hourly'),
-            p(id=4, name="symphony_health_association_extract", brand_id=3,
+            p(id=4, name="symphony_health_association_ilumya_extract", brand_id=3,
+              pipeline_type_id=1, run_frequency='daily'),
+            p(id=5, name="symphony_health_association_odomzo_extract", brand_id=4,
               pipeline_type_id=1, run_frequency='daily')])
         self.session.commit()
         self.logger.debug('Done generating pipeline mocks.')
@@ -116,7 +119,17 @@ class ConfigurationMocker(LoggerMixin):
             p(id=1, pipeline_state_type_id=1, pipeline_id=1, graph_order=0),
             p(id=2, pipeline_state_type_id=2, pipeline_id=1, graph_order=1),
             p(id=3, pipeline_state_type_id=3, pipeline_id=1, graph_order=2),
-            p(id=4, pipeline_state_type_id=1, pipeline_id=2, graph_order=0)])
+            p(id=4, pipeline_state_type_id=1, pipeline_id=2, graph_order=0),
+            p(id=5, pipeline_state_type_id=1, pipeline_id=4, graph_order=0),
+            p(id=6, pipeline_state_type_id=2, pipeline_id=4, graph_order=1),
+            p(id=7, pipeline_state_type_id=3, pipeline_id=4, graph_order=2),
+            p(id=8, pipeline_state_type_id=5, pipeline_id=4, graph_order=3),
+            p(id=9, pipeline_state_type_id=7, pipeline_id=4, graph_order=4),
+            p(id=10, pipeline_state_type_id=1, pipeline_id=5, graph_order=0),
+            p(id=11, pipeline_state_type_id=2, pipeline_id=5, graph_order=1),
+            p(id=12, pipeline_state_type_id=3, pipeline_id=5, graph_order=2),
+            p(id=13, pipeline_state_type_id=5, pipeline_id=5, graph_order=3),
+            p(id=14, pipeline_state_type_id=7, pipeline_id=5, graph_order=4)])
         self.session.commit()
         self.logger.debug('Done generating pipeline state mocks.')
 
@@ -182,7 +195,31 @@ class ConfigurationMocker(LoggerMixin):
             t(id=13, transformation_template_id=2,
               pipeline_state_id=2, graph_order=0),
             t(id=12, transformation_template_id=2,
-              pipeline_state_id=1, graph_order=1)
+              pipeline_state_id=1, graph_order=1),
+            t(id=14, transformation_template_id=3, # ilumya - map product NDCs
+              pipeline_state_id=7, graph_order=0),
+            t(id=15, transformation_template_id=4, # infer med details
+              pipeline_state_id=7, graph_order=1),
+            t(id=16, transformation_template_id=5, # filter to brand
+              pipeline_state_id=8, graph_order=0),
+            t(id=17, transformation_template_id=6, # remap pharm codes
+              pipeline_state_id=8, graph_order=1),
+            t(id=18, transformation_template_id=7, # filter shipment only
+              pipeline_state_id=8, graph_order=2),
+            t(id=19, transformation_template_id=8, # extract column mapping
+              pipeline_state_id=9, graph_order=0),
+            t(id=20, transformation_template_id=3, # odomzo - map product NDCs
+              pipeline_state_id=12, graph_order=0),
+            t(id=21, transformation_template_id=4, # infer med details
+              pipeline_state_id=12, graph_order=1),
+            t(id=22, transformation_template_id=5, # filter to brand
+              pipeline_state_id=13, graph_order=0),
+            t(id=23, transformation_template_id=6, # remap pharm codes
+              pipeline_state_id=13, graph_order=1),
+            t(id=24, transformation_template_id=7, # filter shipment only
+              pipeline_state_id=13, graph_order=2),
+            t(id=25, transformation_template_id=8, # extract column mapping
+              pipeline_state_id=14, graph_order=0),
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation mocks.')
@@ -204,7 +241,29 @@ class ConfigurationMocker(LoggerMixin):
                 "encoding":{"datatype":"string","description":"the encoding of the input file"},
                 "input_file_prefix":{"datatype":"string","description":"the prefix of the selected input files"}
                 }''',
-                pipeline_state_type_id=2)
+                pipeline_state_type_id=2),
+            tt(id=3, name='symphony_health_association_map_product_ndcs',
+                variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"},
+                "index_col":{"datatype":"string","description":"the index column to map NDCs in the source dataset (default is rx_ndc_number)"},
+                "secret_name":{"datatype":"string","description":"the name of the secret in Secret Manager for platform2"},
+                "secret_type_of":{"datatype":"string","description":"the type of the secret in Secret Manager for platform2"}
+                }''',
+                pipeline_state_type_id=3),    
+             tt(id=4, name='symphony_health_association_infer_med_details',
+                variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
+                pipeline_state_type_id=3),
+             tt(id=5, name='symphony_health_association_filter_to_brand',
+                variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
+                pipeline_state_type_id=5),
+             tt(id=6, name='symphony_health_association_remap_pharm_codes',
+                variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
+                pipeline_state_type_id=5),
+             tt(id=7, name='symphony_health_association_filter_shipment_only',
+                variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
+                pipeline_state_type_id=5),
+             tt(id=8, name='symphony_health_association_extract_column_mapping',
+                variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
+                pipeline_state_type_id=7)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')
@@ -246,7 +305,22 @@ class ConfigurationMocker(LoggerMixin):
             tv(id=25, name='delimiter', transformation_id=13, value='|'),
             tv(id=26, name='skip_rows', transformation_id=13, value=1),
             tv(id=27, name='encoding', transformation_id=13, value='iso8859'),
-            tv(id=28, name='input_file_prefix', transformation_id=13, value='some-extracted-file')
+            tv(id=28, name='input_file_prefix', transformation_id=13, value='some-extracted-file'),
+
+            tv(id=29, name="input_transform", transformation_id=14, value="symphony_health_association_refinement"),
+            tv(id=30, name="index_col", transformation_id=14, value="rx_ndc_number"),
+            tv(id=31, name="secret_name", transformation_id=14, value="platform2"),
+            tv(id=32, name="secret_type_of", transformation_id=14, value="database"),
+
+            tv(id=33, name="input_transform", transformation_id=15, value="symphony_health_association_map_product_ndcs"),
+
+            tv(id=34, name="input_transform", transformation_id=16, value="symphony_health_association_infer_med_details"),
+
+            tv(id=35, name="input_transform", transformation_id=17, value="symphony_health_association_filter_to_brand"),
+
+            tv(id=36, name="input_transform", transformation_id=18, value="symphony_health_association_remap_pharm_codes"),
+
+            tv(id=37, name="input_transform", transformation_id=19, value="symphony_health_association_filter_shipment_only")
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_variables mocks.')
