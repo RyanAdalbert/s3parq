@@ -87,7 +87,8 @@ class ConfigurationMocker(LoggerMixin):
         p = config.PharmaceuticalCompany
         self.session.add_all([
             p(id=1, display_name="Natural Life Food Company", name='Nfoods'),
-            p(id=2, display_name="Sitwell Home Construction", name="Sitwell")])
+            p(id=2, display_name="Sitwell Home Construction", name="Sitwell"),
+            p(id=3, display_name="Stephanie", name="Stephanie")])
         self.session.commit()
         self.logger.debug('Done generating pharmaceutical company mocks.')
 
@@ -102,7 +103,9 @@ class ConfigurationMocker(LoggerMixin):
             p(id=3, name="temocil_profitablility", brand_id=1,
               pipeline_type_id=1, run_frequency='daily'),
             p(id=500, name="bluth_banana_regression_deprecated", brand_id=2,
-              pipeline_type_id=1, is_active=False, run_frequency='hourly')])
+              pipeline_type_id=1, is_active=False, run_frequency='hourly'),
+            p(id=4, name="symphony_health_association_extract", brand_id=3,
+              pipeline_type_id=1, run_frequency='daily')])
         self.session.commit()
         self.logger.debug('Done generating pipeline mocks.')
 
