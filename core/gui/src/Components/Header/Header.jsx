@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 
 import styled from 'styled-components';
 
@@ -41,3 +42,8 @@ export default class Header extends PureComponent {
     );
   }
 }
+
+Header.propTypes = {
+  userName: PropTypes.string,
+  logOutHandler: PropTypes.func
+};

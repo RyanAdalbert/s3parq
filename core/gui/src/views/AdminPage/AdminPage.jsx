@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
@@ -16,10 +17,10 @@ const AdminWrapper = styled.div`
 `;
 
 const Main = styled.div`
+  display: flex;
   flex: 5;
   width: 100%;
-  height: 100%;
-  display: flex;
+  height: 100vh;
   flex-direction: column;
 `;
 
@@ -57,3 +58,8 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(AdminPage);
+
+AdminPage.propTypes = {
+  userName: PropTypes.string,
+  logOutHandler: PropTypes.func
+};

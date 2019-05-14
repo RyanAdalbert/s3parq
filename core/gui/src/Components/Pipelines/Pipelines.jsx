@@ -1,60 +1,59 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Table from 'react-bootstrap/Table';
 import styled from 'styled-components';
 
-const PipelineList = styled.ul`
-  margin: 0;
-  padding: 0;
-`;
+import PipelineRow from '../PipelineRow/PipelineRow';
 
-const PipelineRow = styled.li`
-  display: grid;
-  list-style: none;
-  grid-template-columns: 3fr 2fr 3fr 1fr 1fr;
-  grid-column-gap: 5px;
-  border-left: 1px solid #adadad;
-  border-right: 1px solid #adadad;
+const TableContainer = styled.div`
+  thead {
+    background-color: #fff;
+    padding: 5px;
 
-  &:nth-child(odd) {
-    background-color: #ccc;
-  }
-
-  &:last-child {
-    border-bottom: 1px solid #ccc;
-  }
-
-  div {
-    padding: 10px 0 10px 10px;
-    border-right: 1px solid #adadad;
-
-    &:last-child {
-      border-right: none;
+    h5 {
+      margin: 5px 0;
     }
+  }
+
+  tbody {
+    border: 1px solid #000;
   }
 `;
 
 class Pipelines extends React.Component {
   render() {
-    const { pipelines } = this.props;
-
-    const pipeline = pipelines.map(pipeline => {
-      const key = Object.keys(pipeline);
-
-      return (
-        <PipelineRow key={key}>
-          <div>{pipeline[key].name}</div>
-          <div>{pipeline[key].brand}</div>
-          <div>{pipeline[key].pharma_company}</div>
-          <div>{pipeline[key].status}</div>
-          <div>{pipeline[key].run_freq}</div>
-        </PipelineRow>
-      );
-    });
-
     return (
-      <div>
-        <PipelineList>{pipeline}</PipelineList>
-      </div>
+      <TableContainer>
+        <h3>Pipelines</h3>
+        <Table striped bordered hover responsive size="sm">
+          <thead>
+            <tr>
+              <th>
+                <h5>#</h5>
+              </th>
+              <th>
+                <h5>Name</h5>
+              </th>
+              <th>
+                <h5>Brand</h5>
+              </th>
+              <th>
+                <h5>Pharma Company</h5>
+              </th>
+              <th>
+                <h5>Status</h5>
+              </th>
+              <th>
+                <h5>Run Freq</h5>
+              </th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            <PipelineRow {...this.props} />
+          </tbody>
+        </Table>
+      </TableContainer>
     );
   }
 }

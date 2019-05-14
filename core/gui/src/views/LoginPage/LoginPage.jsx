@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { GoogleLogin } from 'react-google-login';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
@@ -100,3 +101,7 @@ class LoginPage extends React.Component {
 }
 
 export default connect()(LoginPage);
+
+LoginPage.propTypes = {
+  dispatch: PropTypes.func
+};

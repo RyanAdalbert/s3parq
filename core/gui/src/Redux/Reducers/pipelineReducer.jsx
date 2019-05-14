@@ -3,11 +3,16 @@ import { userConstants } from '../actions/userAuthActions/userAuthActions';
 
 const INITIAL_STATE = {
   pipelines: [],
-  oAuthToken: 'loading'
+  oAuthToken: 'loading',
+  expanded: false
 };
 
 const pipelineReducer = (state = INITIAL_STATE, action) => {
-  const { RECEIVE_PIPELINES, REQUEST_PIPELINES } = pipelineConstants;
+  const {
+    RECEIVE_PIPELINES,
+    REQUEST_PIPELINES,
+    EXPAND_PIPELINE_DETAILS
+  } = pipelineConstants;
   const { STORE_TOKEN } = userConstants;
 
   switch (action.type) {
@@ -26,6 +31,10 @@ const pipelineReducer = (state = INITIAL_STATE, action) => {
         didInvalidate: false,
         pipelines: action.pipelines,
         lastUpdated: action.receivedAt
+      });
+    case EXPAND_PIPELINE_DETAILS:
+      return Object.assign({}, state, {
+        expanded: true
       });
     default:
       return state;

@@ -1,7 +1,8 @@
 //Pipeline Constants
 export const pipelineConstants = {
   REQUEST_PIPELINES: 'REQUEST_PIPELINES',
-  RECEIVE_PIPELINES: 'RECEIVE_PIPELINES'
+  RECEIVE_PIPELINES: 'RECEIVE_PIPELINES',
+  EXPAND_DETAILS: 'EXPAND_DETAILS'
 };
 
 export const requestPipelines = pipelines => {
@@ -33,5 +34,12 @@ export const fetchPipelines = oAuthToken => {
       .catch(error => {
         console.log('request failed', error);
       });
+  };
+};
+
+export const toggleDetails = expanded => {
+  return {
+    type: 'EXPAND_DETAILS',
+    expanded
   };
 };
