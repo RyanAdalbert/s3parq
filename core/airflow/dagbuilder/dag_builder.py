@@ -56,7 +56,8 @@ class DagBuilder(LoggerMixin):
                                    default_args=self.DEFAULT_ARGS,
                                    # airflow may no longer support start_date in default_args
                                    start_date=self.DEFAULT_ARGS['start_date'],
-                                   schedule_interval=f'@{pipe.run_frequency}'),))
+                                   schedule_interval=f'@{pipe.run_frequency}',
+                                   catchup=False),))
             self.logger.debug("Done creating DAGs.")
         return dags
 

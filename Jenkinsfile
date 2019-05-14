@@ -34,7 +34,7 @@ node {
             echo "Running alembic migrations for ${env.DEPLOYMENT_ENVIRONMENT}."
             sh "script/ci_shell 'cd core/database && alembic upgrade head' ${env.DEPLOYMENT_ENVIRONMENT}"
             echo "Deploying to ECS: ${env.DEPLOYMENT_ENVIRONMENT}."
-            sh "ecs-deploy -r us-east-1 -c ${env.DEPLOYMENT_ENVIRONMENT}-core-airflow -n core  -i 687531504312.dkr.ecr.us-east-1.amazonaws.com/ichain/ --use-latest-task-def core:${env.DEPLOYMENT_ENVIRONMENT}"
+            sh "ecs-deploy -r us-east-1 -c ${env.DEPLOYMENT_ENVIRONMENT}-core -n core  -i 687531504312.dkr.ecr.us-east-1.amazonaws.com/ichain/core:${env.DEPLOYMENT_ENVIRONMENT} --use-latest-task-def"
         }
     }
     stage ('Cleanup') {
