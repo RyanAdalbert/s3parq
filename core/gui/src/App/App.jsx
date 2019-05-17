@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { Router, Route } from 'react-router-dom';
 
-import AdminPage from '../views/AdminPage/AdminPage';
-import LoginPage from '../views/LoginPage/LoginPage';
+import AdminPage from '../pages/AdminPage/AdminPage';
+import LoginPage from '../pages/LoginPage/LoginPage';
 import history from '../utils/history';
 import PrivateRoute from './PrivateRoute';
 

@@ -1,8 +1,10 @@
 import { combineReducers } from 'redux';
 import userReducer from './userReducer';
+import pipelineReducer from './pipelineReducer';
 
 const appReducer = combineReducers({
-  userReducer
+  userReducer,
+  pipelineReducer
 });
 
 const rootReducer = (state, action) => {
