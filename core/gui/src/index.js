@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { loadState, saveState } from './utils/localStorage';
+import 'bootstrap/dist/css/bootstrap.css';
 
 import './index.css';
 import App from './app/App';
@@ -20,9 +21,7 @@ const store = createStore(
 
 //Store Token
 store.subscribe(() => {
-  if (store.getState().userReducer.oAuthToken !== '') {
-    saveState(store.getState().userReducer.state.oAuthToken);
-  }
+  saveState(store.getState());
 });
 
 ReactDOM.render(

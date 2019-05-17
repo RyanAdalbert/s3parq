@@ -1,9 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { GoogleLogin } from 'react-google-login';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 
-import { login, storeToken } from '../../redux/actions/userAuthActions';
+import {
+  login,
+  storeToken
+} from '../../redux/actions/userAuthActions/userAuthActions';
 
 import coreLogo from '../../assets/coreLogo.png';
 import Logo from '../../assets/integrichain-logo.svg';
@@ -55,6 +59,7 @@ const LoginWrapper = styled.div`
 `;
 
 class LoginPage extends React.Component {
+  //if you're on the login page you don't need anything local storage
   componentDidMount() {
     localStorage.clear();
   }
@@ -62,12 +67,13 @@ class LoginPage extends React.Component {
   render() {
     const { dispatch } = this.props;
 
-    // Get Response from Google and store it in state
+    // Get Response from Google
     const responseGoogle = response => {
       const { accessToken } = response;
       const { givenName } = response.profileObj;
-      console.log(response);
+      //store access token in state
       dispatch(storeToken(accessToken, givenName));
+      //get authorization from api to login user
       dispatch(login(accessToken));
     };
 
@@ -75,7 +81,7 @@ class LoginPage extends React.Component {
       <LoginWrapper>
         <div className="LoginContainer">
           <img src={Logo} alt="Integrichain Logo" />
-          <p>Data Transform Admin Panel</p>
+          <p>Pipeline Configuration Admin Panel</p>
           <div className="ButtonWrapper">
             <GoogleLogin
               clientId="437067415795-3hb6psqn86pu7ri76k594do568buebam.apps.googleusercontent.com"
@@ -94,10 +100,8 @@ class LoginPage extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    oAuthToken: state.userReducer.oAuthToken
-  };
-};
+export default connect()(LoginPage);
 
-export default connect(mapStateToProps)(LoginPage);
+LoginPage.propTypes = {
+  dispatch: PropTypes.func
+};
