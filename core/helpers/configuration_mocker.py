@@ -192,10 +192,10 @@ class ConfigurationMocker(LoggerMixin):
               pipeline_state_id=4, graph_order=2),
             t(id=11, transformation_template_id=1,
               pipeline_state_id=2, graph_order=0),
-            t(id=13, transformation_template_id=2,
-              pipeline_state_id=2, graph_order=0),
             t(id=12, transformation_template_id=2,
               pipeline_state_id=1, graph_order=1),
+            t(id=13, transformation_template_id=2,
+              pipeline_state_id=2, graph_order=0),
             t(id=14, transformation_template_id=3, # ilumya - map product NDCs
               pipeline_state_id=7, graph_order=0),
             t(id=15, transformation_template_id=4, # infer med details
@@ -220,6 +220,10 @@ class ConfigurationMocker(LoggerMixin):
               pipeline_state_id=13, graph_order=2),
             t(id=25, transformation_template_id=8, # extract column mapping
               pipeline_state_id=14, graph_order=0),
+            t(id=26, transformation_template_id=9, # final ingest transform (rayne)
+              pipeline_state_id=6, graph_order=0),
+            t(id=27, transformation_template_id=9,
+              pipeline_state_id=11, graph_order=0)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation mocks.')
@@ -263,7 +267,10 @@ class ConfigurationMocker(LoggerMixin):
                 pipeline_state_type_id=5),
              tt(id=8, name='symphony_health_association_extract_column_mapping',
                 variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
-                pipeline_state_type_id=7)
+                pipeline_state_type_id=7),
+             tt(id=9, name='symphony_health_association_refinement',
+                variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
+                pipeline_state_type_id=2)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')
@@ -320,7 +327,9 @@ class ConfigurationMocker(LoggerMixin):
 
             tv(id=36, name="input_transform", transformation_id=18, value="symphony_health_association_remap_pharm_codes"),
 
-            tv(id=37, name="input_transform", transformation_id=19, value="symphony_health_association_filter_shipment_only")
+            tv(id=37, name="input_transform", transformation_id=19, value="symphony_health_association_filter_shipment_only"),
+
+            tv(id=38, name="input_transform", transformation_id=26, value="raw")
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_variables mocks.')

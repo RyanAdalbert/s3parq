@@ -36,4 +36,4 @@ def get_relative_contract(t_name: str, contract:DatasetContract)->DatasetContrac
         raise KeyError("Error: No transform found with name " + t_name)
     dataset = template.name
     state = template.pipeline_state_type.name 
-    return DatasetContract(parent=contract.parent, child=contract.child, state=state, dataset=dataset) 
+    return DatasetContract(branch=contract.branch, parent=contract.parent, child=contract.child, state=state, dataset=dataset) 

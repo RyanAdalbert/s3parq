@@ -17,5 +17,5 @@ class DatasetDiff():
         bucket = self.contract.bucket
         key = self.contract.key
         print(bucket, key, delta.bucket, delta.key, partition)
-        return fetcher.fetch_diff(input_bucket=bucket, input_key=key, comparison_bucket=delta.bucket, comparison_key=delta.key, partition=partition)
+        return fetcher.fetch_diff(input_bucket=delta.bucket, input_key=delta.key, comparison_bucket=bucket, comparison_key=key, partition=partition)
         
