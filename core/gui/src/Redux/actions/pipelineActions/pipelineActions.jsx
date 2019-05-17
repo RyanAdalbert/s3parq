@@ -36,10 +36,3 @@ export const fetchPipelines = oAuthToken => {
       });
   };
 };
-
-export const toggleDetails = expanded => {
-  return {
-    type: 'EXPAND_DETAILS',
-    expanded
-  };
-};

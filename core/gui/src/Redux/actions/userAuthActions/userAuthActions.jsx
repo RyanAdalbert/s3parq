@@ -30,7 +30,7 @@ export const loginSuccess = response => {
       type: 'LOGIN_SUCCESS',
       response
     });
-    history.push('/admin');
+    history.push('/admin/pipelineindex');
   };
 };
 

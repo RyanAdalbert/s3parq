@@ -7,7 +7,7 @@ import styled from 'styled-components';
 const HeaderSec = styled.section`
   display: flex;
   justify-content: flex-end;
-  padding: 6px 50px;
+  padding: 0px 50px;
   background: #004cae;
   color: #fff;
 
@@ -19,11 +19,13 @@ const HeaderSec = styled.section`
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    h3 {
-      margin-bottom: 5px;
+
+    h5 {
+      margin: 5px;
     }
+
     p {
-      margin-top: 5px;
+      margin-bottom: 5px;
       cursor: pointer;
     }
   }
@@ -35,7 +37,7 @@ export default class Header extends PureComponent {
     return (
       <HeaderSec>
         <div className="user-info">
-          <h3>Welcome, {userName}</h3>
+          <h5>Welcome, {userName}</h5>
           <p onClick={logOutHandler}>Log out</p>
         </div>
       </HeaderSec>

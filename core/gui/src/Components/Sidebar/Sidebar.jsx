@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import logo from '../../assets/integrichain-logo.svg';
@@ -14,27 +14,52 @@ const SidebarWrapper = styled.div`
   background-color: #fff;
   grid-area: sb;
 
+  .logo-container {
+    display: flex;
+    align-items: center;
+    height: 63px;
+    border-bottom: 1px solid #f3f3f3;
+  }
+
   img {
     width: 100%;
-    max-width: 200px;
-    margin: 0 auto;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #ccc;
   }
 
   ul {
-    margin: 20px 0;
     padding: 0;
+    text-align: left;
     list-style: none;
-    font-size: 1.5rem;
+    font-size: 1rem;
+
+    li {
+      padding: 5px;
+      &:hover {
+        background-color: #f3f3f3;
+      }
+    }
+
+    a {
+      color: #000;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
   }
 `;
 
 const Sidebar = () => (
   <SidebarWrapper>
-    <img src={logo} alt="Integrichain Logo" />
+    <div className="logo-container">
+      <img src={logo} alt="Integrichain Logo" />
+    </div>
     <ul>
-      <li>Pipelines</li>
+      <li>
+        <Link to="/admin/pipelineindex">Pipeline Index</Link>
+      </li>
+      <li>
+        <Link to="/admin/createpipeline">Create Pipeline</Link>
+      </li>
     </ul>
   </SidebarWrapper>
 );

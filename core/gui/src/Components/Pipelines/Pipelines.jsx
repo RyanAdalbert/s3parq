@@ -6,6 +6,12 @@ import styled from 'styled-components';
 import PipelineRow from '../PipelineRow/PipelineRow';
 
 const TableContainer = styled.div`
+  h3 {
+    margin-bottom: 10px;
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+  }
+
   thead {
     background-color: #fff;
     padding: 5px;
@@ -24,7 +30,7 @@ class Pipelines extends React.Component {
   render() {
     return (
       <TableContainer>
-        <h3>Pipelines</h3>
+        <h3>Pipeline Index</h3>
         <Table striped bordered hover responsive size="sm">
           <thead>
             <tr>
@@ -46,7 +52,6 @@ class Pipelines extends React.Component {
               <th>
                 <h5>Run Freq</h5>
               </th>
-              <th />
             </tr>
           </thead>
           <tbody>

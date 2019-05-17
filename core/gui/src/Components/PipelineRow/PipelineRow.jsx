@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 
 //Pipeline row component
 export default class PipelineRow extends PureComponent {
@@ -16,11 +17,6 @@ export default class PipelineRow extends PureComponent {
           <td>{pipeline[key].pharma_company}</td>
           <td>{pipeline[key].status}</td>
           <td>{pipeline[key].run_freq}</td>
-          <td>
-            <Button size="sm" block>
-              Details
-            </Button>
-          </td>
         </tr>
       );
     });
