@@ -10,13 +10,14 @@ import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 import App from './app/App';
 import rootReducer from './redux/reducers';
+import fetchMiddleware from './redux/middleware/middleware';
 
 const presistedState = loadState();
 const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(
   rootReducer,
   presistedState,
-  composeEnhancer(applyMiddleware(thunk))
+  composeEnhancer(applyMiddleware(thunk, fetchMiddleware))
 );
 
 //Store Token

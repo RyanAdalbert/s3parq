@@ -4,10 +4,7 @@ import { GoogleLogin } from 'react-google-login';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 
-import {
-  login,
-  storeToken
-} from '../../redux/actions/userAuthActions/userAuthActions';
+import { userAuth } from '../../redux/actions/userAuthActions/userAuthActions';
 
 import coreLogo from '../../assets/coreLogo.png';
 import Logo from '../../assets/integrichain-logo.svg';
@@ -70,11 +67,9 @@ class LoginPage extends React.Component {
     // Get Response from Google
     const responseGoogle = response => {
       const { accessToken } = response;
-      const { givenName } = response.profileObj;
-      //store access token in state
-      dispatch(storeToken(accessToken, givenName));
+      //const { givenName } = response.profileObj;
       //get authorization from api to login user
-      dispatch(login(accessToken));
+      dispatch(userAuth(accessToken));
     };
 
     return (
