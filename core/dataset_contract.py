@@ -103,17 +103,17 @@ class DatasetContract(Contract):
     def _set_dataset_metadata(self, df):
         run_timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         df['__metadata_app_version'] = CORE_VERSION
+        df['__metadata_output_contract'] = self.s3_path
         
         if not "__metadata_run_timestamp" in df.columns:
             df['__metadata_run_timestamp'] = run_timestamp
 
-        df['__metadata_output_contract'] = self.s3_path
         partitions = ['__metadata_run_timestamp']
         return (df, partitions)
 
     # functions for use
 
-    def fetch(self, filters: List[dict] = None)->pd.DataFrame:
+    def fetch(self, filters: List[dict] = [])->pd.DataFrame:
         if self.contract_type != "dataset":
             raise ValueError(
                 f"contract.fetch() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
@@ -134,7 +134,8 @@ class DatasetContract(Contract):
             f'Publishing dataframe to s3 location {self.s3_path}.')
 
         dataframe, time_partition = self._set_dataset_metadata(df=dataframe)
-        self.partitions.extend(time_partition)
+        if time_partition not in self.partitions:
+            self.partitions.extend(time_partition)
 
         publish(
             bucket=self.env,
