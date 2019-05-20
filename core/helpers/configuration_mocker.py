@@ -199,25 +199,25 @@ class ConfigurationMocker(LoggerMixin):
             t(id=14, transformation_template_id=3, # ilumya - map product NDCs
               pipeline_state_id=7, graph_order=0),
             t(id=15, transformation_template_id=4, # infer med details
-              pipeline_state_id=7, graph_order=1),
+              pipeline_state_id=7, graph_order=2),
             t(id=16, transformation_template_id=5, # filter to brand
-              pipeline_state_id=8, graph_order=0),
+              pipeline_state_id=7, graph_order=1),
             t(id=17, transformation_template_id=6, # remap pharm codes
-              pipeline_state_id=8, graph_order=1),
+              pipeline_state_id=8, graph_order=0),
             t(id=18, transformation_template_id=7, # filter shipment only
-              pipeline_state_id=8, graph_order=2),
+              pipeline_state_id=8, graph_order=1),
             t(id=19, transformation_template_id=8, # extract column mapping
               pipeline_state_id=9, graph_order=0),
             t(id=20, transformation_template_id=3, # odomzo - map product NDCs
               pipeline_state_id=12, graph_order=0),
             t(id=21, transformation_template_id=4, # infer med details
-              pipeline_state_id=12, graph_order=1),
+              pipeline_state_id=12, graph_order=2),
             t(id=22, transformation_template_id=5, # filter to brand
-              pipeline_state_id=13, graph_order=0),
+              pipeline_state_id=12, graph_order=1),
             t(id=23, transformation_template_id=6, # remap pharm codes
-              pipeline_state_id=13, graph_order=1),
+              pipeline_state_id=13, graph_order=0),
             t(id=24, transformation_template_id=7, # filter shipment only
-              pipeline_state_id=13, graph_order=2),
+              pipeline_state_id=13, graph_order=1),
             t(id=25, transformation_template_id=8, # extract column mapping
               pipeline_state_id=14, graph_order=0),
             t(id=26, transformation_template_id=9, # final ingest transform (rayne)
