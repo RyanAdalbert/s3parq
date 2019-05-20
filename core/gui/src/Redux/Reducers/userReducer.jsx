@@ -7,12 +7,18 @@ export const INITIAL_STATE = {
 };
 
 const userReducer = (state = INITIAL_STATE, action) => {
-  const { USER_AUTH } = userConstants;
+  const { LOGIN_ATTEMPT, LOGIN_SUCCESS } = userConstants;
   switch (action.type) {
-    case USER_AUTH:
+    case LOGIN_ATTEMPT:
       return Object.assign({}, state, {
         isLoggingIn: true,
         isLoggedIn: false
+      });
+    case LOGIN_SUCCESS:
+      return Object.assign({}, state, {
+        error: null,
+        isLoggingIn: false,
+        isLoggedIn: true
       });
     default:
       return state;

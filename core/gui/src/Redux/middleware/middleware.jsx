@@ -1,36 +1,45 @@
+import {
+  loginSuccess,
+  loginError
+} from '../actions/userAuthActions/userAuthActions';
+
 //login action creator
 
 export const CALL_API = 'Call API';
+const API_ROOT = 'http://localhost:5000';
 
-export const middleware = store => next => action => {
-  const callAPI = action[CALL_API];
-
-  if (typeof callAPI === 'undefined') {
+const callApi = store => next => action => {
+  if (!action || !action.config) {
     return next(action);
   }
 
-  const { config } = action.config;
+  let dispatch = store.dispatch;
+  let config = action.config;
 
-  const apiRoot = 'http://localhost:5000';
-  const endPoint = config.endpoint;
   const headers = config.headers;
   const credentials = config.credentials;
   const method = config.method;
+  const END_POINT = config.endPoint;
 
-  return dispatch =>
-    fetch(`${apiRoot}${endPoint}`, {
-      method,
-      headers,
-      credentials
+  return fetch(`${API_ROOT + END_POINT}`, {
+    method,
+    headers,
+    credentials
+  })
+    .then(response => {
+      if (response.status === 200) {
+        console.log(response);
+        dispatch(loginSuccess(response));
+      } else {
+        const error = new Error(response.statusText);
+        error.response = response;
+        dispatch(loginError(error));
+        throw error;
+      }
     })
-      .then(response => {
-        if (response.status === 200) {
-          console.log('success');
-        }
-      })
-      .catch(error => {
-        console.log('request failed', error);
-      });
+    .catch(error => {
+      console.log('request failed', error);
+    });
 };
 
-export default middleware;
+export default callApi;

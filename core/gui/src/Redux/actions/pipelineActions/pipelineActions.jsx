@@ -19,20 +19,14 @@ export const receivePipelines = json => {
   };
 };
 
-export const fetchPipelines = oAuthToken => {
-  const HOST = 'localhost';
-  return dispatch => {
-    return fetch(`http://${HOST}:5000/config_api/index`, {
-      method: 'GET',
-      headers: {
-        Authorization: oAuthToken
-      },
-      credentials: 'include'
-    })
-      .then(response => response.json())
-      .then(json => dispatch(receivePipelines(json)))
-      .catch(error => {
-        console.log('request failed', error);
-      });
-  };
-};
+export const fetchPipelines = oAuthToken => ({
+  type: 'REQUEST_PIPELINES',
+  config: {
+    endPoint: `/config_api/index`,
+    method: 'GET',
+    headers: {
+      authorization: oAuthToken
+    },
+    credentials: 'include'
+  }
+});
