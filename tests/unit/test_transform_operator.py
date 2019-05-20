@@ -1,3 +1,8 @@
+import core.constants as c
+import pytest 
+from unittest.mock import patch
+from airflow.contrib.operators.awsbatch_operator import AWSBatchOperator
+from airflow.contrib.operators.ssh_operator import SSHOperator
 """
 from core.models.configuration import (
     PharmaceuticalCompany, 
@@ -58,3 +63,16 @@ class Test:
         
         assert operator.task_id == f"{n.pname}_{n.pstname}_{n.tname}_1".lower()
 """
+def test_transform_remote(monkeypatch):
+    with monkeypatch.context() as m:
+        m.setenv('ICHAIN_ENVIRONMENT', 'prod')
+        import core.airflow.plugins.transform_operator as toperator
+        to = toperator.TransformOperator(transform_id=1)
+        assert isinstance(to,AWSBatchOperator)
+
+def test_transform_local(monkeypatch):
+    with monkeypatch.context() as m:
+        m.setenv('ICHAIN_ENVIRONMENT', 'dev')
+        import core.airflow.plugins.transform_operator as toperator
+        to = toperator.TransformOperator(transform_id=1)
+        assert isinstance(to, SSHOperator)

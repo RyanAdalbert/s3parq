@@ -1,7 +1,8 @@
-from airflow.utils import apply_defaults
+from airflow.utils.decorators import apply_defaults
 from airflow.contrib.operators.awsbatch_operator import AWSBatchOperator
+from airflow.contrib.operators.ssh_operator import SSHOperator
 from collections import namedtuple
-from core.constants import BATCH_JOB_QUEUE, BRANCH_NAME
+from core.constants import BATCH_JOB_QUEUE, BRANCH_NAME, ENVIRONMENT
 from core.contract import Contract
 from core.helpers.project_root import ProjectRoot
 from core.helpers.session_helper import SessionHelper
@@ -9,9 +10,11 @@ from core.helpers.docker import get_core_job_def_name
 import core.models.configuration as config
 from core.logging import get_logger
 
+#inherit based on env
+InheritOperator = SSHOperator if ENVIRONMENT == 'dev' else AWSBatchOperator
 
-class TransformOperator(AWSBatchOperator):
-
+class TransformOperator(InheritOperator):
+    
     @apply_defaults
     def __init__(self, transform_id: int, *args, **kwargs) -> None:
         """ Transformation operator for DAGs. 
@@ -35,21 +38,33 @@ class TransformOperator(AWSBatchOperator):
             'run',
             f'{transform_id}'
         ]
-        self.__logger.debug(f"Corebot run command string: {run_command}.")
-        job_container_overrides = {
-            'command': run_command
-        }
-        self.__logger.info(f"Executing AWSBatchOperator for {job_name}.")
-        super(TransformOperator, self).__init__(task_id=task_id,
-                                                job_name=job_name,
-                                                job_definition=job_def_name,
-                                                job_queue=job_queue,
-                                                overrides=job_container_overrides,
-                                                *args,
-                                                **kwargs
-                                                )
-        self.__logger.info(f"Done. AWSBatchOperator executed for {job_name}.")
+        
+        """ Run location control: this class inherits SSHOperator for dev, 
+            AWSBatchOperator for prod  
+        """
+        if isinstance(self,SSHOperator):
+            self.__logger.info(f"Running Corebot command `{run_command}` locally in notebook container...")
+            ## ssh into notebook container
+            ## run da corebot!     
+            self.__logger.info("Done. Corebot ran successfully in notebook container.")
+        else:
+            self.__logger.info(f"Running Corebot run command string: {run_command} in AWS Batch.")
+            job_container_overrides = {
+                'command': run_command
+            }
 
+            
+            self.__logger.info(f"Executing AWSBatchOperator for {job_name}.")
+            super(TransformOperator, self).__init__(task_id=task_id,
+                                                    job_name=job_name,
+                                                    job_definition=job_def_name,
+                                                    job_queue=job_queue,
+                                                    overrides=job_container_overrides,
+                                                    *args,
+                                                    **kwargs
+                                                    )
+            self.__logger.info(f"Done. AWSBatchOperator executed for {job_name}.")
+            
     def _get_transform_info(self):
         """ Gets full queried info for the transform.
                 Uses SessionHelper to grab it based on the transform ID
