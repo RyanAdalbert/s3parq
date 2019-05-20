@@ -12,3 +12,4 @@ psycopg2==2.7.6.1
 papermill==0.17.1
 dfmock==0.0.14
 paramiko==2.4.2
+mysql-connector==2.2.9
