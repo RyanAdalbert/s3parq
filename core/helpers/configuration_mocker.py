@@ -258,7 +258,7 @@ class ConfigurationMocker(LoggerMixin):
                 pipeline_state_type_id=3),
              tt(id=5, name='symphony_health_association_filter_to_brand',
                 variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
-                pipeline_state_type_id=5),
+                pipeline_state_type_id=3),
              tt(id=6, name='symphony_health_association_remap_pharm_codes',
                 variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
                 pipeline_state_type_id=5),
