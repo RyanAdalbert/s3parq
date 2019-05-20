@@ -1,4 +1,5 @@
 import history from '../../../utils/history';
+import { CALL_API } from '../../middleware/middleware';
 
 //User Constants
 export const userConstants = {
@@ -6,7 +7,8 @@ export const userConstants = {
   LOGIN_ATTEMPT: 'LOGIN_ATTEMPT',
   LOGIN_FAIL: 'LOGIN_FAIL',
   LOGIN_SUCCESS: 'LOGIN_SUCCESS',
-  USER_LOGOUT: 'USER_LOGOUT'
+  USER_LOGOUT: 'USER_LOGOUT',
+  USER_AUTH: 'USER_AUTH'
 };
 
 // export const loginRequest = oAuthToken => {
@@ -34,10 +36,10 @@ export const userConstants = {
 //   };
 // };
 
-export const userAuth = oAuthToken => {
-  return {
+export const userAuth = oAuthToken => ({
+  [CALL_API]: {
     type: 'USER_AUTH',
-    fetchConfig: {
+    config: {
       path: `/config_api/login`,
       method: 'GET',
       headers: {
@@ -45,8 +47,8 @@ export const userAuth = oAuthToken => {
       },
       credentials: 'include'
     }
-  };
-};
+  }
+});
 
 // //login action creator
 // export const login = oAuthToken => {
