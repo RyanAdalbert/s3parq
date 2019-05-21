@@ -18,7 +18,7 @@ jupyter==1.0.0
 jupyterlab==0.35.4
 
 ###TEST RESOURCES
-s3parq==1.0.0
+s3parq==1.0.2
 dfmock==0.0.14
 paramiko
 flask==1.0.2
