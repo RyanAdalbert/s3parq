@@ -53,7 +53,7 @@ const callApi = store => next => action => {
       headers,
       credentials
     })
-      .then(response => console.log(response.json))
+      .then(response => response.json())
       .then(json => dispatch(receivePipelines(json)))
       .catch(error => {
         console.log('request failed', error);

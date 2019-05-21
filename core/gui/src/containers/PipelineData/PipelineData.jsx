@@ -10,6 +10,7 @@ const PipelineData = WrappedComponent => {
   return class extends Component {
     componentDidMount() {
       const { dispatch, oAuthToken } = this.props;
+      console.log(oAuthToken);
       dispatch(fetchPipelines(oAuthToken));
     }
 

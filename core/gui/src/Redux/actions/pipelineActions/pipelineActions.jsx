@@ -5,13 +5,6 @@ export const pipelineConstants = {
   EXPAND_DETAILS: 'EXPAND_DETAILS'
 };
 
-export const requestPipelines = pipelines => {
-  return {
-    type: 'REQUEST_PIPELINES',
-    pipelines
-  };
-};
-
 export const receivePipelines = json => {
   return {
     type: 'RECEIVE_PIPELINES',

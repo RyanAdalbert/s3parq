@@ -9,12 +9,12 @@ const INITIAL_STATE = {
 
 const pipelineReducer = (state = INITIAL_STATE, action) => {
   const { RECEIVE_PIPELINES, REQUEST_PIPELINES } = pipelineConstants;
-  const { STORE_TOKEN } = userConstants;
+  const { STORE_USER_INFO } = userConstants;
 
   switch (action.type) {
-    case STORE_TOKEN:
+    case STORE_USER_INFO:
       return Object.assign({}, state, {
-        oAuthToken: action.payload.oAuthToken
+        oAuthToken: action.oAuthToken
       });
     case REQUEST_PIPELINES:
       return Object.assign({}, state, {
