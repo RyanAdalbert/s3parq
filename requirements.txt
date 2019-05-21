@@ -16,6 +16,7 @@ alembic==1.0.6
 papermill==0.17.1
 jupyter==1.0.0
 jupyterlab==0.35.4
+mysql-connector==2.2.9
 
 ###TEST RESOURCES
 s3parq==1.0.2

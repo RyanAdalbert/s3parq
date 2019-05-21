@@ -79,7 +79,7 @@ def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
                 
                 fm.get_file(remote_file_path, local_file_path)
 
-def publish_files(contract: RawContract, prefix="": str, suffix="": str, remote_path: str, secret: Secret):
+def publish_files(contract: RawContract, prefix: str="", suffix: str="", remote_path: str, secret: Secret):
    
     # List S3 files using raw contract
     local_files = contract.list_files(file_prefix=prefix)
