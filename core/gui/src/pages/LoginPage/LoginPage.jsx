@@ -66,10 +66,11 @@ class LoginPage extends React.Component {
 
     // Get Response from Google
     const responseGoogle = response => {
+      console.log(response);
       const { accessToken } = response;
-      //const { givenName } = response.profileObj;
+      const { givenName } = response.profileObj;
       //get authorization from api to login user
-      dispatch(userAuth(accessToken));
+      dispatch(userAuth(accessToken, givenName));
     };
 
     return (

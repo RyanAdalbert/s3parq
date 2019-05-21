@@ -1,7 +1,9 @@
 import {
   loginSuccess,
-  loginError
+  loginError,
+  storeUserInfo
 } from '../actions/userAuthActions/userAuthActions';
+import { receivePipelines } from '../actions/pipelineActions/pipelineActions';
 
 //login action creator
 
@@ -20,26 +22,43 @@ const callApi = store => next => action => {
   const credentials = config.credentials;
   const method = config.method;
   const END_POINT = config.endPoint;
+  const userName = config.userName;
 
-  return fetch(`${API_ROOT + END_POINT}`, {
-    method,
-    headers,
-    credentials
-  })
-    .then(response => {
-      if (response.status === 200) {
-        console.log(response);
-        dispatch(loginSuccess(response));
-      } else {
-        const error = new Error(response.statusText);
-        error.response = response;
-        dispatch(loginError(error));
-        throw error;
-      }
+  localStorage.setItem('oAuthToken', headers.authorization);
+  localStorage.setItem('userName', userName);
+
+  if (action.type === 'LOGIN_ATTEMPT') {
+    return fetch(`${API_ROOT + END_POINT}`, {
+      method,
+      headers,
+      credentials
     })
-    .catch(error => {
-      console.log('request failed', error);
-    });
+      .then(response => {
+        if (response.status === 200) {
+          dispatch(storeUserInfo(headers.authorization, userName));
+          dispatch(loginSuccess(response));
+        } else {
+          const error = new Error(response.statusText);
+          error.response = response;
+          dispatch(loginError(error));
+          throw error;
+        }
+      })
+      .catch(error => {
+        console.log('request failed', error);
+      });
+  } else {
+    return fetch(`${API_ROOT + END_POINT}`, {
+      method,
+      headers,
+      credentials
+    })
+      .then(response => console.log(response.json))
+      .then(json => dispatch(receivePipelines(json)))
+      .catch(error => {
+        console.log('request failed', error);
+      });
+  }
 };
 
 export default callApi;

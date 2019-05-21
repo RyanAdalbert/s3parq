@@ -5,16 +5,15 @@ export const userConstants = {
   LOGIN_ATTEMPT: 'LOGIN_ATTEMPT',
   LOGIN_SUCCESS: 'LOGIN_SUCCESS',
   LOGIN_FAILURE: 'LOGIN_FAILURE',
+  STORE_USER_INFO: 'STORE_USER_INFO',
   USER_LOGOUT: 'USER_LOGOUT'
 };
 
 // login flow action creators
-export const loginError = error => {
-  return {
-    type: 'LOGIN_FAILURE',
-    error
-  };
-};
+export const loginError = error => ({
+  type: 'LOGIN_FAILURE',
+  error
+});
 
 export const loginSuccess = response => {
   return dispatch => {
@@ -26,7 +25,7 @@ export const loginSuccess = response => {
   };
 };
 
-export const userAuth = oAuthToken => ({
+export const userAuth = (oAuthToken, userName) => ({
   type: 'LOGIN_ATTEMPT',
   config: {
     endPoint: `/config_api/login`,
@@ -34,13 +33,18 @@ export const userAuth = oAuthToken => ({
     headers: {
       authorization: oAuthToken
     },
-    credentials: 'include'
+    credentials: 'include',
+    userName
   }
 });
 
+export const storeUserInfo = (oAuthToken, userName) => ({
+  type: 'STORE_USER_INFO',
+  oAuthToken,
+  userName
+});
+
 //logout action creator
-export const logOut = () => {
-  return {
-    type: 'USER_LOGOUT'
-  };
-};
+export const logOut = () => ({
+  type: 'USER_LOGOUT'
+});

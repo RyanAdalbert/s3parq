@@ -7,7 +7,7 @@ export const INITIAL_STATE = {
 };
 
 const userReducer = (state = INITIAL_STATE, action) => {
-  const { LOGIN_ATTEMPT, LOGIN_SUCCESS } = userConstants;
+  const { LOGIN_ATTEMPT, LOGIN_SUCCESS, STORE_USER_INFO } = userConstants;
   switch (action.type) {
     case LOGIN_ATTEMPT:
       return Object.assign({}, state, {
@@ -19,6 +19,12 @@ const userReducer = (state = INITIAL_STATE, action) => {
         error: null,
         isLoggingIn: false,
         isLoggedIn: true
+      });
+    case STORE_USER_INFO:
+      const { oAuthToken, userName } = action;
+      return Object.assign({}, state, {
+        oAuthToken,
+        userName
       });
     default:
       return state;

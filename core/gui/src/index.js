@@ -4,7 +4,6 @@ import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
-import { loadState, saveState } from './utils/localStorage';
 import 'bootstrap/dist/css/bootstrap.css';
 
 import './index.css';
@@ -12,18 +11,11 @@ import App from './app/App';
 import rootReducer from './redux/reducers';
 import middleware from './redux/middleware/middleware';
 
-const presistedState = loadState();
 const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(
   rootReducer,
-  presistedState,
   composeEnhancer(applyMiddleware(thunk, middleware))
 );
-
-//Store Token
-store.subscribe(() => {
-  saveState(store.getState());
-});
 
 ReactDOM.render(
   <Provider store={store}>
