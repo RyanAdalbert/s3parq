@@ -45,10 +45,13 @@ class TransformOperator(InheritOperator):
         """
         if isinstance(self,SSHOperator):
             self.__logger.info(f"Running Corebot command `{run_command}` locally in notebook container...")
-
-
-            ## ssh into notebook container
-            ## run da corebot!     
+            super(TransformOperator, self).__init__(task_id=task_id,
+                                                    remote_host='hardcoding!',
+                                                    command = run_command,
+                                                    timeout = 5000,
+                                                    *args,
+                                                    **kwargs
+                                                    )
             self.__logger.info("Done. Corebot ran successfully in notebook container.")
         else:
             self.__logger.info(f"Running Corebot run command string: {run_command} in AWS Batch.")
