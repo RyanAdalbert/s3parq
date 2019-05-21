@@ -4,7 +4,7 @@ from core.helpers.session_helper import SessionHelper
 from unittest.mock import patch
 from airflow.contrib.operators.awsbatch_operator import AWSBatchOperator
 from airflow.contrib.operators.ssh_operator import SSHOperator
-"""
+
 from core.models.configuration import (
     PharmaceuticalCompany, 
     Brand, 
@@ -14,13 +14,10 @@ from core.models.configuration import (
     PipelineState, 
     PipelineStateType, 
     TransformationTemplate, 
-    Transformation,
-    ExtractTransformation
+    Transformation
 )
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 from mock import patch, PropertyMock, MagicMock
-import pytest
-
 from core.airflow.plugins.transform_operator import TransformOperator
 
 class Names:
@@ -44,7 +41,7 @@ class Test:
                                   graph_order=1, pipeline_id=1))
         session.add(TransformationTemplate(id=1, name=n.tname))
 
-        session.add(ExtractTransformation(id=1, graph_order=0,
+        session.add(Transformation(id=1, graph_order=0,
                                    transformation_template_id=1, pipeline_state_id=1))
         session.add(Transformation(id=2, graph_order=0,
                                    transformation_template_id=1, pipeline_state_id=1))
@@ -54,7 +51,7 @@ class Test:
 
     @patch('core.airflow.plugins.transform_operator.SessionHelper', autospec=True)
     @patch('core.airflow.plugins.transform_operator.BRANCH_NAME')
-    def test_transform_operator_sends_to_batch(self,mock_repo,mock_session_helper):
+    def test_transform_operator_assigns_task_id(self,mock_repo,mock_session_helper):
         n = Names()
         type(mock_session_helper.return_value).session = PropertyMock(return_value = self.setup_session_mock())
             
@@ -63,7 +60,7 @@ class Test:
         operator = TransformOperator(transform_id=1)
         
         assert operator.task_id == f"{n.pname}_{n.pstname}_{n.tname}_1".lower()
-"""
+
 @patch('core.airflow.plugins.transform_operator.SessionHelper', SessionHelper)
 def test_transform_remote(monkeypatch):
     with monkeypatch.context() as m:
@@ -80,3 +77,16 @@ def test_transform_local(monkeypatch):
         import core.airflow.plugins.transform_operator as toperator
         to = toperator.TransformOperator(transform_id=1)
         assert isinstance(to, SSHOperator)
+
+    @patch('core.airflow.plugins.transform_operator.AWSBatchOperator.__init__')
+    @patch('core.airflow.plugins.transform_operator.SessionHelper', autospec=True)
+    @patch('core.airflow.plugins.transform_operator.BRANCH_NAME')
+    def test_transform_operator_calls_batch(self,mock_repo,mock_session_helper, mock_batch):
+        n = Names()
+        type(mock_session_helper.return_value).session = PropertyMock(return_value = self.setup_session_mock())
+            
+        mock_repo.return_value = PropertyMock(return_value = "test_branch")
+        
+        operator = TransformOperator(transform_id=1)
+        
+        assert mock_batch.called
