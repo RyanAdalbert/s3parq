@@ -10,7 +10,7 @@ from core.helpers.docker import get_core_job_def_name
 import core.models.configuration as config
 from core.logging import get_logger
 
-#inherit based on env
+#inherit based on environment 
 InheritOperator = SSHOperator if ENVIRONMENT == 'dev' else AWSBatchOperator
 
 class TransformOperator(InheritOperator):
@@ -21,6 +21,7 @@ class TransformOperator(InheritOperator):
                 **kwargs are direct passed into super - PythonOperator from Airflow
                 returns a valid task object for use in DAGs only
         """
+
         self.__logger = get_logger(
             ".".join([self.__module__, self.__class__.__name__]))
 
@@ -44,6 +45,8 @@ class TransformOperator(InheritOperator):
         """
         if isinstance(self,SSHOperator):
             self.__logger.info(f"Running Corebot command `{run_command}` locally in notebook container...")
+
+
             ## ssh into notebook container
             ## run da corebot!     
             self.__logger.info("Done. Corebot ran successfully in notebook container.")
@@ -52,7 +55,6 @@ class TransformOperator(InheritOperator):
             job_container_overrides = {
                 'command': run_command
             }
-
             
             self.__logger.info(f"Executing AWSBatchOperator for {job_name}.")
             super(TransformOperator, self).__init__(task_id=task_id,
