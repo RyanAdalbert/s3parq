@@ -7,6 +7,11 @@ import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 import App from './app/App';
 import store from './redux/store';
+import { saveState } from './redux/store';
+
+store.subscribe(() => {
+  saveState(store.getState());
+});
 
 ReactDOM.render(
   <Provider store={store}>
