@@ -79,18 +79,20 @@ def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
                 
                 fm.get_file(remote_file_path, local_file_path)
 
-def publish_files(contract: RawContract, prefix: str="", suffix: str="", remote_path: str, secret: Secret):
+def publish_files(contract: RawContract, prefix: str, suffix: str, remote_path: str, secret: Secret):
    
     # List S3 files using raw contract
-    local_files = contract.list_files(file_prefix=prefix)
-    local_files = os.path.basename(f) for f in local_files
+    local_files = []
+    for file in contract.list_files(file_prefix=prefix):
+        local_files.append(os.path.basename(file))
     local_files = filter (lambda x: x.endswith(suffix), local_files)
+    local_files = set(local_files)
 
     # Open SFTP connection
     with FileMover(secret=secret) as fm:
-        remote_files = f.filename for f in fm.list_files(remote_path)
-        local_files = set(local_files)
-        remote_files = set(remote_files)
+        remote_files = set()
+        for file in fm.list_files(remote_path):
+            remote_files.add(file.filename)
         local_files = local_files.difference(remote_files) # only publish files not already on the remote server
 
         for local_file in local_files:

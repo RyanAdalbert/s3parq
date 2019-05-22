@@ -223,7 +223,7 @@ class ConfigurationMocker(LoggerMixin):
             t(id=26, transformation_template_id=9, # final ingest transform (rayne) ilumya
               pipeline_state_id=6, graph_order=0),
             t(id=27, transformation_template_id=9, # final ingest transform (rayne) odomzo
-              pipeline_state_id=11, graph_order=0)
+              pipeline_state_id=11, graph_order=0),
             t(id=28, transformation_template_id=10, # publish to ftp ilumya
               pipeline_state_id=9, graph_order=1),
             t(id=29, transformation_template_id=10, # publish to ftp odomzo
@@ -277,11 +277,12 @@ class ConfigurationMocker(LoggerMixin):
                 pipeline_state_type_id=2),
             tt(id=10, name='publish_to_ftp',
                 variable_structures = ''' {"prefix":{"datatype": "string", "description": "file prefix in s3 to pull"},
-                "suffix":{"datatype":"string","description":"file suffix in s3 to pull"},
-                "secret_name":{"datatype":"string","description":"the name of the secret in Secret Manager for FTP server"},
-                "secret_type_of":{"datatype":"string","description":"the type of the secret in Secret Manager for FTP server (almost always \"FTP\""}
+                "suffix":{"datatype":"string", "description":"file suffix in s3 to pull"},
+                "remote_path":{"datatype":"string", "description":"path to publish to on FTP server"},
+                "secret_name":{"datatype":"string", "description":"the name of the secret in Secret Manager for FTP server"},
+                "secret_type_of":{"datatype":"string", "description":"the type of the secret in Secret Manager for FTP server, almost always FTP"}
                 }''',
-                pipeline_state_type_id=7),   
+                pipeline_state_type_id=7)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')
@@ -340,7 +341,14 @@ class ConfigurationMocker(LoggerMixin):
 
             tv(id=37, name="input_transform", transformation_id=19, value="symphony_health_association_filter_shipment_only"),
 
-            tv(id=38, name="input_transform", transformation_id=26, value="raw")
+            tv(id=38, name="input_transform", transformation_id=26, value="raw"),
+
+            tv(id=39, name="prefix", transformation_id=28, value="symphony_health_association"),
+            tv(id=40, name="suffix", transformation_id=28, value=""),
+            tv(id=41, name="remote_path", transformation_id=28, value=""),
+            tv(id=42, name="secret_name", transformation_id=28, value="dev-sftp"),
+            tv(id=43, name="secret_type_of", transformation_id=28, value="FTP")
+
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_variables mocks.')
