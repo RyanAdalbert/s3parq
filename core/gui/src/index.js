@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 import './index.css';
 import App from './app/App';
-import store from './redux/configureStore';
+import store from './redux/store';
 
 ReactDOM.render(
   <Provider store={store}>
