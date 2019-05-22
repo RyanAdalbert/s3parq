@@ -6,12 +6,19 @@ export const INITIAL_STATE = {
   isLoggedIn: 'loading'
 };
 
+const { LOGIN_ATTEMPT, LOGIN_SUCCESS, LOGIN_FAIL, STORE_TOKEN } = userConstants;
+
 const userReducer = (state = INITIAL_STATE, action) => {
-  const { LOGIN_ATTEMPT, LOGIN_SUCCESS, STORE_USER_INFO } = userConstants;
   switch (action.type) {
     case LOGIN_ATTEMPT:
       return Object.assign({}, state, {
         isLoggingIn: true,
+        isLoggedIn: false
+      });
+    case LOGIN_FAIL:
+      return Object.assign({}, state, {
+        error: action.error,
+        isLoggingIn: false,
         isLoggedIn: false
       });
     case LOGIN_SUCCESS:
@@ -20,8 +27,8 @@ const userReducer = (state = INITIAL_STATE, action) => {
         isLoggingIn: false,
         isLoggedIn: true
       });
-    case STORE_USER_INFO:
-      const { oAuthToken, userName } = action;
+    case STORE_TOKEN:
+      const { oAuthToken, userName } = action.payload;
       return Object.assign({}, state, {
         oAuthToken,
         userName

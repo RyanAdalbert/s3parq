@@ -10,7 +10,6 @@ const PipelineData = WrappedComponent => {
   return class extends Component {
     componentDidMount() {
       const { dispatch, oAuthToken } = this.props;
-      console.log(oAuthToken);
       dispatch(fetchPipelines(oAuthToken));
     }
 
@@ -22,7 +21,7 @@ const PipelineData = WrappedComponent => {
 
 const mapStateToProps = state => {
   return {
-    oAuthToken: state.pipelineReducer.oAuthToken,
+    oAuthToken: state.userReducer.oAuthToken,
     isLoggedIn: state.pipelineReducer.isLoggedIn,
     pipelines: state.pipelineReducer.pipelines,
     expanded: state.pipelineReducer.expanded
