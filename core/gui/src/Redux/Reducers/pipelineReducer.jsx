@@ -1,8 +1,7 @@
 import { pipelineConstants } from '../actions/pipelineActions/pipelineActions';
 
 const INITIAL_STATE = {
-  pipelines: [],
-  expanded: false
+  pipelines: []
 };
 
 const pipelineReducer = (state = INITIAL_STATE, action) => {
