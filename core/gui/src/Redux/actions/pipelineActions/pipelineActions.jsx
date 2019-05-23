@@ -1,38 +1,32 @@
+import { RSAA } from 'redux-api-middleware';
+import { API_HOST } from '../../constants';
+
 //Pipeline Constants
 export const pipelineConstants = {
-  REQUEST_PIPELINES: 'REQUEST_PIPELINES',
-  RECEIVE_PIPELINES: 'RECEIVE_PIPELINES',
-  EXPAND_DETAILS: 'EXPAND_DETAILS'
+  FETCH_PIPELINES: 'FETCH_PIPELINES',
+  FETCH_PIPELINES_SUCCESS: 'FETCH_PIPELINES_SUCCESS',
+  FETCH_PIPELINE_FAILURE: 'FETCH_PIPELINES_FAILURE'
 };
 
-export const requestPipelines = pipelines => {
-  return {
-    type: 'REQUEST_PIPELINES',
-    pipelines
-  };
-};
-
-export const receivePipelines = json => {
-  return {
-    type: 'RECEIVE_PIPELINES',
-    pipelines: json.data.map(pipeline => pipeline)
-  };
-};
-
-export const fetchPipelines = oAuthToken => {
-  const HOST = 'localhost';
-  return dispatch => {
-    return fetch(`http://${HOST}:5000/config_api/index`, {
-      method: 'GET',
-      headers: {
-        Authorization: oAuthToken
+//Fetch Pipeline with redux-api-middleware
+export const fetchPipelines = oAuthToken => ({
+  //The parameters of the API call are specified by root properties of the [RSAA] property of an RSAA.
+  [RSAA]: {
+    endpoint: `${API_HOST}/config_api/index`,
+    method: 'GET',
+    headers: {
+      authorization: oAuthToken
+    },
+    credentials: 'include',
+    types: [
+      'FETCH_PIPELINES',
+      {
+        type: 'FETCH_PIPELINES_SUCCESS',
+        payload: (action, state, res) => {
+          return res.json();
+        }
       },
-      credentials: 'include'
-    })
-      .then(response => response.json())
-      .then(json => dispatch(receivePipelines(json)))
-      .catch(error => {
-        console.log('request failed', error);
-      });
-  };
-};
+      'FETCH_PIPELINES_FAILURE'
+    ]
+  }
+});

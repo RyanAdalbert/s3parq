@@ -1,32 +1,31 @@
 import { pipelineConstants } from '../actions/pipelineActions/pipelineActions';
-import { userConstants } from '../actions/userAuthActions/userAuthActions';
 
 const INITIAL_STATE = {
-  pipelines: [],
-  oAuthToken: 'loading',
-  expanded: false
+  pipelines: []
 };
 
 const pipelineReducer = (state = INITIAL_STATE, action) => {
-  const { RECEIVE_PIPELINES, REQUEST_PIPELINES } = pipelineConstants;
-  const { STORE_TOKEN } = userConstants;
-
+  const {
+    FETCH_PIPELINES,
+    FETCH_PIPELINES_SUCCESS,
+    FETCH_PIPELINES_FAILURE
+  } = pipelineConstants;
   switch (action.type) {
-    case STORE_TOKEN:
-      return Object.assign({}, state, {
-        oAuthToken: action.payload.oAuthToken
-      });
-    case REQUEST_PIPELINES:
+    case FETCH_PIPELINES:
       return Object.assign({}, state, {
         isFetching: true,
         didInvalidate: false
       });
-    case RECEIVE_PIPELINES:
+    case FETCH_PIPELINES_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
         didInvalidate: false,
-        pipelines: action.pipelines,
-        lastUpdated: action.receivedAt
+        pipelines: action.payload.data
+      });
+    case FETCH_PIPELINES_FAILURE:
+      return Object.assign({}, state, {
+        isFetching: false,
+        didInvalidate: true
       });
     default:
       return state;
