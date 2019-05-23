@@ -1,8 +1,7 @@
-import os
-import paramiko
-import re
-import stat
+import os, paramiko, re, stat
+from core.secret import Secret
 from typing import NamedTuple
+from core.raw_contract import RawContract
 
 from core.logging import LoggerMixin
 
@@ -13,7 +12,7 @@ class FileDestination(NamedTuple):
 
 
 class FileMover(LoggerMixin):
-    def __init__(self,secret):
+    def __init__(self, secret: Secret):
         user = secret.user
         password = secret.password
         host = secret.host
@@ -43,7 +42,10 @@ class FileMover(LoggerMixin):
         self.sftp.get(remote_path, local_path)
         os.utime(local_path, (utime,utime))
 
-    def get_file_type(self, filename, file_dest_map):
+    def put_file(self, remote_path: str, local_path: str):
+        self.sftp.put(localpath=local_path, remotepath=remote_path)
+
+    def get_file_type(self, filename: str, file_dest_map: str):
         # Check if file is matching to the prefix, otherwise don't move
         file_type = [x.file_type for x in file_dest_map if re.match(x.regex, filename)]
         if len(file_type) < 1:
@@ -60,7 +62,7 @@ class FileMover(LoggerMixin):
         return self.sftp.listdir_attr(sftp_prefix)
 
 
-def get_files(tmp_dir:str,prefix: str, remote_path: str, secret):
+def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
     # Set file filtering
     files_dest = [FileDestination(f"^{prefix}.*$","do_move")]
 
@@ -76,3 +78,23 @@ def get_files(tmp_dir:str,prefix: str, remote_path: str, secret):
                 local_file_path = os.path.join(tmp_dir, local_file_name)
                 
                 fm.get_file(remote_file_path, local_file_path)
+
+def publish_files(contract: RawContract, prefix: str, suffix: str, remote_path: str, secret: Secret):
+   
+    # List S3 files using raw contract
+    local_files = []
+    for file in contract.list_files(file_prefix=prefix):
+        local_files.append(os.path.basename(file))
+    local_files = filter (lambda x: x.endswith(suffix), local_files)
+    local_files = set(local_files)
+
+    # Open SFTP connection
+    with FileMover(secret=secret) as fm:
+        remote_files = set()
+        for file in fm.list_files(remote_path):
+            remote_files.add(file.filename)
+        local_files = local_files.difference(remote_files) # only publish files not already on the remote server
+
+        for local_file in local_files:
+            with contract.download_raw_file(filename=local_file) as file:
+                fm.put_file(remote_path=remote_path, local_path=file)

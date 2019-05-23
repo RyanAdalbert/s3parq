@@ -11,7 +11,7 @@ class ConfigurationMocker(LoggerMixin):
         and could potentially differ from alembic migrations. 
     """
 
-    def __init__(self) -> None:
+    def __init__(self)-> None:
         engine = config.GenerateEngine(in_memory=True).get_engine()
 
         # this instansiates the in-memory sqlite instance
@@ -23,7 +23,7 @@ class ConfigurationMocker(LoggerMixin):
     def get_session(self) -> Session:
         return self.session
 
-    def generate_mocks(self) -> None:
+    def generate_mocks(self)-> None:
         self._mock_administrators()
         self._mock_pharmaceutical_companies()
         self._mock_brands()
@@ -38,61 +38,52 @@ class ConfigurationMocker(LoggerMixin):
         self._mock_transformations()
         self._mock_transformation_variables()
 
-    def _mock_transformation_templates_tags(self) -> None:
-        self.logger.debug(
-            'Generating bridge table mocks for transformation_templates <=> tags.')
+    def _mock_transformation_templates_tags(self)->None:
+        self.logger.debug('Generating bridge table mocks for transformation_templates <=> tags.')
         t = config.TransformationTemplateTag
         self.session.add_all([
-            t(transformation_template_id=1, tag_id=1),
-            t(transformation_template_id=2, tag_id=1),
-            t(transformation_template_id=1, tag_id=2)
+            t(transformation_template_id = 1, tag_id = 1),
+            t(transformation_template_id = 2, tag_id = 1),
+            t(transformation_template_id = 1, tag_id = 2)
         ])
         self.session.commit()
-        self.logger.debug(
-            'Done generating transformation_templates_tags mocks.')
+        self.logger.debug('Done generating transformation_templates_tags mocks.')
 
-    def _mock_tags(self) -> None:
+    def _mock_tags(self)->None:
         self.logger.debug('Generating tag mocks.')
         t = config.Tag
         self.session.add_all([
-            t(id=1, value='current'),
-            t(id=2, value='deprecated'),
-            t(id=3, value='beta')
+            t(id=1, value = 'current'),
+            t(id=2, value = 'deprecated'),
+            t(id=3, value = 'beta')
         ])
         self.session.commit()
         self.logger.debug('Done generating tag mocks.')
-
-    def _mock_administrators(self) -> None:
+    
+    def _mock_administrators(self)->None:
         self.logger.debug('Generating administrator mocks.')
         a = config.Administrator
         self.session.add_all([
-            a(id=1, first_name="Fox", last_name="Mulder",
-              email_address="fwm@integrichain.com"),
-            a(id=2, first_name="Dana", last_name="Skully",
-              email_address="dks@integrichain.com"),
-            a(id=3, first_name="Alec", last_name="Wertheimer",
-              email_address="ajw@integrichain.com"),
-            a(id=4, first_name="Natie", last_name="Bohnel",
-              email_address="njb@integrichain.com")
+            a(id=1, first_name = "Fox", last_name = "Mulder", email_address="fwm@integrichain.com"),
+            a(id=2, first_name = "Dana", last_name = "Skully", email_address="dks@integrichain.com"),
+            a(id=3, first_name = "Alec", last_name="Wertheimer", email_address="ajw@integrichain.com"),
+            a(id=4, first_name = "Natie", last_name="Bohnel", email_address="njb@integrichain.com")
         ])
         self.session.commit()
         self.logger.debug('Done generating administrator mocks.')
-
-    def _mock_brands(self) -> None:
+        
+    def _mock_brands(self)-> None:
         self.logger.debug('Generating brand mocks.')
         b = config.Brand
         self.session.add_all([
-            b(id=1, name="Teamocil", display_name="Teamocil",
-              pharmaceutical_company_id=1),
-            b(id=2, name="Cornballer", display_name="Corn Baller",
-              pharmaceutical_company_id=2),
-            b(id=3, name="ILUMYA", display_name="ILUMYA",
-              pharmaceutical_company_id=3),
+            b(id=1, name="Teamocil", display_name="Teamocil", pharmaceutical_company_id=1),
+            b(id=2, name="Cornballer", display_name="Corn Baller", pharmaceutical_company_id=2),
+            b(id=3, name="ILUMYA", display_name="ILUMYA", pharmaceutical_company_id=3),
             b(id=4, name="ODOMZO", display_name="ODOMZO", pharmaceutical_company_id=3)])
         self.session.commit()
         self.logger.debug('Done generating brand mocks.')
 
-    def _mock_pharmaceutical_companies(self) -> None:
+    def _mock_pharmaceutical_companies(self)-> None:
         self.logger.debug('Generating pharmaceutical company mocks.')
         p = config.PharmaceuticalCompany
         self.session.add_all([
@@ -102,7 +93,7 @@ class ConfigurationMocker(LoggerMixin):
         self.session.commit()
         self.logger.debug('Done generating pharmaceutical company mocks.')
 
-    def _mock_pipelines(self) -> None:
+    def _mock_pipelines(self)-> None:
         self.logger.debug('Generating pipeline mocks.')
         p = config.Pipeline
         self.session.add_all([
@@ -121,7 +112,7 @@ class ConfigurationMocker(LoggerMixin):
         self.session.commit()
         self.logger.debug('Done generating pipeline mocks.')
 
-    def _mock_pipeline_states(self) -> None:
+    def _mock_pipeline_states(self)-> None:
         self.logger.debug('Generating pipeline state mocks.')
         p = config.PipelineState
         self.session.add_all([
@@ -142,7 +133,7 @@ class ConfigurationMocker(LoggerMixin):
         self.session.commit()
         self.logger.debug('Done generating pipeline state mocks.')
 
-    def _mock_pipeline_state_types(self) -> None:
+    def _mock_pipeline_state_types(self)-> None:
         self.logger.debug('Generating pipeline state type mocks.')
         p = config.PipelineStateType
         self.session.add_all([
@@ -156,7 +147,7 @@ class ConfigurationMocker(LoggerMixin):
         self.session.commit()
         self.logger.debug('Done generating pipeline state type mocks.')
 
-    def _mock_pipeline_types(self) -> None:
+    def _mock_pipeline_types(self)-> None:
         self.logger.debug('Generating pipeline type mocks.')
         p = config.PipelineType
         self.session.add_all([
@@ -165,7 +156,7 @@ class ConfigurationMocker(LoggerMixin):
         self.session.commit()
         self.logger.debug('Done generating pipeline type mocks.')
 
-    def _mock_segments(self) -> None:
+    def _mock_segments(self)-> None:
         self.logger.debug('Generating segment mocks.')
         s = config.Segment
         self.session.add_all([
@@ -175,7 +166,7 @@ class ConfigurationMocker(LoggerMixin):
         self.session.commit()
         self.logger.debug('Done generating segment mocks.')
 
-    def _mock_transformations(self) -> None:
+    def _mock_transformations(self)-> None:
         self.logger.debug('Generating transformation mocks.')
         t = config.Transformation
         self.session.add_all([
@@ -204,28 +195,8 @@ class ConfigurationMocker(LoggerMixin):
             t(id=12, transformation_template_id=2,
               pipeline_state_id=1, graph_order=1),
             t(id=13, transformation_template_id=2,
-              pipeline_state_id=6, graph_order=0),
-            t(id=28, transformation_template_id=2,
-              pipeline_state_id=6, graph_order=0),
-            t(id=29, transformation_template_id=2,
-              pipeline_state_id=6, graph_order=0),
-            t(id=30, transformation_template_id=2,
-              pipeline_state_id=6, graph_order=0),
-            t(id=31, transformation_template_id=2,
-              pipeline_state_id=6, graph_order=0),
-
-            t(id=32, transformation_template_id=2,
-              pipeline_state_id=11, graph_order=0),
-            t(id=33, transformation_template_id=2,
-              pipeline_state_id=11, graph_order=0),
-            t(id=34, transformation_template_id=2,
-              pipeline_state_id=11, graph_order=0),
-            t(id=35, transformation_template_id=2,
-              pipeline_state_id=11, graph_order=0),
-            t(id=36, transformation_template_id=2,
-              pipeline_state_id=11, graph_order=0),
-
-            t(id=14, transformation_template_id=3,  # ilumya - map product NDCs
+              pipeline_state_id=2, graph_order=0),
+            t(id=14, transformation_template_id=3, # ilumya - map product NDCs
               pipeline_state_id=7, graph_order=0),
             t(id=15, transformation_template_id=4, # infer med details
               pipeline_state_id=7, graph_order=2),
@@ -237,7 +208,7 @@ class ConfigurationMocker(LoggerMixin):
               pipeline_state_id=8, graph_order=1),
             t(id=19, transformation_template_id=8, # extract column mapping
               pipeline_state_id=9, graph_order=0),
-            t(id=20, transformation_template_id=3,  # odomzo - map product NDCs
+            t(id=20, transformation_template_id=3, # odomzo - map product NDCs
               pipeline_state_id=12, graph_order=0),
             t(id=21, transformation_template_id=4, # infer med details
               pipeline_state_id=12, graph_order=2),
@@ -249,59 +220,65 @@ class ConfigurationMocker(LoggerMixin):
               pipeline_state_id=13, graph_order=1),
             t(id=25, transformation_template_id=8, # extract column mapping
               pipeline_state_id=14, graph_order=0),
-            t(id=26, transformation_template_id=9,  # final ingest transform (rayne)
+            t(id=26, transformation_template_id=9, # final ingest transform (rayne) ilumya
               pipeline_state_id=6, graph_order=0),
-            t(id=37, transformation_template_id=9,  # final ingest transform (rayne)
+            t(id=37, transformation_template_id=9,  # final ingest transform (rayne) ilumya
               pipeline_state_id=6, graph_order=0),
-            t(id=38, transformation_template_id=9,  # final ingest transform (rayne)
+            t(id=38, transformation_template_id=9,  # final ingest transform (rayne) ilumya
               pipeline_state_id=6, graph_order=0),
-            t(id=39, transformation_template_id=9,  # final ingest transform (rayne)
+            t(id=39, transformation_template_id=9,  # final ingest transform (rayne) ilumya
               pipeline_state_id=6, graph_order=0),
-            t(id=40, transformation_template_id=9,  # final ingest transform (rayne)
-              pipeline_state_id=6, graph_order=0)
+            t(id=40, transformation_template_id=9,  # final ingest transform (rayne) ilumya
+              pipeline_state_id=6, graph_order=0),
+            t(id=27, transformation_template_id=9, # final ingest transform (rayne) odomzo
+              pipeline_state_id=11, graph_order=0),
+            t(id=28, transformation_template_id=10, # publish to ftp ilumya
+              pipeline_state_id=9, graph_order=1),
+            t(id=29, transformation_template_id=10, # publish to ftp odomzo
+              pipeline_state_id=14, graph_order=1)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation mocks.')
 
-    def _mock_transformation_templates(self) -> None:
+    def _mock_transformation_templates(self)-> None:
         self.logger.debug('Generating transformation_template mocks.')
         tt = config.TransformationTemplate
         self.session.add_all([
             tt(id=1, name='extract_from_ftp',
-               variable_structures=''' {"filesystem_path":{"datatype": "string", "description": "the remote path to the files"},
+                  variable_structures = ''' {"filesystem_path":{"datatype": "string", "description": "the remote path to the files"},
                           "secret_name":{"datatype":"string","description":"the name of the secret in secret manager"},
                           "prefix":{"datatype":"string","description":"the prefix of the files to get on the remote filesystem"},
                           "secret_type_of":{"datatype":"string","description":"the type of the remote server, used in the secret path"}
                           }''',
                           pipeline_state_type_id=1),
             tt(id=2, name='initial_ingest',
-                variable_structures=''' {"delimiter":{"datatype": "string", "description": "the input file delimiter"},
+                variable_structures = ''' {"delimiter":{"datatype": "string", "description": "the input file delimiter"},
                 "skip_rows":{"datatype":"int","description":"the number of rows to skip at the top of the file"},
                 "encoding":{"datatype":"string","description":"the encoding of the input file"},
                 "input_file_prefix":{"datatype":"string","description":"the prefix of the selected input files"}
                 }''',
                 pipeline_state_type_id=2),
             tt(id=3, name='symphony_health_association_map_product_ndcs',
-                variable_structures=''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"},
+                variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"},
                 "index_col":{"datatype":"string","description":"the index column to map NDCs in the source dataset (default is rx_ndc_number)"},
                 "secret_name":{"datatype":"string","description":"the name of the secret in Secret Manager for platform2"},
                 "secret_type_of":{"datatype":"string","description":"the type of the secret in Secret Manager for platform2"}
                 }''',
+                pipeline_state_type_id=3),    
+            tt(id=4, name='symphony_health_association_infer_med_details',
+                variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
                 pipeline_state_type_id=3),
             tt(id=5, name='symphony_health_association_filter_to_brand',
                 variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
                 pipeline_state_type_id=3),
-            tt(id=4, name='symphony_health_association_infer_med_details',
-                variable_structures=''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
-                pipeline_state_type_id=3),
             tt(id=6, name='symphony_health_association_remap_pharm_codes',
-                variable_structures=''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
+                variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
                 pipeline_state_type_id=5),
             tt(id=7, name='symphony_health_association_filter_shipment_only',
-                variable_structures=''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
+                variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
                 pipeline_state_type_id=5),
             tt(id=8, name='symphony_health_association_extract_column_mapping',
-                variable_structures=''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
+                variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"}}''',
                 pipeline_state_type_id=7),
             tt(id=9, name='symphony_health_association_refinement',
                 variable_structures=''' {"ingest_source_transform":{"datatype": "string", "description": "The input source transform"},
@@ -375,25 +352,30 @@ class ConfigurationMocker(LoggerMixin):
                 "msa_patient_bmap":{"datatype":"string","description":"The mapped dataset column"},
                 "metadata_run_timestamp":{"datatype":"string","description":"The mapped dataset column"},
                 "metadata_app_version":{"datatype":"string","description":"The mapped dataset column"},
-                "metadata_output_contract":{"datatype":"string","description":"The mapped dataset column"}
+                "metadata_output_contract":{"datatype":"string","description":"The mapped dataset column"}''',
+                pipeline_state_type_id=2),
+            tt(id=10, name='publish_to_ftp',
+                variable_structures = ''' {"prefix":{"datatype": "string", "description": "file prefix in s3 to pull"},
+                "suffix":{"datatype":"string", "description":"file suffix in s3 to pull"},
+                "remote_path":{"datatype":"string", "description":"path to publish to on FTP server"},
+                "secret_name":{"datatype":"string", "description":"the name of the secret in Secret Manager for FTP server"},
+                "secret_type_of":{"datatype":"string", "description":"the type of the secret in Secret Manager for FTP server, almost always FTP"}
                 }''',
-                pipeline_state_type_id=2)
+                pipeline_state_type_id=7)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_template mocks.')
 
-    def _mock_transformation_variables(self) -> None:
+    def _mock_transformation_variables(self)->None:
         self.logger.debug('Generating transformation_variables mocks')
         tv = config.TransformationVariable
         self.session.add_all([
-            tv(id=5, name='filesystem_path',
-               transformation_id=2, value='banana_stand_data'),
+            tv(id=5, name='filesystem_path', transformation_id=2, value='banana_stand_data'),
             tv(id=6, name='prefix', transformation_id=2, value='gob'),
             tv(id=1, name='secret_name', transformation_id=2, value='dev-sftp'),
             tv(id=2, name='secret_type_of', transformation_id=2, value='FTP'),
 
-            tv(id=3, name='filesystem_path', transformation_id=3,
-               value='sudden_valley_holdings'),
+            tv(id=3, name='filesystem_path', transformation_id=3, value='sudden_valley_holdings'),
             tv(id=4, name='secret_name', transformation_id=3, value='dev-sftp'),
             tv(id=12, name='prefix', transformation_id=3, value=''),
             tv(id=11, name='secret_type_of', transformation_id=3, value='FTP'),
@@ -403,72 +385,48 @@ class ConfigurationMocker(LoggerMixin):
             tv(id=9, name='secret_name', transformation_id=9, value='dev-sftp'),
             tv(id=10, name='secret_type_of', transformation_id=9, value='FTP'),
 
-            tv(id=13, name='filesystem_path',
-               transformation_id=1, value='/incoming'),
+            tv(id=13, name='filesystem_path', transformation_id=1, value='/incoming'),
             tv(id=14, name='prefix', transformation_id=1, value=''),
             tv(id=15, name='secret_name', transformation_id=1, value='dev-sftp'),
             tv(id=16, name='secret_type_of', transformation_id=1, value='FTP'),
 
-            tv(id=17, name='filesystem_path',
-               transformation_id=10, value='/incoming'),
-            tv(id=18, name='prefix', transformation_id=10,
-               value='test-extract-root-prefix'),
+            tv(id=17, name='filesystem_path', transformation_id=10, value='/incoming'),
+            tv(id=18, name='prefix', transformation_id=10, value='test-extract-root-prefix'),
             tv(id=19, name='secret_name', transformation_id=10, value='dev-sftp'),
             tv(id=20, name='secret_type_of', transformation_id=10, value='FTP'),
 
-            tv(id=21, name='filesystem_path', transformation_id=10,
-               value='/incoming/testing_extract'),
+            tv(id=21, name='filesystem_path', transformation_id=10, value='/incoming/testing_extract'),
             tv(id=22, name='prefix', transformation_id=11, value=''),
             tv(id=23, name='secret_name', transformation_id=11, value='dev-sftp'),
             tv(id=24, name='secret_type_of', transformation_id=11, value='FTP'),
 
             tv(id=25, name='delimiter', transformation_id=13, value='|'),
-            tv(id=26, name='skip_rows', transformation_id=13, value=0),
+            tv(id=26, name='skip_rows', transformation_id=13, value=1),
             tv(id=27, name='encoding', transformation_id=13, value='iso8859'),
-            tv(id=28, name='input_file_prefix',
-               transformation_id=13, value='INTEGRICHAIN_SUN_ACCREDO_STATUSDISPENSE'),
-            tv(id=43, name='delimiter', transformation_id=28, value='|'),
-            tv(id=44, name='skip_rows', transformation_id=28, value=0),
-            tv(id=45, name='encoding', transformation_id=28, value='iso8859'),
-            tv(id=46, name='input_file_prefix',
-               transformation_id=28, value='INTEGRICHAIN_SUN_BRIOVA_STATUSDISPENSE'),
-            tv(id=47, name='delimiter', transformation_id=29, value='|'),
-            tv(id=48, name='skip_rows', transformation_id=29, value=0),
-            tv(id=49, name='encoding', transformation_id=29, value='iso8859'),
-            tv(id=50, name='input_file_prefix',
-               transformation_id=29, value='INTEGRICHAIN_SUN_CIGNA_STATUSDISPENSE'),
-            tv(id=51, name='delimiter', transformation_id=30, value='|'),
-            tv(id=52, name='skip_rows', transformation_id=30, value=0),
-            tv(id=53, name='encoding', transformation_id=30, value='iso8859'),
-            tv(id=54, name='input_file_prefix',
-               transformation_id=30, value='INTEGRICHAIN_SUN_CVS_STATUSDISPENSE'),
-            tv(id=55, name='delimiter', transformation_id=31, value='|'),
-            tv(id=56, name='skip_rows', transformation_id=31, value=0),
-            tv(id=57, name='encoding', transformation_id=31, value='iso8859'),
-            tv(id=58, name='input_file_prefix',
-               transformation_id=31, value='INTEGRICHAIN_SUN_WALGREENS_STATUSDISPENSE'),
+            tv(id=28, name='input_file_prefix', transformation_id=13, value='some-extracted-file'),
 
-            tv(id=29, name="input_transform", transformation_id=14,
-               value="symphony_health_association_refinement"),
+            tv(id=29, name="input_transform", transformation_id=14, value="symphony_health_association_refinement"),
             tv(id=30, name="index_col", transformation_id=14, value="rx_ndc_number"),
             tv(id=31, name="secret_name", transformation_id=14, value="platform2"),
-            tv(id=32, name="secret_type_of",
-               transformation_id=14, value="database"),
+            tv(id=32, name="secret_type_of", transformation_id=14, value="database"),
 
-            tv(id=33, name="input_transform", transformation_id=15,
-               value="symphony_health_association_map_product_ndcs"),
+            tv(id=33, name="input_transform", transformation_id=15, value="symphony_health_association_map_product_ndcs"),
 
-            tv(id=34, name="input_transform", transformation_id=16,
-               value="symphony_health_association_infer_med_details"),
+            tv(id=34, name="input_transform", transformation_id=16, value="symphony_health_association_infer_med_details"),
 
-            tv(id=35, name="input_transform", transformation_id=17,
-               value="symphony_health_association_filter_to_brand"),
+            tv(id=35, name="input_transform", transformation_id=17, value="symphony_health_association_filter_to_brand"),
 
-            tv(id=36, name="input_transform", transformation_id=18,
-               value="symphony_health_association_remap_pharm_codes"),
+            tv(id=36, name="input_transform", transformation_id=18, value="symphony_health_association_remap_pharm_codes"),
 
-            tv(id=37, name="input_transform", transformation_id=19,
-               value="symphony_health_association_filter_shipment_only"),
+            tv(id=37, name="input_transform", transformation_id=19, value="symphony_health_association_filter_shipment_only"),
+
+            tv(id=38, name="input_transform", transformation_id=26, value="raw"),
+
+            tv(id=39, name="prefix", transformation_id=28, value="symphony_health_association"),
+            tv(id=40, name="suffix", transformation_id=28, value=""),
+            tv(id=41, name="remote_path", transformation_id=28, value=""),
+            tv(id=42, name="secret_name", transformation_id=28, value="dev-sftp"),
+            tv(id=43, name="secret_type_of", transformation_id=28, value="FTP")
 
             tv(id=59, name='ingest_source_transform', transformation_id=26, value="initial_ingest"),
             tv(id=60, name='ingest_source_file_prefix', transformation_id=26, value="INTEGRICHAIN_SUN_ACCREDO_STATUSDISPENSE"),
@@ -838,16 +796,12 @@ class ConfigurationMocker(LoggerMixin):
         self.session.commit()
         self.logger.debug('Done generating transformation_variables mocks.')
 
-
 def setup_base_session():
     mock = ConfigurationMocker()
     session = mock.get_session()
-    session.add(PharmaceuticalCompany(
-        id=1, display_name='test_client', name='test_client'))
-    session.add(Brand(id=1, pharmaceutical_company_id=1,
-                      display_name='test_brand', name='test_brand'))
+    session.add(PharmaceuticalCompany(id=1, display_name='test_client', name='test_client'))
+    session.add(Brand(id=1, pharmaceutical_company_id=1, display_name='test_brand', name='test_brand'))
     session.add(Segment(id=1, name='test_segment'))
     session.add(PipelineType(id=1, segment_id=1, name='test_patient_pipeline'))
-    session.add(Pipeline(id=1, pipeline_type_id=1,
-                         brand_id=1, name='test_pipeline'))
+    session.add(Pipeline(id=1, pipeline_type_id=1, brand_id=1, name='test_pipeline'))
     return session
