@@ -80,14 +80,14 @@ def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
                 
                 fm.get_file(remote_file_path, local_file_path)
 
-def publish_files(prefix: str, suffix: str, local_path: str, remote_path: str, secret: Secret):
+def publish_file(local_path: str, remote_path: str, secret: Secret):
     # Open SFTP connection
     with FileMover(secret=secret) as fm:
         local_file = os.path.basename(local_path)
         remote_files = set()
         for file in fm.list_files(remote_path):
             remote_files.add(file.filename)
-        if local_file in remote_files:
+        if local_file in remote_files: # we don't want to overwrite any existing files on external FTP
             logger.debug("Error: File already exists on remote FTP server.")
             raise ValueError("Error: File already exists on remote FTP server.")
         fm.put_file(remote_path=remote_path, local_path=local_path)
