@@ -52,7 +52,7 @@ services:
         # host port, but leave the container port as 8888
         ports:
             - "8081:8888"
-            - "22:22"
+            - "3022:22"
         working_dir: /host
         command: /notebook-entrypoint.sh
         depends_on:
