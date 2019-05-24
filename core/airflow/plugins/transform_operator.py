@@ -7,6 +7,7 @@ from core.contract import Contract
 from core.helpers.project_root import ProjectRoot
 from core.helpers.session_helper import SessionHelper
 from core.helpers.docker import get_core_job_def_name
+from airflow.contrib.hooks.ssh_hook import SSHHook
 import core.models.configuration as config
 from core.logging import get_logger
 
@@ -44,11 +45,18 @@ class TransformOperator(InheritOperator):
             AWSBatchOperator for prod  
         """
         if isinstance(self,SSHOperator):
+
+            hook = SSHHook( remote_host='notebook',
+                            port=22,
+                            username='corebot_remote',
+                            password='corebot_remote',
+                            timeout=5000
+            )        
+
             self.__logger.info(f"Running Corebot command `{run_command}` locally in notebook container...")
             super(TransformOperator, self).__init__(task_id=task_id,
-                                                    remote_host='hardcoding!',
+                                                    ssh_hook=hook,
                                                     command = run_command,
-                                                    timeout = 5000,
                                                     *args,
                                                     **kwargs
                                                     )

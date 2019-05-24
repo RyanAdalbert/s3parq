@@ -92,3 +92,4 @@ def test_transform_local(monkeypatch):
         transform_operator.TransformOperator(transform_id=1)
         
         assert mock_batch.called
+
