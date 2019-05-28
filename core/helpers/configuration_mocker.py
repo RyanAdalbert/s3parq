@@ -235,7 +235,18 @@ class ConfigurationMocker(LoggerMixin):
             t(id=28, transformation_template_id=10, # publish to ftp ilumya
               pipeline_state_id=9, graph_order=1),
             t(id=29, transformation_template_id=10, # publish to ftp odomzo
-              pipeline_state_id=14, graph_order=1)
+              pipeline_state_id=14, graph_order=1),
+
+            t(id=41, transformation_template_id=2, # publish to ftp odomzo
+              pipeline_state_id=6, graph_order=1),
+            t(id=42, transformation_template_id=2, # publish to ftp odomzo
+              pipeline_state_id=6, graph_order=1),
+            t(id=43, transformation_template_id=2, # publish to ftp odomzo
+              pipeline_state_id=6, graph_order=1),
+            t(id=44, transformation_template_id=2, # publish to ftp odomzo
+              pipeline_state_id=6, graph_order=1),
+            t(id=45, transformation_template_id=2, # publish to ftp odomzo
+              pipeline_state_id=6, graph_order=1)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation mocks.')
@@ -352,7 +363,7 @@ class ConfigurationMocker(LoggerMixin):
                 "msa_patient_bmap":{"datatype":"string","description":"The mapped dataset column"},
                 "metadata_run_timestamp":{"datatype":"string","description":"The mapped dataset column"},
                 "metadata_app_version":{"datatype":"string","description":"The mapped dataset column"},
-                "metadata_output_contract":{"datatype":"string","description":"The mapped dataset column"}''',
+                "metadata_output_contract":{"datatype":"string","description":"The mapped dataset column"}}''',
                 pipeline_state_type_id=2),
             tt(id=10, name='publish_to_ftp',
                 variable_structures = ''' {"prefix":{"datatype": "string", "description": "file prefix in s3 to pull"},
@@ -420,13 +431,37 @@ class ConfigurationMocker(LoggerMixin):
 
             tv(id=37, name="input_transform", transformation_id=19, value="symphony_health_association_filter_shipment_only"),
 
-            tv(id=38, name="input_transform", transformation_id=26, value="raw"),
-
             tv(id=39, name="prefix", transformation_id=28, value="symphony_health_association"),
             tv(id=40, name="suffix", transformation_id=28, value=""),
             tv(id=41, name="remote_path", transformation_id=28, value=""),
             tv(id=42, name="secret_name", transformation_id=28, value="dev-sftp"),
-            tv(id=43, name="secret_type_of", transformation_id=28, value="FTP")
+            tv(id=43, name="secret_type_of", transformation_id=28, value="FTP"),
+
+            tv(id=438, name='delimiter', transformation_id=41, value='|'),
+            tv(id=437, name='skip_rows', transformation_id=41, value=0),
+            tv(id=436, name='encoding', transformation_id=41, value='iso8859'),
+            tv(id=419, name='input_file_prefix',
+               transformation_id=41, value='INTEGRICHAIN_SUN_ACCREDO_STATUSDISPENSE'),
+            tv(id=420, name='delimiter', transformation_id=42, value='|'),
+            tv(id=421, name='skip_rows', transformation_id=42, value=0),
+            tv(id=422, name='encoding', transformation_id=42, value='iso8859'),
+            tv(id=423, name='input_file_prefix',
+               transformation_id=42, value='INTEGRICHAIN_SUN_BRIOVA_STATUSDISPENSE'),
+            tv(id=424, name='delimiter', transformation_id=43, value='|'),
+            tv(id=425, name='skip_rows', transformation_id=43, value=0),
+            tv(id=426, name='encoding', transformation_id=43, value='iso8859'),
+            tv(id=427, name='input_file_prefix',
+               transformation_id=43, value='INTEGRICHAIN_SUN_CIGNA_STATUSDISPENSE'),
+            tv(id=428, name='delimiter', transformation_id=44, value='|'),
+            tv(id=429, name='skip_rows', transformation_id=44, value=0),
+            tv(id=430, name='encoding', transformation_id=44, value='iso8859'),
+            tv(id=431, name='input_file_prefix',
+               transformation_id=44, value='INTEGRICHAIN_SUN_CVS_STATUSDISPENSE'),
+            tv(id=432, name='delimiter', transformation_id=45, value='|'),
+            tv(id=433, name='skip_rows', transformation_id=45, value=0),
+            tv(id=434, name='encoding', transformation_id=45, value='iso8859'),
+            tv(id=435, name='input_file_prefix',
+               transformation_id=45, value='INTEGRICHAIN_SUN_WALGREENS_STATUSDISPENSE'),
 
             tv(id=59, name='ingest_source_transform', transformation_id=26, value="initial_ingest"),
             tv(id=60, name='ingest_source_file_prefix', transformation_id=26, value="INTEGRICHAIN_SUN_ACCREDO_STATUSDISPENSE"),
