@@ -5,9 +5,10 @@ from core.constants import ENV_BUCKET
 from core.helpers.session_helper import SessionHelper
 from core.models import configuration
 from core.dataset_contract import DatasetContract
-from core.logging import LoggerMixin
-
+from core.logging import LoggerSingleton
 root = project_root.ProjectRoot().get_path()
+
+logger = LoggerSingleton().logger
 
 def run_transform(transform_id:int) -> str:
     ## notebook name == transform_template.name
@@ -44,8 +45,10 @@ def output_url(output_path: str) -> str:
     return output_path.replace(s3_prefix, url_prefix)
 
 def get_transform(transform_id):
+    logger.info(f"Collecting transform id {transform_id} from config database...")
     session = SessionHelper().session
     transform_config = configuration.Transformation
     # Start querying the extract config
     transform = session.query(transform_config).filter(transform_config.id == transform_id).one()
+    logger.info(f"Done. Transform {transform.transformation_template.name} found.")
     return transform
