@@ -69,6 +69,10 @@ class LoggerSingleton(object):
     logger.debug("this is a debug message!")
     ```
     """
+    __logger = None
+    @property
     def logger(self)-> logging.Logger:
-        return get_logger(__name__)       
-           
+        if self.__logger is None:
+            self.__logger = get_logger(__name__)       
+        
+        return self.__logger       
