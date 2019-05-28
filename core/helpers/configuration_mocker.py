@@ -426,11 +426,11 @@ class ConfigurationMocker(LoggerMixin):
             tv(id=31, name="secret_name", transformation_id=14, value="platform2"),
             tv(id=32, name="secret_type_of", transformation_id=14, value="database"),
 
-            tv(id=33, name="input_transform", transformation_id=15, value="symphony_health_association_map_product_ndcs"),
+            tv(id=33, name="input_transform", transformation_id=15, value="symphony_health_association_filter_to_brand"),
 
-            tv(id=34, name="input_transform", transformation_id=16, value="symphony_health_association_infer_med_details"),
+            tv(id=34, name="input_transform", transformation_id=16, value="symphony_health_association_map_product_ndcs"),
 
-            tv(id=35, name="input_transform", transformation_id=17, value="symphony_health_association_filter_to_brand"),
+            tv(id=35, name="input_transform", transformation_id=17, value="symphony_health_association_infer_med_details"),
 
             tv(id=36, name="input_transform", transformation_id=18, value="symphony_health_association_remap_pharm_codes"),
 
