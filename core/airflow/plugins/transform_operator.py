@@ -56,7 +56,7 @@ class TransformOperator(InheritOperator):
             self.__logger.info(f"Running Corebot command `{run_command}` locally in notebook container...")
             super(TransformOperator, self).__init__(task_id=task_id,
                                                     ssh_hook=hook,
-                                                    command = run_command,
+                                                    command = " ".join(run_command), ##SSH can only take a string here :(
                                                     *args,
                                                     **kwargs
                                                     )
