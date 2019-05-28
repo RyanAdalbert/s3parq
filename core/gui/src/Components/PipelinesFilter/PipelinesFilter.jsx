@@ -5,9 +5,17 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 
 class PipelinesFilter extends React.Component {
   render() {
+    const { pipelines } = this.props;
+
+    const dropdownItemsArr = [];
+    const dropdownItems = pipelines.map(pipeline => {
+      const key = Object.keys(pipeline);
+      return <Dropdown.Item as="button">{pipeline[key].brand}</Dropdown.Item>;
+    });
+
     return (
       <Dropdown>
-        <DropdownButton title="Brand" />
+        <DropdownButton title="Brand">{dropdownItems}</DropdownButton>
       </Dropdown>
     );
   }
