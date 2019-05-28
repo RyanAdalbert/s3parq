@@ -3,7 +3,7 @@ from core.secret import Secret
 from typing import NamedTuple
 from core.raw_contract import RawContract
 
-from core.logging import LoggerMixin
+from core.logging import LoggerMixin, get_logger
 
 
 class FileDestination(NamedTuple):
@@ -61,6 +61,7 @@ class FileMover(LoggerMixin):
         # List all files on remote
         return self.sftp.listdir_attr(sftp_prefix)
 
+logger = get_logger("file_mover")
 
 def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
     # Set file filtering
@@ -79,22 +80,14 @@ def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
                 
                 fm.get_file(remote_file_path, local_file_path)
 
-def publish_files(contract: RawContract, prefix: str, suffix: str, remote_path: str, secret: Secret):
-   
-    # List S3 files using raw contract
-    local_files = []
-    for file in contract.list_files(file_prefix=prefix):
-        local_files.append(os.path.basename(file))
-    local_files = filter (lambda x: x.endswith(suffix), local_files)
-    local_files = set(local_files)
-
+def publish_file(local_path: str, remote_path: str, secret: Secret):
     # Open SFTP connection
     with FileMover(secret=secret) as fm:
+        local_file = os.path.basename(local_path)
         remote_files = set()
         for file in fm.list_files(remote_path):
             remote_files.add(file.filename)
-        local_files = local_files.difference(remote_files) # only publish files not already on the remote server
-
-        for local_file in local_files:
-            with contract.download_raw_file(filename=local_file) as file:
-                fm.put_file(remote_path=remote_path, local_path=file)
+        if local_file in remote_files: # we don't want to overwrite any existing files on external FTP
+            logger.debug("Error: File already exists on remote FTP server.")
+            raise ValueError("Error: File already exists on remote FTP server.")
+        fm.put_file(remote_path=remote_path, local_path=local_path)
