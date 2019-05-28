@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 
 import { fetchPipelines } from '../../redux/actions/pipelineActions/pipelineActions';
+import { fetchFilters } from '../../redux/actions/filtersActions/filtersActions';
 
 // Data container for the pipelines component, handles data for the pipelines component
 const PipelineData = WrappedComponent => {
@@ -11,6 +12,7 @@ const PipelineData = WrappedComponent => {
     componentDidMount() {
       const { dispatch, oAuthToken } = this.props;
       dispatch(fetchPipelines(oAuthToken));
+      dispatch(fetchFilters(oAuthToken));
     }
 
     render() {
