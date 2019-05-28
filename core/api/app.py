@@ -3,7 +3,7 @@ from datetime import datetime
 from flask_cors import CORS
 import json, requests, os, sqlalchemy.orm
 from flask import Flask, Blueprint, request, session
-from core.api.routes import auth, index
+from core.api.routes import auth, index, filters
 from core.constants import BRANCH_NAME
 
 def create_app()->Flask:
