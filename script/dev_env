@@ -24,6 +24,9 @@ docker-compose exec notebook /bin/bash -c "cd core/core/database && alembic upgr
 docker-compose exec notebook /bin/bash -c "apt-get update && \
 apt-get install -y openssh-server && \
 mkdir /var/run/sshd && \
-useradd -p $(openssl passwd -1 corebot_remote) -ms /bin/bash corebot_remote
+useradd -ms /bin/bash corebot_remote && \
+ echo -e 'corebot_remote\ncorebot_remote' | passwd corebot_remote && \
 service ssh start" 
 script/dev_shell $TYPE
+
+##useradd -p $(openssl passwd -1 corebot_remote) -ms /bin/bash corebot_remote
