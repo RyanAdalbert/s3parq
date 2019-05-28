@@ -1,7 +1,8 @@
+import os
 from datetime import datetime
 import papermill
 from core.helpers import project_root
-from core.constants import ENV_BUCKET
+from core.constants import ENV_BUCKET, ENVIRONMENT
 from core.helpers.session_helper import SessionHelper
 from core.models import configuration
 from core.dataset_contract import DatasetContract
@@ -34,9 +35,18 @@ def run_transform(transform_id:int) -> str:
 
 # TODO: figure out how else we're going to separate the notebook 
 def output_path(output_contract: str) -> str:
+    """ for dev environments it will write inside the container. 
+        everywhere else it will write to S3 logs. 
+    """
     s3_prefix = f"s3://{ENV_BUCKET}/notebooks"
     day = datetime.now().strftime('%Y-%m-%d')
     time = datetime.now().strftime('%H-%M-%S.%f')
+
+    if ENVIRONMENT == 'dev':
+        local_path = f"{root}/output_notebooks/{output_contract}/{day}"
+        if not os.path.isdir(local_path):
+            os.makedirs(local_path, exist_ok = True)
+        return local_path + f"/{time}.ipynb"
     return f"{s3_prefix}/{output_contract}/{day}/{time}.ipynb"
 
 def output_url(output_path: str) -> str:
