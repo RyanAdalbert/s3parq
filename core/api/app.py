@@ -11,6 +11,7 @@ def create_app()->Flask:
     app.secret_key = b'\xb6\xcf:v_\xffh\xfe\xa2\x82\xac\x8b\xd7qL\x07'
     app.register_blueprint(auth.bp, url_prefix="/config_api")
     app.register_blueprint(index.bp, url_prefix="/config_api")
+    app.register_blueprint(filters.bp, url_prefix="/config_api")
     CORS(app, supports_credentials=True)
     return app
 
