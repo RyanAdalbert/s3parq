@@ -1,23 +1,28 @@
-from airflow.utils import apply_defaults
+from airflow.utils.decorators import apply_defaults
 from airflow.contrib.operators.awsbatch_operator import AWSBatchOperator
+from airflow.contrib.operators.ssh_operator import SSHOperator
 from collections import namedtuple
-from core.constants import BATCH_JOB_QUEUE, BRANCH_NAME
+from core.constants import BATCH_JOB_QUEUE, BRANCH_NAME, ENVIRONMENT
 from core.contract import Contract
 from core.helpers.project_root import ProjectRoot
 from core.helpers.session_helper import SessionHelper
 from core.helpers.docker import get_core_job_def_name
+from airflow.contrib.hooks.ssh_hook import SSHHook
 import core.models.configuration as config
 from core.logging import get_logger
 
+#inherit based on environment 
+InheritOperator = SSHOperator if ENVIRONMENT == 'dev' else AWSBatchOperator
 
-class TransformOperator(AWSBatchOperator):
-
+class TransformOperator(InheritOperator):
+    
     @apply_defaults
     def __init__(self, transform_id: int, *args, **kwargs) -> None:
         """ Transformation operator for DAGs. 
                 **kwargs are direct passed into super - PythonOperator from Airflow
                 returns a valid task object for use in DAGs only
         """
+
         self.__logger = get_logger(
             ".".join([self.__module__, self.__class__.__name__]))
 
@@ -35,21 +40,44 @@ class TransformOperator(AWSBatchOperator):
             'run',
             f'{transform_id}'
         ]
-        self.__logger.debug(f"Corebot run command string: {run_command}.")
-        job_container_overrides = {
-            'command': run_command
-        }
-        self.__logger.info(f"Executing AWSBatchOperator for {job_name}.")
-        super(TransformOperator, self).__init__(task_id=task_id,
-                                                job_name=job_name,
-                                                job_definition=job_def_name,
-                                                job_queue=job_queue,
-                                                overrides=job_container_overrides,
-                                                *args,
-                                                **kwargs
-                                                )
-        self.__logger.info(f"Done. AWSBatchOperator executed for {job_name}.")
+        
+        """ Run location control: this class inherits SSHOperator for dev, 
+            AWSBatchOperator for prod  
+        """
+        if isinstance(self,SSHOperator):
 
+            hook = SSHHook( remote_host='notebook',
+                            port=22,
+                            username='corebot_remote',
+                            password='corebot_remote',
+                            timeout=5000
+            )        
+
+            self.__logger.info(f"Running Corebot command `{run_command}` locally in notebook container...")
+            super(TransformOperator, self).__init__(task_id=task_id,
+                                                    ssh_hook=hook,
+                                                    command = " ".join(run_command), ##SSH can only take a string here :(
+                                                    *args,
+                                                    **kwargs
+                                                    )
+            self.__logger.info("Done. Corebot ran successfully in notebook container.")
+        else:
+            self.__logger.info(f"Running Corebot run command string: {run_command} in AWS Batch.")
+            job_container_overrides = {
+                'command': run_command
+            }
+            
+            self.__logger.info(f"Executing AWSBatchOperator for {job_name}.")
+            super(TransformOperator, self).__init__(task_id=task_id,
+                                                    job_name=job_name,
+                                                    job_definition=job_def_name,
+                                                    job_queue=job_queue,
+                                                    overrides=job_container_overrides,
+                                                    *args,
+                                                    **kwargs
+                                                    )
+            self.__logger.info(f"Done. AWSBatchOperator executed for {job_name}.")
+            
     def _get_transform_info(self):
         """ Gets full queried info for the transform.
                 Uses SessionHelper to grab it based on the transform ID
