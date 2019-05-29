@@ -56,3 +56,23 @@ class LoggerMixin(object):
             ])
             self.__logger = get_logger(name)
         return self.__logger
+
+
+class LoggerSingleton(object):
+    """ logger attribute class for use in a procdeural module.
+    Usage:
+    
+    ```
+    logger = LoggerSingleton().logger
+    
+    ## some code later.. 
+    logger.debug("this is a debug message!")
+    ```
+    """
+    __logger = None
+    @property
+    def logger(self)-> logging.Logger:
+        if self.__logger is None:
+            self.__logger = get_logger(__name__)       
+        
+        return self.__logger       
