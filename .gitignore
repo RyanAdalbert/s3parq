@@ -9,3 +9,4 @@ htmlcov/
 .terraform
 *.DS_Store
 dist/
+output_notebooks/
