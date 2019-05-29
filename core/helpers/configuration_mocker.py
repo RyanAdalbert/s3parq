@@ -240,16 +240,6 @@ class ConfigurationMocker(LoggerMixin):
 
             t(id=41, transformation_template_id=2, # publish to ftp odomzo
               pipeline_state_id=6, graph_order=1),
-            t(id=42, transformation_template_id=2, # publish to ftp odomzo
-              pipeline_state_id=6, graph_order=1),
-            t(id=43, transformation_template_id=2, # publish to ftp odomzo
-              pipeline_state_id=6, graph_order=1),
-            t(id=44, transformation_template_id=2, # publish to ftp odomzo
-              pipeline_state_id=6, graph_order=1),
-            t(id=45, transformation_template_id=2, # publish to ftp odomzo
-              pipeline_state_id=6, graph_order=1)
-            t(id=12, transformation_template_id=2,
-              pipeline_state_id=1, graph_order=1),
             t(id=1000, transformation_template_id=1000, pipeline_state_id=2, graph_order=2)
         ])
         self.session.commit()
@@ -273,7 +263,6 @@ class ConfigurationMocker(LoggerMixin):
                 "input_file_prefix":{"datatype":"string","description":"the prefix of the selected input files"}
                 }''',
                 pipeline_state_type_id=2),
-<<<<<<< HEAD
             tt(id=3, name='symphony_health_association_map_product_ndcs',
                 variable_structures = ''' {"input_transform":{"datatype": "string", "description": "the name of the transform to input source data from"},
                 "index_col":{"datatype":"string","description":"the index column to map NDCs in the source dataset (default is rx_ndc_number)"},
@@ -845,7 +834,7 @@ class ConfigurationMocker(LoggerMixin):
             tv(id=416, name='metadata_run_timestamp', transformation_id=40, value="__metadata_run_timestamp"),
             tv(id=417, name='metadata_app_version', transformation_id=40, value="__metadata_app_version"),
             tv(id=418, name='metadata_output_contract', transformation_id=40, value="__metadata_output_contract"),
-            
+
             tv(id=1000, name="noun", transformation_id=1000, value="world")
         ])
         self.session.commit()
