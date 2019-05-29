@@ -69,3 +69,17 @@ def test_unlogged_index(client):
     url = root + "/index"
     response = client.get(url)
     assert response.status_code == 401
+
+def test_filters(logged_client):
+    url = root + "/filters"
+    response = logged_client.get(url)
+    try:
+        json.loads(response.get_data())
+    except json.JSONDecodeError:
+        pytest.fail("Invalid JSON response")
+    assert response.status_code == 200
+
+def test_unlogged_filters(client):
+    url = root + "/filters"
+    response = client.get(url)
+    assert response.status_code == 401
