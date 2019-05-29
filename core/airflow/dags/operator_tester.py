@@ -24,8 +24,9 @@ if ENVIRONMENT == "dev":
 
     kickoff_task = DummyOperator(task_id="task_that_does_nothing", dag=dag)
 
+
     # Needs to pass in the required transformation ID
-    transform_task = TransformOperator(transform_id=1, dag=dag)
+    transform_task = TransformOperator(transform_id=1000, dag=dag)
 
     # put them in order
     kickoff_task >> transform_task

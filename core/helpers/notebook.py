@@ -1,13 +1,15 @@
+import os
 from datetime import datetime
 import papermill
 from core.helpers import project_root
-from core.constants import ENV_BUCKET
+from core.constants import ENV_BUCKET, ENVIRONMENT
 from core.helpers.session_helper import SessionHelper
 from core.models import configuration
 from core.dataset_contract import DatasetContract
-from core.logging import LoggerMixin
-
+from core.logging import LoggerSingleton
 root = project_root.ProjectRoot().get_path()
+
+logger = LoggerSingleton().logger
 
 def run_transform(transform_id:int) -> str:
     ## notebook name == transform_template.name
@@ -33,9 +35,18 @@ def run_transform(transform_id:int) -> str:
 
 # TODO: figure out how else we're going to separate the notebook 
 def output_path(output_contract: str) -> str:
+    """ for dev environments it will write inside the container. 
+        everywhere else it will write to S3 logs. 
+    """
     s3_prefix = f"s3://{ENV_BUCKET}/notebooks"
     day = datetime.now().strftime('%Y-%m-%d')
     time = datetime.now().strftime('%H-%M-%S.%f')
+
+    if ENVIRONMENT == 'dev':
+        local_path = f"{root}/output_notebooks/{output_contract}/{day}"
+        if not os.path.isdir(local_path):
+            os.makedirs(local_path, exist_ok = True)
+        return local_path + f"/{time}.ipynb"
     return f"{s3_prefix}/{output_contract}/{day}/{time}.ipynb"
 
 def output_url(output_path: str) -> str:
@@ -44,8 +55,10 @@ def output_url(output_path: str) -> str:
     return output_path.replace(s3_prefix, url_prefix)
 
 def get_transform(transform_id):
+    logger.info(f"Collecting transform id {transform_id} from config database...")
     session = SessionHelper().session
     transform_config = configuration.Transformation
     # Start querying the extract config
     transform = session.query(transform_config).filter(transform_config.id == transform_id).one()
+    logger.info(f"Done. Transform {transform.transformation_template.name} found.")
     return transform
