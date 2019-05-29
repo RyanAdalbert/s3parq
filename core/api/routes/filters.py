@@ -32,9 +32,9 @@ def filters():
         status.add('Active')
       else:
         status.add('Inactive')
-    filters['brands'] = brands
-    filters['companies'] = companies
-    filters['types'] = types
-    filters['status'] = status
+    filters['brands'] = list(brands)
+    filters['companies'] = list(companies)
+    filters['types'] = list(types)
+    filters['status'] = list(status)
     mainObj = {"data" : filters}
     return json.dumps(mainObj), 200
