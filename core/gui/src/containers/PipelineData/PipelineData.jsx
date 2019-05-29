@@ -21,7 +21,7 @@ const PipelineData = WrappedComponent => {
 
 const mapStateToProps = state => {
   return {
-    oAuthToken: state.pipelineReducer.oAuthToken,
+    oAuthToken: state.userReducer.oAuthToken,
     isLoggedIn: state.pipelineReducer.isLoggedIn,
     pipelines: state.pipelineReducer.pipelines,
     expanded: state.pipelineReducer.expanded

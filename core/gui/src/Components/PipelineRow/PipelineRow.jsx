@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+// import Button from 'react-bootstrap/Button';
+// import Modal from 'react-bootstrap/Modal';
 
 //Pipeline row component
 export default class PipelineRow extends PureComponent {
