@@ -4,6 +4,8 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import styled from 'styled-components';
 
+import { setFilter } from '../../redux/actions/filterActions/filterActions';
+
 class DropdownButtons extends React.Component {
   render() {
     const { brands, companies, types, status } = this.props.filters;
@@ -53,7 +55,8 @@ class DropdownButtons extends React.Component {
         : null;
 
     const handleSelect = evt => {
-      console.log(evt);
+      const { dispatch } = this.props;
+      dispatch(setFilter(evt));
     };
 
     return (
