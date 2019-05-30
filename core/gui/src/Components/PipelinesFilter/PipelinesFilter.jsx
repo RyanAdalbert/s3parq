@@ -26,45 +26,85 @@ class PipelinesFilter extends React.Component {
   render() {
     const { brands, companies, types, status } = this.props.filters;
 
-    const dropdownBrands = brands.map(brand => {
-      return (
-        <Dropdown.Item as="button" key={brand}>
-          {brand}
-        </Dropdown.Item>
-      );
-    });
+    const dropdownBrands =
+      brands !== undefined
+        ? brands.map(brand => {
+            return (
+              <Dropdown.Item as="button" key={brand} eventKey={brand}>
+                {brand}
+              </Dropdown.Item>
+            );
+          })
+        : null;
 
-    const dropdownCompanies = companies.map(company => {
-      return (
-        <Dropdown.Item as="button" key={company}>
-          {company}
-        </Dropdown.Item>
-      );
-    });
+    const dropdownCompanies =
+      companies !== undefined
+        ? companies.map(company => {
+            return (
+              <Dropdown.Item as="button" key={company} eventKey={company}>
+                {company}
+              </Dropdown.Item>
+            );
+          })
+        : null;
 
-    const dropdownTypes = types.map(type => {
-      return (
-        <Dropdown.Item as="button" key={type}>
-          {type}
-        </Dropdown.Item>
-      );
-    });
+    const dropdownTypes =
+      types !== undefined
+        ? types.map(type => {
+            return (
+              <Dropdown.Item as="button" key={type} eventKey={type}>
+                {type}
+              </Dropdown.Item>
+            );
+          })
+        : null;
 
-    const dropdownStatus = status.map(stat => {
-      return (
-        <Dropdown.Item as="button" key={stat}>
-          {stat}
-        </Dropdown.Item>
-      );
-    });
+    const dropdownStatus =
+      status !== undefined
+        ? status.map(stat => {
+            return (
+              <Dropdown.Item as="button" key={stat} eventKey={stat}>
+                {stat}
+              </Dropdown.Item>
+            );
+          })
+        : null;
 
     return (
       <PipelineFilterContainer>
         <Dropdown className="dropdown-container" size="sm">
-          <DropdownButton title="Brand">{dropdownBrands}</DropdownButton>
-          <DropdownButton title="Companies">{dropdownCompanies}</DropdownButton>
-          <DropdownButton title="Types">{dropdownTypes}</DropdownButton>
-          <DropdownButton title="Status">{dropdownStatus}</DropdownButton>
+          <DropdownButton
+            title="Brand"
+            onSelect={function(evt) {
+              console.log(evt);
+            }}
+          >
+            {dropdownBrands}
+          </DropdownButton>
+          <DropdownButton
+            title="Companies"
+            onSelect={function(evt) {
+              console.log(evt);
+            }}
+          >
+            {dropdownCompanies}
+          </DropdownButton>
+          <DropdownButton
+            title="Types"
+            onSelect={function(evt) {
+              console.log(evt);
+            }}
+          >
+            {dropdownTypes}
+          </DropdownButton>
+          <DropdownButton
+            title="Status"
+            onSelect={function(evt) {
+              console.log(evt);
+            }}
+          >
+            {dropdownStatus}
+          </DropdownButton>
         </Dropdown>
       </PipelineFilterContainer>
     );

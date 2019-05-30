@@ -14,18 +14,21 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
     case FETCH_FILTERS:
       return Object.assign({}, state, {
         isFetching: true,
-        didInvalidate: false
+        didInvalidate: false,
+        fetched: false
       });
     case FETCH_FILTERS_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
         didInvalidate: false,
-        filters: action.payload.data
+        filters: action.payload.data,
+        fetched: true
       });
     case FETCH_FILTERS_FAILURE:
       return Object.assign({}, state, {
         isFetching: false,
-        didInvalidate: true
+        didInvalidate: true,
+        fetched: false
       });
     default:
       return state;
