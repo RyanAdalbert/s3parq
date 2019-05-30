@@ -5,7 +5,8 @@ import { API_HOST } from '../../constants';
 export const pipelineConstants = {
   FETCH_PIPELINES: 'FETCH_PIPELINES',
   FETCH_PIPELINES_SUCCESS: 'FETCH_PIPELINES_SUCCESS',
-  FETCH_PIPELINE_FAILURE: 'FETCH_PIPELINES_FAILURE'
+  FETCH_PIPELINE_FAILURE: 'FETCH_PIPELINES_FAILURE',
+  SET_FILTER: 'SET_FILTER'
 };
 
 //Fetch Pipeline with redux-api-middleware

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 
 import { fetchPipelines } from '../../redux/actions/pipelineActions/pipelineActions';
-import { fetchFilters } from '../../redux/actions/filtersActions/filtersActions';
+import { fetchFilters } from '../../redux/actions/filterActions/filterActions';
 
 // Data container for the pipelines component, handles data for the pipelines component
 const PipelineData = WrappedComponent => {
@@ -27,8 +27,8 @@ const mapStateToProps = state => {
     isLoggedIn: state.pipelineReducer.isLoggedIn,
     pipelines: state.pipelineReducer.pipelines,
     expanded: state.pipelineReducer.expanded,
-    filters: state.filtersReducer.filters,
-    filtersFetched: state.filtersReducer.fetched,
+    filters: state.filterReducer.filters,
+    filtersFetched: state.filterReducer.fetched,
     pipelinesFetched: state.pipelineReducer
   };
 };

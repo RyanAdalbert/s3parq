@@ -1,18 +1,17 @@
 import { RSAA } from 'redux-api-middleware';
 import { API_HOST } from '../../constants';
 
-export const filterConstants = {};
-
 export const setVisibilityFilter = filter => ({
   type: 'SET_VISIBILITY_FILTER',
   filter
 });
 
 //Filters Constants
-export const filtersConstants = {
+export const filterConstants = {
   FETCH_FILTERS: 'FETCH_FILTERS',
   FETCH_FILTERS_SUCCESS: 'FETCH_FILTERS_SUCCESS',
-  FETCH_FILTERS_FAILURE: 'FETCH_FILTERS_FAILURE'
+  FETCH_FILTERS_FAILURE: 'FETCH_FILTERS_FAILURE',
+  SET_FILTER: 'SET_FILTER'
 };
 
 //Fetch Filters with redux-api-middleware
@@ -36,4 +35,9 @@ export const fetchFilters = oAuthToken => ({
       'FETCH_FILTERS_FAILURE'
     ]
   }
+});
+
+export const setFilter = evt => ({
+  type: 'SET_FILTER',
+  evt
 });
