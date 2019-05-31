@@ -28,6 +28,10 @@ const mapStateToProps = state => {
     pipelines: state.pipelineReducer.pipelines,
     expanded: state.pipelineReducer.expanded,
     filters: state.filterReducer.filters,
+    brand: state.filterReducer.brand,
+    company: state.filterReducer.company,
+    type: state.filterReducer.type,
+    status: state.filterReducer.status,
     filtersFetched: state.filterReducer.fetched,
     pipelinesFetched: state.pipelineReducer
   };

@@ -4,12 +4,18 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import styled from 'styled-components';
 
-import { setFilter } from '../../redux/actions/filterActions/filterActions';
+import {
+  setFilterBrand,
+  setFilterCompany,
+  setFilterType,
+  setFilterStatus
+} from '../../redux/actions/filterActions/filterActions';
 
 class DropdownButtons extends React.Component {
   render() {
     const { brands, companies, types, status } = this.props.filters;
 
+    //Check to make sure Attributes (Brands, Companies, Types, Status) are being hydrated in the Store if so render dropdown buttons
     const dropdownBrands =
       brands !== undefined
         ? brands.map(brand => {
@@ -54,28 +60,54 @@ class DropdownButtons extends React.Component {
           })
         : null;
 
-    const handleSelect = evt => {
+    // Dispatch corresponding button action that sets the filter in the store with the correct selection
+    const handleSelect = (evt, buttonName) => {
       const { dispatch } = this.props;
-      dispatch(setFilter(evt));
+      if (buttonName === 'brand') {
+        dispatch(setFilterBrand(evt));
+      }
+      if (buttonName === 'company') {
+        dispatch(setFilterCompany(evt));
+      }
+      if (buttonName === 'type') {
+        dispatch(setFilterType(evt));
+      }
+      if (buttonName === 'status') {
+        dispatch(setFilterStatus(evt));
+      }
     };
 
     return (
       <>
-        <DropdownButton title="Brand" onSelect={evt => handleSelect(evt)}>
+        <DropdownButton
+          title="Brand"
+          onSelect={evt => handleSelect(evt, 'brand')}
+        >
           {dropdownBrands}
         </DropdownButton>
-        <DropdownButton title="Companies" onSelect={evt => handleSelect(evt)}>
+        <DropdownButton
+          title="Companies"
+          onSelect={evt => handleSelect(evt, 'company')}
+        >
           {dropdownCompanies}
         </DropdownButton>
-        <DropdownButton title="Types" onSelect={evt => handleSelect(evt)}>
+        <DropdownButton
+          title="Types"
+          onSelect={evt => handleSelect(evt, 'type')}
+        >
           {dropdownTypes}
         </DropdownButton>
-        <DropdownButton title="Status" onSelect={evt => handleSelect(evt)}>
+        <DropdownButton
+          title="Status"
+          onSelect={evt => handleSelect(evt, 'status')}
+        >
           {dropdownStatus}
         </DropdownButton>
       </>
     );
   }
 }
+
+DropdownButtons.propTypes = {};
 
 export default DropdownButtons;

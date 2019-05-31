@@ -11,7 +11,10 @@ export const filterConstants = {
   FETCH_FILTERS: 'FETCH_FILTERS',
   FETCH_FILTERS_SUCCESS: 'FETCH_FILTERS_SUCCESS',
   FETCH_FILTERS_FAILURE: 'FETCH_FILTERS_FAILURE',
-  SET_FILTER: 'SET_FILTER'
+  SET_FILTER_BRAND: 'SET_FILTER_BRAND',
+  SET_FILTER_COMPANY: 'SET_FILTER_COMPANY',
+  SET_FILTER_TYPE: 'SET_FILTER_TYPE',
+  SET_FILTER_STATUS: 'SET_FILTER_STATUS'
 };
 
 //Fetch Filters with redux-api-middleware
@@ -37,7 +40,22 @@ export const fetchFilters = oAuthToken => ({
   }
 });
 
-export const setFilter = evt => ({
-  type: 'SET_FILTER',
+export const setFilterBrand = evt => ({
+  type: 'SET_FILTER_BRAND',
+  evt
+});
+
+export const setFilterCompany = evt => ({
+  type: 'SET_FILTER_COMPANY',
+  evt
+});
+
+export const setFilterType = evt => ({
+  type: 'SET_FILTER_TYPE',
+  evt
+});
+
+export const setFilterStatus = evt => ({
+  type: 'SET_FILTER_STATUS',
   evt
 });
