@@ -174,7 +174,7 @@ class ConfigurationMocker(LoggerMixin):
             t(id=1, transformation_template_id=1,
               pipeline_state_id=1, graph_order=0),
             t(id=2, transformation_template_id=1,
-              pipeline_state_id=2, graph_order=0),
+              pipeline_state_id=5, graph_order=0),
             t(id=3, transformation_template_id=1,
               pipeline_state_id=2, graph_order=1),
             t(id=9, transformation_template_id=1,
@@ -383,9 +383,9 @@ class ConfigurationMocker(LoggerMixin):
         self.logger.debug('Generating transformation_variables mocks')
         tv = config.TransformationVariable
         self.session.add_all([
-            tv(id=5, name='filesystem_path', transformation_id=2, value='banana_stand_data'),
-            tv(id=6, name='prefix', transformation_id=2, value='gob'),
-            tv(id=1, name='secret_name', transformation_id=2, value='dev-sftp'),
+            tv(id=5, name='filesystem_path', transformation_id=2, value='/upload/sha_dry_run_test_raw_fetch'),
+            tv(id=6, name='prefix', transformation_id=2, value='INTEGRICHAIN_SUN_'),
+            tv(id=1, name='secret_name', transformation_id=2, value='test-sftp'),
             tv(id=2, name='secret_type_of', transformation_id=2, value='FTP'),
 
             tv(id=3, name='filesystem_path', transformation_id=3, value='sudden_valley_holdings'),
@@ -435,8 +435,8 @@ class ConfigurationMocker(LoggerMixin):
 
             tv(id=39, name="prefix", transformation_id=28, value="symphony_health_association"),
             tv(id=40, name="suffix", transformation_id=28, value=""),
-            tv(id=41, name="remote_path", transformation_id=28, value=""),
-            tv(id=42, name="secret_name", transformation_id=28, value="dev-sftp"),
+            tv(id=41, name="remote_path", transformation_id=28, value="/sha_dry_run_test_publish"),
+            tv(id=42, name="secret_name", transformation_id=28, value="test-sftp"),
             tv(id=43, name="secret_type_of", transformation_id=28, value="FTP"),
             tv(id=439, name="input_transform", transformation_id=28, value="symphony_health_association_extract_column_mapping"),
             tv(id=440, name="separator", transformation_id=28, value="|"),

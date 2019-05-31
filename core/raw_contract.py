@@ -85,6 +85,25 @@ class RawContract(Contract):
         path += filename
         return path
 
+    def key_with_filename(self, filename: str)->str:
+        ''' INTENT: builds the s3 path from the contract.
+            RETURNS: string s3 path
+            NOTE: requires all params to be set to at least the state level
+        '''
+        if not (self.env and
+                self.branch and
+                self.parent and
+                self.child and
+                self.state
+                ):
+            raise ValueError(
+                's3_path_with_filename() requires all contract params to be set.')
+
+        path = f'{self.branch}/{self.parent}/{self.child}/{self.state}/'
+
+        path += filename
+        return path
+
     # Outside functions
 
     def publish_raw_file(self, local_file_path: str) ->None:
@@ -109,7 +128,7 @@ class RawContract(Contract):
         s3_client = boto3.client('s3')
         
         filename = os.path.split(local_file_path)[1]
-        key = self.s3_path_with_filename(filename)
+        key = self.key_with_filename(filename)
         try:
             return s3_client.head_object(Bucket=self.bucket,Key=key)["Metadata"]
         except ClientError as e:
