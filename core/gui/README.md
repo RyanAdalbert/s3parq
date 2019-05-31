@@ -9,6 +9,8 @@ As of right now you will need your local core repo to be inside a Repos director
 
 To start GUI container fun `script/dev_env --gui` from root core directory. This will start the docker container for the GUI and and start up an instace of the api, in a separate terminal window.
 
+Open [http://localhost:3000](http://localhost3000) to view app in the browser.
+
 ### Dependancies
 To install all necessary dependancies run `NPM install`, or `Yarn` if you are using Yarn.
 
