@@ -14,7 +14,6 @@ import {
 class DropdownButtons extends React.Component {
   render() {
     const { brands, companies, types, status } = this.props.filters;
-
     //Check to make sure Attributes (Brands, Companies, Types, Status) are being hydrated in the Store if so render dropdown buttons
     const dropdownBrands =
       brands !== undefined
@@ -80,27 +79,39 @@ class DropdownButtons extends React.Component {
     return (
       <>
         <DropdownButton
-          title="Brand"
+          title={this.props.brand}
           onSelect={evt => handleSelect(evt, 'brand')}
         >
+          <Dropdown.Item as="button" key="Brand" eventKey="Brand">
+            Brand
+          </Dropdown.Item>
           {dropdownBrands}
         </DropdownButton>
         <DropdownButton
-          title="Companies"
+          title={this.props.company}
           onSelect={evt => handleSelect(evt, 'company')}
         >
+          <Dropdown.Item as="button" key="Company" eventKey="Company">
+            Company
+          </Dropdown.Item>
           {dropdownCompanies}
         </DropdownButton>
         <DropdownButton
-          title="Types"
+          title={this.props.type}
           onSelect={evt => handleSelect(evt, 'type')}
         >
+          <Dropdown.Item as="button" key="Type" eventKey="Type">
+            Type
+          </Dropdown.Item>
           {dropdownTypes}
         </DropdownButton>
         <DropdownButton
-          title="Status"
+          title={this.props.status}
           onSelect={evt => handleSelect(evt, 'status')}
         >
+          <Dropdown.Item as="button" key="Status" eventKey="Status">
+            Status
+          </Dropdown.Item>
           {dropdownStatus}
         </DropdownButton>
       </>
