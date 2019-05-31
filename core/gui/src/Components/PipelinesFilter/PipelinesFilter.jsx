@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import Dropdown from 'react-bootstrap/Dropdown';
 import styled from 'styled-components';
 
-import { setFilter } from '../../redux/actions/filterActions/filterActions';
 import DropdownButtons from '../DropdownButtons/DropdownButtons';
 
 const PipelineFilterContainer = styled.div`
@@ -13,14 +12,10 @@ const PipelineFilterContainer = styled.div`
     width: 100%;
     display: flex;
     justify-content: flex-start;
+  }
 
-    .dropdown {
-      margin-right: 5px;
-
-      button {
-        padding: 2px 10px;
-      }
-    }
+  .dropdown {
+    margin-right: 5px;
   }
 `;
 
