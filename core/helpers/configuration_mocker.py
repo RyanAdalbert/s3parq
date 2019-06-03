@@ -365,7 +365,7 @@ class ConfigurationMocker(LoggerMixin):
                 "suffix":{"datatype":"string", "description":"file suffix to publish to ftp"},
                 "filetype":{"datatype": "string", "description": "filetype to publish to ftp (DO NOT INCLUDE . IN FILETYPE)"},
                 "separator":{"datatype": "string", "description": "single character separator for output file"},
-                "compression":{"datatype": "string", "description": "if true, published file will be compressed as gzip"},
+                "compression":{"datatype": "int", "description": "if true, published file will be compressed as gzip"},
                 "date_format":{"datatype": "string", "description": "string formatting for datetime"},
                 "remote_path":{"datatype":"string", "description":"path to publish to on FTP server"},
                 "secret_name":{"datatype":"string", "description":"the name of the secret in Secret Manager for FTP server"},
@@ -435,7 +435,7 @@ class ConfigurationMocker(LoggerMixin):
 
             tv(id=39, name="prefix", transformation_id=28, value="symphony_health_association"),
             tv(id=40, name="suffix", transformation_id=28, value=""),
-            tv(id=41, name="remote_path", transformation_id=28, value="/sha_dry_run_test_publish"),
+            tv(id=41, name="remote_path", transformation_id=28, value="/upload/sha_dry_run_test_publish"),
             tv(id=42, name="secret_name", transformation_id=28, value="test-sftp"),
             tv(id=43, name="secret_type_of", transformation_id=28, value="FTP"),
             tv(id=439, name="input_transform", transformation_id=28, value="symphony_health_association_extract_column_mapping"),
