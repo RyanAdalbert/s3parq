@@ -13,6 +13,8 @@ class SessionHelper(LoggerMixin):
     def __init__(self):
         self._session = None
         self.logger.info(f"Creating session for {ENVIRONMENT} environment...")  
+        if FORCE_POSTGRES:
+            self.logger.info("Forcing postgres instead of configuration mocker...")
         if ENVIRONMENT in ("prod", "uat") or FORCE_POSTGRES:
             engine = config.GenerateEngine().get_engine()
             session = config.Session(engine)
