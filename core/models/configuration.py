@@ -207,8 +207,10 @@ class Transformation(UniversalWithPrimary, Base):
             return int(value)
         if typestring in ("float","decimal","number", "double"):
             return float(value)
+        if typestring in ("bool","boolean"):
+            value = int(value)
+            return bool(value)
         
-
 class TransformationVariable(UniversalWithPrimary, Base):
     __tablename__ = 'transformation_variables'
     transformation_id = Column(Integer, ForeignKey('transformations.id'), nullable=False)
