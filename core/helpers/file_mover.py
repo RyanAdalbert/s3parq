@@ -90,4 +90,5 @@ def publish_file(local_path: str, remote_path: str, secret: Secret):
         if local_file in remote_files: # we don't want to overwrite any existing files on external FTP
             logger.debug("Error: File already exists on remote FTP server.")
             raise ValueError("Error: File already exists on remote FTP server.")
-        fm.put_file(remote_path=remote_path, local_path=local_path)
+        remote_file = remote_path + "/" + local_file
+        fm.put_file(remote_path=remote_file, local_path=local_path)
