@@ -194,7 +194,7 @@ class ConfigurationMocker(LoggerMixin):
             t(id=11, transformation_template_id=1,
               pipeline_state_id=2, graph_order=0),
             t(id=12, transformation_template_id=2,
-              pipeline_state_id=1, graph_order=1),
+              pipeline_state_id=1, graph_order=0),
             t(id=13, transformation_template_id=2,
               pipeline_state_id=2, graph_order=0),
             t(id=14, transformation_template_id=3, # ilumya - map product NDCs
@@ -222,17 +222,17 @@ class ConfigurationMocker(LoggerMixin):
             t(id=25, transformation_template_id=8, # extract column mapping
               pipeline_state_id=14, graph_order=0),
             t(id=26, transformation_template_id=9, # final ingest transform (rayne) ilumya
-              pipeline_state_id=6, graph_order=0),
+              pipeline_state_id=6, graph_order=1),
             t(id=37, transformation_template_id=9,  # final ingest transform (rayne) ilumya
-              pipeline_state_id=6, graph_order=0),
+              pipeline_state_id=6, graph_order=1),
             t(id=38, transformation_template_id=9,  # final ingest transform (rayne) ilumya
-              pipeline_state_id=6, graph_order=0),
+              pipeline_state_id=6, graph_order=1),
             t(id=39, transformation_template_id=9,  # final ingest transform (rayne) ilumya
-              pipeline_state_id=6, graph_order=0),
+              pipeline_state_id=6, graph_order=1),
             t(id=40, transformation_template_id=9,  # final ingest transform (rayne) ilumya
-              pipeline_state_id=6, graph_order=0),
+              pipeline_state_id=6, graph_order=1),
             t(id=27, transformation_template_id=9, # final ingest transform (rayne) odomzo
-              pipeline_state_id=11, graph_order=0),
+              pipeline_state_id=11, graph_order=1),
             t(id=28, transformation_template_id=10, # publish to ftp ilumya
               pipeline_state_id=9, graph_order=1),
             t(id=29, transformation_template_id=10, # publish to ftp odomzo
