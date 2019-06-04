@@ -11,6 +11,7 @@ AWS_BATCH_TEST_JOB_QUEUE: core
 LOGGING_CONFIG: logging.yaml
 DEV_CONFIGURATION_APPLICATION_CONN_STRING: "postgresql://configurator:configurator@core_configurationpg_1/configuration_application"
 CORE_VERSION: "0.0.11"
+FORCE_POSTGRES: True # if true, force postgres to be used by the SessionHelper even in dev
 
 ## DYNAMICS
 # AWS_ACCOUNT default is set to PROD_AWS_ACCOUNT for prod and uat, DEV_AWS_ACCOUNT otherwise

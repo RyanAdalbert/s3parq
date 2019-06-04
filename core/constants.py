@@ -64,7 +64,5 @@ def reset_constants():
     globals()['ENV_BUCKET'] = get_env_bucket()
     globals()['AWS_ACCOUNT'] = get_aws_account()
     globals()['BATCH_JOB_QUEUE'] = get_batch_job_queue()
-    globals()['FORCE_POSTGRES'] = True # if true, force postgres to be used by the SessionHelper even in dev
-
 
 reset_constants()
