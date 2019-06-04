@@ -1,14 +1,18 @@
 import React, { PureComponent } from 'react';
 // import Button from 'react-bootstrap/Button';
 // import Modal from 'react-bootstrap/Modal';
+import multiFilter from '../../utils/multiFilter/multiFilter';
 
 //Pipeline row component
 export default class PipelineRow extends PureComponent {
   render() {
     const { pipelines } = this.props;
+    const { setFilters } = this.props;
+
+    console.log(multiFilter(pipelines, setFilters));
+
     const pipelineRow = pipelines.map(pipeline => {
       const key = Object.keys(pipeline);
-
       return (
         <tr key={key}>
           <td>{key}</td>

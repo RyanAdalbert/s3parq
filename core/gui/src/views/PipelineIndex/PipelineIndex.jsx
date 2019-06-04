@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 import PipelineData from '../../containers/PipelineData/PipelineData';
 import Pipelines from '../../components/Pipelines/Pipelines';
-import PipelinesFilter from '../../components/PipelinesFilter/PipelinesFilter';
 
 // Styles
 const DashboardContainer = styled.section`

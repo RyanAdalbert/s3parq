@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import userReducer from './userReducer/userReducer';
 import pipelineReducer from './pipelineReducer/pipelineReducer';
-import filterReducer from './filterReducer/filterReducer';
+import { filterReducer } from './filterReducer/filterReducer';
 
 const appReducer = combineReducers({
   userReducer,

@@ -1,23 +1,17 @@
 import { filterConstants } from '../../actions/filterActions/filterActions';
+import { combineReducers } from 'redux';
 
-const INITIAL_STATE = {
-  filters: [],
-  brand: 'brand',
-  company: 'company',
-  type: 'type',
-  status: 'status'
+const FILTERS_STATE = {
+  filters: []
 };
 
-const filterReducer = (state = INITIAL_STATE, action) => {
+const fetchFilters = (state = FILTERS_STATE, action) => {
   const {
     FETCH_FILTERS,
     FETCH_FILTERS_SUCCESS,
-    FETCH_FILTERS_FAILURE,
-    SET_FILTER_BRAND,
-    SET_FILTER_COMPANY,
-    SET_FILTER_TYPE,
-    SET_FILTER_STATUS
+    FETCH_FILTERS_FAILURE
   } = filterConstants;
+
   switch (action.type) {
     case FETCH_FILTERS:
       return Object.assign({}, state, {
@@ -38,25 +32,40 @@ const filterReducer = (state = INITIAL_STATE, action) => {
         didInvalidate: true,
         fetched: false
       });
+    default:
+      return state;
+  }
+};
+
+const SET_FILTERS_STATE = {
+  setBrand: 'Brand',
+  setCompany: 'Company',
+  setStatus: 'Status'
+};
+//Reducer that handles selected filters so we can pass this object to our filter function
+const setFilters = (state = SET_FILTERS_STATE, action) => {
+  const {
+    SET_FILTER_BRAND,
+    SET_FILTER_COMPANY,
+    SET_FILTER_STATUS
+  } = filterConstants;
+
+  switch (action.type) {
     case SET_FILTER_BRAND:
       return Object.assign({}, state, {
-        brand: action.evt
+        setBrand: action.evt
       });
     case SET_FILTER_COMPANY:
       return Object.assign({}, state, {
-        company: action.evt
-      });
-    case SET_FILTER_TYPE:
-      return Object.assign({}, state, {
-        type: action.evt
+        setCompany: action.evt
       });
     case SET_FILTER_STATUS:
       return Object.assign({}, state, {
-        status: action.evt
+        setStatus: action.evt
       });
     default:
       return state;
   }
 };
 
-export default filterReducer;
+export const filterReducer = combineReducers({ fetchFilters, setFilters });

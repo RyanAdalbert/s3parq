@@ -1,11 +1,6 @@
 import { RSAA } from 'redux-api-middleware';
 import { API_HOST } from '../../constants';
 
-export const setVisibilityFilter = filter => ({
-  type: 'SET_VISIBILITY_FILTER',
-  filter
-});
-
 //Filters Constants
 export const filterConstants = {
   FETCH_FILTERS: 'FETCH_FILTERS',
@@ -13,7 +8,6 @@ export const filterConstants = {
   FETCH_FILTERS_FAILURE: 'FETCH_FILTERS_FAILURE',
   SET_FILTER_BRAND: 'SET_FILTER_BRAND',
   SET_FILTER_COMPANY: 'SET_FILTER_COMPANY',
-  SET_FILTER_TYPE: 'SET_FILTER_TYPE',
   SET_FILTER_STATUS: 'SET_FILTER_STATUS'
 };
 
@@ -47,11 +41,6 @@ export const setFilterBrand = evt => ({
 
 export const setFilterCompany = evt => ({
   type: 'SET_FILTER_COMPANY',
-  evt
-});
-
-export const setFilterType = evt => ({
-  type: 'SET_FILTER_TYPE',
   evt
 });
 
