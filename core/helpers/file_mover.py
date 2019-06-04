@@ -76,6 +76,7 @@ def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
                 remote_file_path = remote_path + "/" + remote_file.filename
                 # Set file name to include the path, in case of duplicate file names in different locations
                 local_file_name = remote_file_path.replace("/",".")
+                local_file_name = local_file_name.lstrip(".")
                 local_file_path = os.path.join(tmp_dir, local_file_name)
                 
                 fm.get_file(remote_file_path, local_file_path)
