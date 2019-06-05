@@ -37,4 +37,5 @@ def filters():
     filters['types'] = list(types)
     filters['status'] = list(status)
     mainObj = {"data" : filters}
+    sess.close()
     return json.dumps(mainObj), 200
