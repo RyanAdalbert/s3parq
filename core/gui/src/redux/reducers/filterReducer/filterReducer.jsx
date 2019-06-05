@@ -38,9 +38,9 @@ const fetchFilters = (state = FILTERS_STATE, action) => {
 };
 
 const SET_FILTERS_STATE = {
-  setBrand: 'Brand',
-  setCompany: 'Company',
-  setStatus: 'Status'
+  brand: '',
+  pharma_company: '',
+  status: ''
 };
 //Reducer that handles selected filters so we can pass this object to our filter function
 const setFilters = (state = SET_FILTERS_STATE, action) => {
@@ -53,15 +53,15 @@ const setFilters = (state = SET_FILTERS_STATE, action) => {
   switch (action.type) {
     case SET_FILTER_BRAND:
       return Object.assign({}, state, {
-        setBrand: action.evt
+        brand: action.evt
       });
     case SET_FILTER_COMPANY:
       return Object.assign({}, state, {
-        setCompany: action.evt
+        pharma_company: action.evt
       });
     case SET_FILTER_STATUS:
       return Object.assign({}, state, {
-        setStatus: action.evt
+        status: action.evt
       });
     default:
       return state;

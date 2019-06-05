@@ -13,10 +13,9 @@ const multiFilter = (array, filters) => {
     // dynamically validate all filter criteria
     return filterKeys.every(key => {
       // ignores an empty filter
-      return key.every(secondKey => {
-        if (!filters[secondKey].length) return true;
-        return filters[secondKey].includes(item[secondKey]);
-      });
+      if (!filters[key].length) return true;
+      console.log(item[key]);
+      return filters[key].includes(item[key]);
     });
   });
 };

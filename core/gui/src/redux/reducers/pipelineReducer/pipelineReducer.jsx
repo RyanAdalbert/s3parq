@@ -22,7 +22,7 @@ const pipelineReducer = (state = INITIAL_STATE, action) => {
         isFetching: false,
         fetched: true,
         didInvalidate: false,
-        pipelines: action.payload.data
+        pipelines: action.payload
       });
     case FETCH_PIPELINES_FAILURE:
       return Object.assign({}, state, {
