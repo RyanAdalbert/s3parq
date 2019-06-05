@@ -64,31 +64,31 @@ class DropdownButtons extends React.Component {
       // Render buttons with default selection
       <>
         <DropdownButton
-          title={brand}
+          title={brand === '' ? 'All Brands' : brand}
           onSelect={evt => handleSelect(evt, 'brand')}
         >
           <Dropdown.Item as="button" key="" eventKey="">
-            Brand
+            All Brands
           </Dropdown.Item>
           {dropdownBrands}
         </DropdownButton>
 
         <DropdownButton
-          title={pharma_company}
+          title={pharma_company === '' ? 'All Companies' : pharma_company}
           onSelect={evt => handleSelect(evt, 'company')}
         >
           <Dropdown.Item as="button" key="" eventKey="">
-            Company
+            All Companies
           </Dropdown.Item>
           {dropdownCompanies}
         </DropdownButton>
 
         <DropdownButton
-          title={status}
+          title={status === '' ? 'All Statuses' : status}
           onSelect={evt => handleSelect(evt, 'status')}
         >
           <Dropdown.Item as="button" key="" eventKey="">
-            Status
+            All Statuses
           </Dropdown.Item>
           {dropdownStatus}
         </DropdownButton>
