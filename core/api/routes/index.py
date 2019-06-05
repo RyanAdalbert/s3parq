@@ -19,7 +19,7 @@ def index():
     helper = SHelp()
     sess = helper.session
     query = sess.query(Pipeline).all()
-    pipelines = []
+    pipelines = {} 
     for pl in query:
         key = pl.id
         pl_data = {}
@@ -41,6 +41,6 @@ def index():
                 transforms.append(transform.transformation_template.name)
         pl_data['states'] = states
         pl_data['transformations'] = transforms
-        pipelines.append({key : pl_data})
-    mainObj = {"data" : pipelines}
-    return json.dumps(mainObj), 200
+        pipelines[key] = pl_data
+    sess.close()
+    return json.dumps(pipelines), 200
