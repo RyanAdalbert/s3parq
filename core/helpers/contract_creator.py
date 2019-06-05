@@ -20,6 +20,7 @@ def contract_from_transformation_id(t_id: int)->DatasetContract:
     parent = transform.pipeline_state.pipeline.brand.pharmaceutical_company.name
     state = transform.pipeline_state.pipeline_state_type.name
     child = transform.pipeline_state.pipeline.brand.name
+    sess.close()
     return DatasetContract(parent=parent, child=child, state=state, dataset=dataset)
 
     """ creates a contract for a given transformation (dataset) name, relative to another (relative) contract. 
@@ -29,11 +30,13 @@ def contract_from_transformation_id(t_id: int)->DatasetContract:
                 - contract (DatasetContract) the existing dataset contract we want to create a contract relative to
             RETURNS: DatasetContract object
     """
+    
 def get_relative_contract(t_name: str, contract:DatasetContract)->DatasetContract:
     sess = SHelp().session
     template = sess.query(TransformationTemplate).filter(TransformationTemplate.name==t_name).first()
     if template is None:
         raise KeyError("Error: No transform found with name " + t_name)
     dataset = template.name
-    state = template.pipeline_state_type.name 
+    state = template.pipeline_state_type.name
+    sess.close()
     return DatasetContract(branch=contract.branch, parent=contract.parent, child=contract.child, state=state, dataset=dataset) 
