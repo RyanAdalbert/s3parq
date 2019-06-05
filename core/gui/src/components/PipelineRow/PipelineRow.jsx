@@ -14,6 +14,7 @@ export default class PipelineRow extends PureComponent {
     const key = Object.keys(pipelines);
     const pipelineRow = filtered.map(pipeline => {
       return (
+        // creates modals
         <tr key={key + pipeline.name}>
           <td>{key}</td>
           <td>{pipeline.name}</td>
