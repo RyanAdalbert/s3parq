@@ -77,15 +77,16 @@ class TransformOperator(InheritOperator):
                                                     **kwargs
                                                     )
             self.__logger.info(f"Done. AWSBatchOperator executed for {job_name}.")
+            self.session.close()
             
     def _get_transform_info(self):
         """ Gets full queried info for the transform.
                 Uses SessionHelper to grab it based on the transform ID
                 TODO: Throw detailed exception if no transform exists
         """
-        session = SessionHelper().session
+        self.session = SessionHelper().session
         transform_config = config.Transformation
-        transform = session.query(transform_config).filter(
+        transform = self.session.query(transform_config).filter(
             transform_config.id == self.transform_id).one()
         return transform
 

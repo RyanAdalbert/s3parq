@@ -77,6 +77,7 @@ class DagBuilder(LoggerMixin):
             pipelines = session.query(Pipeline)
         self.logger.debug(
             f"Done getting pipelines, {len([x for x in pipelines])} pipelines found.")
+        session.close()
         return pipelines
 
     def _get_prepped_tasks(self, pipeline: Pipeline, dag: DAG)-> tuple:

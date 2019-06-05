@@ -30,4 +30,3 @@ ssh-keygen -R notebook && \
 service ssh start" 
 script/dev_shell $TYPE
 
-##useradd -p $(openssl passwd -1 corebot_remote) -ms /bin/bash corebot_remote
