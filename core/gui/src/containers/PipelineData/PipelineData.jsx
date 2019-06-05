@@ -25,7 +25,7 @@ const mapStateToProps = state => {
   return {
     oAuthToken: state.userReducer.oAuthToken,
     isLoggedIn: state.pipelineReducer.isLoggedIn,
-    pipelines: state.pipelineReducer.pipelines,
+    pipelines: Object.values(state.pipelineReducer.pipelines),
     expanded: state.pipelineReducer.expanded,
     filters: state.filterReducer.fetchFilters.filters,
     setFilters: state.filterReducer.setFilters,

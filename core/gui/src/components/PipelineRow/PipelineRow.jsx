@@ -7,9 +7,9 @@ import multiFilter from '../../utils/multiFilter/multiFilter';
 export default class PipelineRow extends PureComponent {
   render() {
     const { pipelines } = this.props;
-    const { setFilters } = this.props;
+    // const { setFilters } = this.props;
 
-    console.log(multiFilter(pipelines, setFilters));
+    // console.log(multiFilter(pipelines, setFilters));
 
     const pipelineRow = pipelines.map(pipeline => {
       const key = Object.keys(pipeline);

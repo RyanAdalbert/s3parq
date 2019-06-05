@@ -8,12 +8,15 @@
 
 const multiFilter = (array, filters) => {
   const filterKeys = Object.keys(filters);
-  return array.filter(eachObj => {
-    return filterKeys.every(eachKey => {
-      if (!filters[eachKey].length) {
-        return true; // passing an empty filter means that filter is ignored.
-      }
-      return filters[eachKey].includes(eachObj[eachKey]);
+  // filters all elements passing the criteria
+  return array.filter(item => {
+    // dynamically validate all filter criteria
+    return filterKeys.every(key => {
+      // ignores an empty filter
+      return key.every(secondKey => {
+        if (!filters[secondKey].length) return true;
+        return filters[secondKey].includes(item[secondKey]);
+      });
     });
   });
 };
