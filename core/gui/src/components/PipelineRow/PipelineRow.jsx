@@ -8,10 +8,8 @@ export default class PipelineRow extends PureComponent {
   render() {
     const { pipelines } = this.props;
     const { setFilters } = this.props;
-    console.log(pipelines);
-    const filtered = multiFilter(pipelines, setFilters);
 
-    console.log(filtered);
+    const filtered = multiFilter(pipelines, setFilters);
 
     const key = Object.keys(pipelines);
     const pipelineRow = filtered.map(pipeline => {
