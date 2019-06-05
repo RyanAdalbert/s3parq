@@ -29,7 +29,7 @@ with open(filename, "r") as f:
 
 		sql = ( 
 			f'(\'{name}\',(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states '
-		 	f'WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = \'{pl}\')) AND id = (SELECT id FROM transformations ' 
+		 	f'WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = \'{pl}\')) AND id IN (SELECT id FROM transformations ' 
 		 	f'WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv '
 		 	f'ON t.id = tv.transformation_id WHERE tv.name = \'{name}\' ORDER BY t.id)) AND id IN (SELECT t.id from '
 		 	f'transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE '
