@@ -1,3 +1,4 @@
+BEGIN;
 INSERT INTO 
     pharmaceutical_companies (display_name, name, last_actor) 
 VALUES 
@@ -119,3 +120,5 @@ INSERT INTO transformation_variables (name, transformation_id, value, last_actor
         ('prefix',(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_patient_journey')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'skip_rows' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'extract_from_ftp')))ORDER BY id LIMIT 1), 'VIVITROL_', 'rns@integrichain.com'),
         ('secret_name',(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_patient_journey')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'encoding' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'extract_from_ftp')))ORDER BY id LIMIT 1), 'alkermes', 'rns@integrichain.com'),
         ('secret_type_of',(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_patient_journey')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'input_file_prefix' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'extract_from_ftp')))ORDER BY id LIMIT 1), 'FTP', 'rns@integrichain.com');
+
+COMMIT;
