@@ -1,3 +1,4 @@
+BEGIN;
 INSERT INTO 
     ADMINISTRATORS (email_address, first_name, last_name)
 VALUES
@@ -7,3 +8,4 @@ VALUES
 ('emk@integrichain.com','Ethan','Knox'),
 ('njb@integrichain.com','Natie','Bohnel'),
 ('ajw@integrichain.com','Alec','Wertheimer');
+COMMIT;
