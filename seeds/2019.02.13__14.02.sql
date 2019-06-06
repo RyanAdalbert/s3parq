@@ -81,7 +81,7 @@ INSERT INTO pipelines (name, is_active, description, pipeline_type_id, brand_id,
 INSERT INTO transformation_templates (name, variable_structures, pipeline_state_type_id, last_actor) 
     VALUES
         ('extract_from_ftp', 
-        '{"filesystem_path":{"datatype": "string", "description": "the remote path to the files"},secret_name":{"datatype":"string","description":"the name of the secret in secret manager"},"prefix":{"datatype":"string","description":"the prefix of the files to get on the remote filesystem"},"secret_type_of":{"datatype":"string","description":"the type of the remote server, used in the secret path"}}', 
+        '{"filesystem_path":{"datatype": "string", "description": "the remote path to the files"},"secret_name":{"datatype":"string","description":"the name of the secret in secret manager"},"prefix":{"datatype":"string","description":"the prefix of the files to get on the remote filesystem"},"secret_type_of":{"datatype":"string","description":"the type of the remote server, used in the secret path"}}', 
         (SELECT id FROM pipeline_state_types WHERE name = 'raw'),
         'rns@integrichain.com');
 

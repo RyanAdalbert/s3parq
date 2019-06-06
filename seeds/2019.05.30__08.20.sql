@@ -1,7 +1,6 @@
 INSERT INTO pipelines (name, is_active, description, pipeline_type_id, brand_id, run_frequency, last_actor)
     VALUES
         ('sun_ilumya_extract', TRUE, 'Extract for Symphony Health Association -- ILUMYA', (SELECT id FROM pipeline_types WHERE name = 'patient_journey'), (SELECT id from brands WHERE name = 'ILUMYA'), 'weekly', 'njb@integrichain.com'),
-        ('sun_ilumya_test', TRUE, 'natie test for ilumya', (SELECT id FROM pipeline_types WHERE name = 'patient_journey'), (SELECT id from brands WHERE name = 'ILUMYA'), 'weekly', 'njb@integrichain.com'),
         ('sun_odomzo_extract', TRUE, 'Extract for Symphony Health Association -- ODOMZO', (SELECT id FROM pipeline_types WHERE name = 'patient_journey'), (SELECT id from brands WHERE name = 'ODOMZO'), 'weekly', 'njb@integrichain.com');
 
 INSERT INTO transformation_templates (name, variable_structures, pipeline_state_type_id, last_actor) 
@@ -58,11 +57,6 @@ INSERT INTO pipeline_states (pipeline_state_type_id, pipeline_id, graph_order, l
         ((SELECT id FROM pipeline_state_types WHERE name = 'master'), (SELECT id FROM pipelines WHERE name = 'sun_ilumya_extract'), 2, 'njb@integrichain.com'),
         ((SELECT id FROM pipeline_state_types WHERE name = 'enrich'), (SELECT id FROM pipelines WHERE name = 'sun_ilumya_extract'), 3, 'njb@integrichain.com'),
         ((SELECT id FROM pipeline_state_types WHERE name = 'dimensional'), (SELECT id FROM pipelines WHERE name = 'sun_ilumya_extract'), 4, 'njb@integrichain.com'),
-
-        ((SELECT id FROM pipeline_state_types WHERE name = 'ingest'), (SELECT id FROM pipelines WHERE name = 'sun_ilumya_test'), 0, 'njb@integrichain.com'),
-        ((SELECT id FROM pipeline_state_types WHERE name = 'master'), (SELECT id FROM pipelines WHERE name = 'sun_ilumya_test'), 1, 'njb@integrichain.com'),
-        ((SELECT id FROM pipeline_state_types WHERE name = 'enrich'), (SELECT id FROM pipelines WHERE name = 'sun_ilumya_test'), 2, 'njb@integrichain.com'),
-        ((SELECT id FROM pipeline_state_types WHERE name = 'dimensional'), (SELECT id FROM pipelines WHERE name = 'sun_ilumya_test'), 3, 'njb@integrichain.com'),
 
         ((SELECT id FROM pipeline_state_types WHERE name = 'raw'), (SELECT id FROM pipelines WHERE name = 'sun_odomzo_extract'), 0, 'njb@integrichain.com'),
         ((SELECT id FROM pipeline_state_types WHERE name = 'ingest'), (SELECT id FROM pipelines WHERE name = 'sun_odomzo_extract'), 1, 'njb@integrichain.com'),
