@@ -1,4 +1,4 @@
-import { userConstants } from '../actions/userAuthActions/userAuthActions';
+import { userConstants } from '../../actions/userAuthActions/userAuthActions';
 
 export const INITIAL_STATE = {
   oAuthToken: 'loading',

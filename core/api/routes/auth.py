@@ -24,6 +24,7 @@ def authorize(token, session_helper): # the token passed here needs to be genera
         return False
     sess = session_helper.session
     query = sess.query(Administrator).filter(Administrator.email_address==email)
+    sess.close()
     try:
         query.one()
         return True
