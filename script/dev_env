@@ -31,6 +31,6 @@ ssh-keygen -R notebook && \
 service ssh start && \
 cp -r /host/home/.aws /home/corebot_remote/.aws && \
 chown corebot_remote /home/corebot_remote/.aws/* && \
-chmod -R 644 /home/corebot_remote/.aws"  
+chmod -R u+rx /home/corebot_remote/.aws"  
 script/dev_shell $TYPE
 
