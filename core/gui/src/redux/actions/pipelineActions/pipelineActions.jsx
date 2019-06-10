@@ -5,7 +5,8 @@ import { API_HOST } from '../../constants';
 export const pipelineConstants = {
   FETCH_PIPELINES: 'FETCH_PIPELINES',
   FETCH_PIPELINES_SUCCESS: 'FETCH_PIPELINES_SUCCESS',
-  FETCH_PIPELINE_FAILURE: 'FETCH_PIPELINES_FAILURE'
+  FETCH_PIPELINE_FAILURE: 'FETCH_PIPELINES_FAILURE',
+  MODAL_TOGGLE: 'MODAL_TOGGLE'
 };
 
 //Fetch Pipeline with redux-api-middleware
@@ -29,4 +30,9 @@ export const fetchPipelines = oAuthToken => ({
       'FETCH_PIPELINES_FAILURE'
     ]
   }
+});
+
+export const modalToggle = modalStatus => ({
+  type: 'MODAL_TOGGLE',
+  modalStatus
 });

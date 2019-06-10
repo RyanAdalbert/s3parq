@@ -1,14 +1,16 @@
 import { pipelineConstants } from '../../actions/pipelineActions/pipelineActions';
 
 const INITIAL_STATE = {
-  pipelines: []
+  pipelines: [],
+  modal: null
 };
 
 const pipelineReducer = (state = INITIAL_STATE, action) => {
   const {
     FETCH_PIPELINES,
     FETCH_PIPELINES_SUCCESS,
-    FETCH_PIPELINES_FAILURE
+    FETCH_PIPELINES_FAILURE,
+    MODAL_TOGGLE
   } = pipelineConstants;
   switch (action.type) {
     case FETCH_PIPELINES:
@@ -29,6 +31,10 @@ const pipelineReducer = (state = INITIAL_STATE, action) => {
         isFetching: false,
         fetched: false,
         didInvalidate: true
+      });
+    case MODAL_TOGGLE:
+      return Object.assign({}, state, {
+        modal: null
       });
     default:
       return state;
