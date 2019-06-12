@@ -4,6 +4,7 @@ import Table from 'react-bootstrap/Table';
 import styled from 'styled-components';
 
 import PipelineRow from '../PipelineRow/PipelineRow';
+import PipelinesFilter from '../PipelinesFilter/PipelinesFilter';
 
 const TableContainer = styled.div`
   h3 {
@@ -31,6 +32,7 @@ class Pipelines extends React.Component {
     return (
       <TableContainer>
         <h3>Pipeline Index</h3>
+        <PipelinesFilter {...this.props} />
         <Table striped bordered hover responsive size="sm">
           <thead>
             <tr>
