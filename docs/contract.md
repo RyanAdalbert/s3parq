@@ -10,7 +10,7 @@ The DatasetContract class defines the way we write to and read from the S3 data 
     *--------------------------------------------------------------------------------------------------------------------*
 
     *--------------------------------------------------------------------------------------------------------------------*
-    | dataset contract structure in CORE (core/dataset\_contract.py):                                                    |
+    | dataset contract structure in CORE (core/dataset_contract.py):                                                    |
     |                                                                                                                    |
     | bucket: {ENV}                                                                                                      |
  	| key: {BRANCH} / {PARENT} / {CHILD} / {STATE} / {DATASET}                                                           |
@@ -20,10 +20,6 @@ The DatasetContract class defines the way we write to and read from the S3 data 
 Make sure that you are using DatasetContract and not Contract. Contract is a parent class DatasetContract inherits from and should not be used directly.
 
 Properties of DatasetContracts can be retrieved as attributes, e.g. {contract\_name}.parent
-
-    
-## Using S3 with CORE
-The open-source library [s3parq](https://github.com/IntegriChain1/s3parq) is necessary to read/write dataset contracts to S3. The following functions are provided by s3parq. s3parq can easily be installed using [pip3](https://pypi.org/project/s3parq/).
 
 ### Writing to S3
 Invoke the `publish()` command to write to a given contract. Some things to know:
