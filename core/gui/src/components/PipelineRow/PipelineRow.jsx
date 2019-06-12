@@ -14,21 +14,27 @@ export default class PipelineRow extends PureComponent {
 
     const key = Object.keys(pipelines);
 
-    const handleClick = ({ modalState, modalProps }) => {
-      dispatch(modalToggle({ modalState, modalProps }));
+    const handleClick = (modalState, pipeline) => {
+      // console.log(modalState);
+      // console.log(pipeline);
+      dispatch(modalToggle(modalState, pipeline));
     };
 
     const pipelineRow = filtered.map(pipeline => {
       return (
         // creates modals
         <>
-          <tr key={key + pipeline.name} onClick={() => handleClick(true)}>
+          <tr
+            key={key + pipeline.name}
+            onClick={() => handleClick(true, pipeline)}
+          >
             <td>{key}</td>
             <td>{pipeline.name}</td>
             <td>{pipeline.brand}</td>
             <td>{pipeline.pharma_company}</td>
             <td>{pipeline.status}</td>
             <td>{pipeline.run_freq}</td>
+            {/*console.log(pipeline)*/}
           </tr>
 
           <PipelineModal show={this.props.modalShow} onHide={modalClose} />

@@ -32,7 +32,7 @@ export const fetchPipelines = oAuthToken => ({
   }
 });
 
-export const modalToggle = ({ modalStatus, modalProps }) => ({
+export const modalToggle = (modalStatus, modalProps) => ({
   type: 'MODAL_TOGGLE',
   modalStatus,
   modalProps
