@@ -12,8 +12,8 @@ The DatasetContract class defines the way we write to and read from the S3 data 
     *--------------------------------------------------------------------------------------------------------------------*
     | dataset contract structure in CORE (core/dataset\_contract.py):                                                    |
     |                                                                                                                    |
-    | bucket: {ENV}																										 |
- 	| key: {BRANCH} / {PARENT} / {CHILD} / {STATE} / {DATASET}															 |
+    | bucket: {ENV}                                                                                                      |
+ 	| key: {BRANCH} / {PARENT} / {CHILD} / {STATE} / {DATASET}                                                           |
     |                                                                                                                    |
     *--------------------------------------------------------------------------------------------------------------------*
 
