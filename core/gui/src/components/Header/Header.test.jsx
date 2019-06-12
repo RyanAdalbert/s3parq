@@ -26,9 +26,9 @@ describe('<Header/> interaction', () => {
   });
 
   it('should call the onClick function when [Log out] is clicked', () => {
-    const component = wrapper.find('.log-out');
-    console.log(component);
-    expect(wrapper.find('.log-out').simulate('clicked')).toHaveBeenCalledTimes(
+    const component = wrapper.find('log-out');
+    console.log(component.debug());
+    expect(wrapper.find('log-out').simulate('clicked')).toHaveBeenCalledTimes(
       1
     );
   });

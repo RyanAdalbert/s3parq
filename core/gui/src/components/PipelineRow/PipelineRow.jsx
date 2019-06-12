@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 
 import multiFilter from '../../utils/multiFilter/multiFilter';
-import guiModal from '../guiModal/guiModal';
+import PipelineModal from '../PipelineModal/PipelineModal';
 import { modalToggle } from '../../redux/actions/pipelineActions/pipelineActions';
 //Pipeline row component
 export default class PipelineRow extends PureComponent {
@@ -14,8 +14,8 @@ export default class PipelineRow extends PureComponent {
 
     const key = Object.keys(pipelines);
 
-    const handleClick = modalState => {
-      dispatch(modalToggle(modalState));
+    const handleClick = ({ modalState, modalProps }) => {
+      dispatch(modalToggle({ modalState, modalProps }));
     };
 
     const pipelineRow = filtered.map(pipeline => {
@@ -31,7 +31,7 @@ export default class PipelineRow extends PureComponent {
             <td>{pipeline.run_freq}</td>
           </tr>
 
-          <guiModal show={this.props.modalShow} onHide={modalClose} />
+          <PipelineModal show={this.props.modalShow} onHide={modalClose} />
         </>
       );
     });

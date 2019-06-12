@@ -2,7 +2,8 @@ import { pipelineConstants } from '../../actions/pipelineActions/pipelineActions
 
 const INITIAL_STATE = {
   pipelines: [],
-  modal: null
+  modal: null,
+  modalProps: {}
 };
 
 const pipelineReducer = (state = INITIAL_STATE, action) => {
@@ -34,7 +35,8 @@ const pipelineReducer = (state = INITIAL_STATE, action) => {
       });
     case MODAL_TOGGLE:
       return Object.assign({}, state, {
-        modal: null
+        modal: action.modalStatus,
+        modalProps: action.modalProps
       });
     default:
       return state;

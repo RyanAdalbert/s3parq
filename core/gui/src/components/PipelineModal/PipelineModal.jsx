@@ -2,7 +2,7 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-class guiModal extends React.Component {
+class PipelineModal extends React.Component {
   render() {
     return (
       <Modal
@@ -32,4 +32,4 @@ class guiModal extends React.Component {
   }
 }
 
-export default guiModal;
+export default PipelineModal;
