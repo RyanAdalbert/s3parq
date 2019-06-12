@@ -6,4 +6,6 @@ VALUES
 ('rns@integrichain.com','Rayne','Schaffer'),
 ('emk@integrichain.com','Ethan','Knox'),
 ('njb@integrichain.com','Natie','Bohnel'),
-('ajw@integrichain.com','Alec','Wertheimer');
+('ajw@integrichain.com','Alec','Wertheimer'),
+('jlewis@integrichain.com', 'Justin', 'Lewis'),
+('jtobias@integrichain.com', 'Jacob', 'Tobias');
