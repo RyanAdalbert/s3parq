@@ -13,7 +13,6 @@ logger = LoggerSingleton().logger
 def postgres():
     with open(yaml_path) as f:
         doc = yaml.load(f)
-    
     if doc[db_field] == False:
         doc[db_field] = True
         with open(yaml_path, 'w') as f:

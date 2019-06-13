@@ -1,4 +1,6 @@
 import pytest
+import tempfile
+import core.helpers.postgres_toggle as postgres_toggle
 from dfmock import DFMock
 from core.helpers.drop_metadata import drop_metadata
 from unittest.mock import patch
@@ -123,3 +125,31 @@ def test_drop_metadata():
     new_df = drop_metadata(df.dataframe)
 
     assert ','.join(new_df.columns) == 'hamburger,bananas'
+
+@patch('core.helpers.postgres_toggle.logger.debug')
+def test_postgres_toggle_on_already(debug):
+    """ log that pg was already on for this session."""
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(b'FORCE_POSTGRES: true')
+        postgres_toggle.yaml_path = f.name
+        f.seek(0)
+        postgres_toggle.postgres()
+        debug.assert_called_with("Session helper is already set to use postgres.")
+
+@patch('core.helpers.postgres_toggle.logger.debug')
+def test_postgres_toggle_off_already(debug):
+    """ log that cmock was already on for this session."""
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(b'FORCE_POSTGRES: false')
+        postgres_toggle.yaml_path = f.name
+        f.seek(0)
+        postgres_toggle.cmock()
+        debug.assert_called_with("Session helper is already set to use configuration mocker.")
+
+def test_postgres_toggle_on_new():
+    """ overwrite the config to turn on pg."""
+    pass
+
+def test_postgres_toggle_off_new():
+    """ overwite the config to turn off pg."""
+    pass
