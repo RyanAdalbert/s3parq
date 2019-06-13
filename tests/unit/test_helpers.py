@@ -1,3 +1,4 @@
+import yaml
 import pytest
 import tempfile
 import core.helpers.postgres_toggle as postgres_toggle
@@ -148,8 +149,18 @@ def test_postgres_toggle_off_already(debug):
 
 def test_postgres_toggle_on_new():
     """ overwrite the config to turn on pg."""
-    pass
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(b'FORCE_POSTGRES: false')
+        postgres_toggle.yaml_path = f.name
+        f.seek(0)
+        postgres_toggle.postgres()
+        assert yaml.load(f)['FORCE_POSTGRES'] == True
 
 def test_postgres_toggle_off_new():
     """ overwite the config to turn off pg."""
-    pass
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(b'FORCE_POSTGRES: true')
+        postgres_toggle.yaml_path = f.name
+        f.seek(0)
+        postgres_toggle.cmock()
+        assert yaml.load(f)['FORCE_POSTGRES'] == False
