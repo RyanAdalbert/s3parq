@@ -25,7 +25,7 @@ def _s3_mock_setup():
 
 
 def _contract_setup():
-    contract = RawContract(branch='test',
+    contract = RawContract(branch='fine-feature-branch',
                         parent='Merck',
                         child='Wonder_Drug',
                         state='raw'
@@ -45,7 +45,7 @@ def test_publish_raw_valid():
     contract.publish_raw_file(_file.name)
     _file.close()
 
-    key = f'test/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
+    key = f'fine-feature-branch/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
     s3_client = boto3.client('s3')
     body = s3_client.get_object(
         Bucket=f'{ENV_BUCKET}', Key=key)['Body'].read()
@@ -80,7 +80,7 @@ def test_publish_raw_metadata():
         contract.publish_raw_file(_file.name)
         f_time = os.stat(_file.name).st_mtime
 
-        key = f'test/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
+        key = f'fine-feature-branch/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
         s3_client = boto3.client('s3')
         meta = s3_client.get_object(
             Bucket=f'{ENV_BUCKET}', Key=key)['Metadata']
@@ -100,7 +100,7 @@ def test_list_files():
 
 
         f_time = os.stat(_file.name).st_mtime
-        key = f'test/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
+        key = f'fine-feature-branch/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
 
         files = contract.list_files('imb4')
 

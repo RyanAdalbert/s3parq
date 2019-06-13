@@ -13,7 +13,7 @@ import moto
 @pytest.fixture
 def _contract():
     contract = Contract(
-            branch="test",
+            branch="fine-feature-branch",
             parent="Merck",
             child="Wonder_Drug",
             state="ingest"
@@ -29,7 +29,7 @@ def test_set_env_valid(_contract):
 def test_set_env_invalid():
     with pytest.raises(ValueError):
         contract = Contract(
-            branch="test",
+            branch="fine-feature-branch",
             parent="Merck",
             child="Wonder_Drug",
             state="ingest"
@@ -62,25 +62,25 @@ def test_set_branch_restricted():
         )
     
     contract = Contract(
-        branch="fine-feature",
+        branch="fine-feature-branch",
         parent="Merck",
         child="Wonder_Drug",
         state="ingest"
     )
-    assert contract.branch == "fine-feature"
+    assert contract.branch == "fine-feature-branch"
 
 
 def test_s3path(_contract):
     contract = _contract
     path = contract.s3_path
 
-    assert path == f's3://{ENV_BUCKET}/test/merck/wonder_drug/ingest/', 'path was incorrectly built.'
+    assert path == f's3://{ENV_BUCKET}/fine-feature-branch/merck/wonder_drug/ingest/', 'path was incorrectly built.'
 
 
 def test_quick_set(_contract):
     contract = _contract
 
-    assert contract.branch == 'test', 'failed to set branch'
+    assert contract.branch == 'fine-feature-branch', 'failed to set branch'
     assert contract.env == f'{ENV_BUCKET}', 'failed to set env'
     assert contract.parent == 'merck', 'failed to set parent'
     assert contract.child == 'wonder_drug', 'failed to set child'
