@@ -2,7 +2,10 @@ import React, { PureComponent } from 'react';
 
 import multiFilter from '../../utils/multiFilter/multiFilter';
 import PipelineModal from '../PipelineModal/PipelineModal';
-import { modalToggle } from '../../redux/actions/pipelineActions/pipelineActions';
+import {
+  modalOpen,
+  modalClose
+} from '../../redux/actions/pipelineActions/pipelineActions';
 //Pipeline row component
 export default class PipelineRow extends PureComponent {
   render() {
@@ -10,14 +13,14 @@ export default class PipelineRow extends PureComponent {
 
     const filtered = multiFilter(pipelines, setFilters);
 
-    let modalClose = () => this.setState({ modalShow: false });
-
     const key = Object.keys(pipelines);
 
-    const handleClick = (modalState, pipeline) => {
-      // console.log(modalState);
-      // console.log(pipeline);
-      dispatch(modalToggle(modalState, pipeline));
+    const handleClick = (modalStatus, pipeline) => {
+      dispatch(modalOpen(modalStatus, pipeline));
+    };
+
+    const closeModal = () => {
+      dispatch(modalClose(false));
     };
 
     const pipelineRow = filtered.map(pipeline => {
@@ -37,7 +40,7 @@ export default class PipelineRow extends PureComponent {
             {/*console.log(pipeline)*/}
           </tr>
 
-          <PipelineModal show={this.props.modalShow} onHide={modalClose} />
+          <PipelineModal show={this.props.modalShow} onHide={closeModal} />
         </>
       );
     });

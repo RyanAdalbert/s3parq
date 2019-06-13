@@ -11,7 +11,8 @@ const pipelineReducer = (state = INITIAL_STATE, action) => {
     FETCH_PIPELINES,
     FETCH_PIPELINES_SUCCESS,
     FETCH_PIPELINES_FAILURE,
-    MODAL_TOGGLE
+    MODAL_OPEN,
+    MODAL_CLOSE
   } = pipelineConstants;
   switch (action.type) {
     case FETCH_PIPELINES:
@@ -33,10 +34,14 @@ const pipelineReducer = (state = INITIAL_STATE, action) => {
         fetched: false,
         didInvalidate: true
       });
-    case MODAL_TOGGLE:
+    case MODAL_OPEN:
       return Object.assign({}, state, {
         modalShow: action.modalStatus,
         modalProps: action.modalProps
+      });
+    case MODAL_CLOSE:
+      return Object.assign({}, state, {
+        modalShow: action.modalStatus
       });
     default:
       return state;

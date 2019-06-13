@@ -35,7 +35,8 @@ const mapStateToProps = state => {
     status: state.filterReducer.status,
     filtersFetched: state.filterReducer.fetched,
     pipelinesFetched: state.pipelineReducer,
-    modalShow: state.pipelineReducer.modalShow
+    modalShow: state.pipelineReducer.modalShow,
+    modalProps: state.pipelineReducer.modalProps
   };
 };
 

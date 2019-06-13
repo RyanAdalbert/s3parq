@@ -6,7 +6,8 @@ export const pipelineConstants = {
   FETCH_PIPELINES: 'FETCH_PIPELINES',
   FETCH_PIPELINES_SUCCESS: 'FETCH_PIPELINES_SUCCESS',
   FETCH_PIPELINE_FAILURE: 'FETCH_PIPELINES_FAILURE',
-  MODAL_TOGGLE: 'MODAL_TOGGLE'
+  MODAL_OPEN: 'MODAL_OPEN',
+  MODAL_CLOSE: 'MODAL_CLOSE'
 };
 
 //Fetch Pipeline with redux-api-middleware
@@ -32,8 +33,13 @@ export const fetchPipelines = oAuthToken => ({
   }
 });
 
-export const modalToggle = (modalStatus, modalProps) => ({
-  type: 'MODAL_TOGGLE',
+export const modalOpen = (modalStatus, modalProps) => ({
+  type: 'MODAL_OPEN',
   modalStatus,
   modalProps
+});
+
+export const modalClose = modalStatus => ({
+  type: 'MODAL_CLOSE',
+  modalStatus
 });
