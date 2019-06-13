@@ -16,7 +16,7 @@ class Test:
         s3_client = boto3.client('s3')
         s3_client.create_bucket(Bucket=ENV_BUCKET)
 
-    @patch('core.helpers.notebook.ENVIRONMENT','prod')
+    @patch('core.helpers.notebook.ENVIRONMENT', 'prod')
     def test_output_path(self):
         self.setup()
         output_contract = "asdf/1234/merp/boomboom"
@@ -25,7 +25,7 @@ class Test:
         prefix = f"s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/boomboom"
         assert re.match(f"^{prefix}.*$", output_path)
 
-    @patch('core.helpers.notebook.ENVIRONMENT','prod')
+    @patch('core.helpers.notebook.ENVIRONMENT', 'prod')
     def test_output_url(self):
         self.setup()
         output_path = "s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/shared.raw.extract.ipynb"
@@ -33,17 +33,17 @@ class Test:
         assert output_url == "http://notebook.integrichain.net/view/asdf/1234/merp/shared.raw.extract.ipynb"
 
     @patch("core.helpers.notebook.papermill")
-    def test_run_transform(self,mock_papermill):
+    def test_run_transform(self, mock_papermill):
         self.setup()
         s3 = boto3.resource('s3')
-    
+
         bucket = ENV_BUCKET
         key = "notebooks/dev/important_business/raw/extract/shared.test.hello_world.ipynb"
-        tid=2
-        tbranch="test_branch"
-        tstate="raw"
-        tparent="merck"
-        tchild="prilosec"
+        tid = 2
+        tbranch = "test_branch"
+        tstate = "raw"
+        tparent = "merck"
+        tchild = "prilosec"
         notebook_url = notebook.run_transform(transform_id=tid)
 
         mock_papermill.execute_notebook.assert_called

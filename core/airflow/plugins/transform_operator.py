@@ -1,5 +1,5 @@
-from sqlalchemy.orm.exc import NoResultFound 
-from sqlalchemy.exc import SQLAlchemyError 
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import SQLAlchemyError
 from airflow.utils.decorators import apply_defaults
 from airflow.contrib.operators.awsbatch_operator import AWSBatchOperator
 from airflow.contrib.operators.ssh_operator import SSHOperator
@@ -13,11 +13,12 @@ from airflow.contrib.hooks.ssh_hook import SSHHook
 import core.models.configuration as config
 from core.logging import get_logger
 
-#inherit based on environment 
+# inherit based on environment
 InheritOperator = SSHOperator if ENVIRONMENT == 'dev' else AWSBatchOperator
 
+
 class TransformOperator(InheritOperator):
-    
+
     @apply_defaults
     def __init__(self, transform_id: int, *args, **kwargs) -> None:
         """ Transformation operator for DAGs. 
@@ -42,33 +43,36 @@ class TransformOperator(InheritOperator):
             'run',
             f'{transform_id}'
         ]
-        
+
         """ Run location control: this class inherits SSHOperator for dev, 
             AWSBatchOperator for prod  
         """
-        if isinstance(self,SSHOperator):
+        if isinstance(self, SSHOperator):
 
-            hook = SSHHook( remote_host='notebook',
-                            port=22,
-                            username='corebot_remote',
-                            password='corebot_remote',
-                            timeout=5000
-            )        
+            hook = SSHHook(remote_host='notebook',
+                           port=22,
+                           username='corebot_remote',
+                           password='corebot_remote',
+                           timeout=5000
+                           )
 
-            self.__logger.info(f"Running Corebot command `{run_command}` locally in notebook container...")
+            self.__logger.info(
+                f"Running Corebot command `{run_command}` locally in notebook container...")
             super(TransformOperator, self).__init__(task_id=task_id,
                                                     ssh_hook=hook,
-                                                    command = " ".join(run_command), ##SSH can only take a string here :(
+                                                    command=" ".join(run_command),  # SSH can only take a string here :(
                                                     *args,
                                                     **kwargs
                                                     )
-            self.__logger.info("Done. Corebot ran successfully in notebook container.")
+            self.__logger.info(
+                "Done. Corebot ran successfully in notebook container.")
         else:
-            self.__logger.info(f"Running Corebot run command string: {run_command} in AWS Batch.")
+            self.__logger.info(
+                f"Running Corebot run command string: {run_command} in AWS Batch.")
             job_container_overrides = {
                 'command': run_command
             }
-            
+
             self.__logger.info(f"Executing AWSBatchOperator for {job_name}.")
             super(TransformOperator, self).__init__(task_id=task_id,
                                                     job_name=job_name,
@@ -78,9 +82,10 @@ class TransformOperator(InheritOperator):
                                                     *args,
                                                     **kwargs
                                                     )
-            self.__logger.info(f"Done. AWSBatchOperator executed for {job_name}.")
+            self.__logger.info(
+                f"Done. AWSBatchOperator executed for {job_name}.")
             self.session.close()
-            
+
     def _get_transform_info(self):
         """ Gets full queried info for the transform.
                 Uses SessionHelper to grab it based on the transform ID
@@ -88,12 +93,13 @@ class TransformOperator(InheritOperator):
         """
         self.session = SessionHelper().session
         transform_config = config.Transformation
-        ## if the transform is missing for some reason, we want a clear error 
+        # if the transform is missing for some reason, we want a clear error
         try:
             transform = self.session.query(transform_config).filter(
-            transform_config.id == self.transform_id).one()
+                transform_config.id == self.transform_id).one()
         except NoResultFound as ex:
-            raise SQLAlchemyError(f"Transform id {self.transform_id} was not found in the configuration database.")
+            raise SQLAlchemyError(
+                f"Transform id {self.transform_id} was not found in the configuration database.")
         return transform
 
     def _generate_task_id(self) -> str:
@@ -123,7 +129,8 @@ class TransformOperator(InheritOperator):
         self.__logger.debug(
             f"Named contract params:: branch = {BRANCH_NAME}, parent = {parent}, child = {child}, state = {state}, dataset = {dataset}")
         contract_tuple = namedtuple(
-            "params", ["branch", "parent", "child", "state","dataset"])
-        contract_params = contract_tuple(BRANCH_NAME, parent, child, state, dataset)
+            "params", ["branch", "parent", "child", "state", "dataset"])
+        contract_params = contract_tuple(
+            BRANCH_NAME, parent, child, state, dataset)
 
         return contract_params
