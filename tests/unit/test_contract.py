@@ -44,6 +44,22 @@ def test_set_branch_restricted():
             child="Wonder_Drug",
             state="ingest"
         )
+    
+    with pytest.raises(ValueError):
+        contract = Contract(
+            branch="test",
+            parent="Merck",
+            child="Wonder_Drug",
+            state="ingest"
+        )
+
+    with pytest.raises(ValueError):
+        contract = Contract(
+            branch="rse",
+            parent="Merck",
+            child="Wonder_Drug",
+            state="ingest"
+        )
 
     with pytest.raises(ValueError):
         contract = Contract(
