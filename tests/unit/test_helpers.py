@@ -1,4 +1,6 @@
 import pytest
+from dfmock import DFMock
+from core.helpers.drop_metadata import drop_metadata
 from unittest.mock import patch
 import os
 from sqlalchemy.orm.session import Session
@@ -104,3 +106,20 @@ def test_session_helper_dev(mock_cmock, mock_config):
     session = SessionHelper().session
     assert not mock_config.GenerateEngine.called
     assert mock_cmock.called
+
+
+
+def test_drop_metadata():
+    columns = { "hamburger":"string",
+            "__metadata_app_version":"float",
+            "__metadata_output_contract": "string",
+            "__metadata_run_timestamp":"datetime",
+            "bananas":"integer"
+          }
+    df = DFMock(count=100, columns = columns)   
+    
+    df.generate_dataframe()
+
+    new_df = drop_metadata(df.dataframe)
+
+    assert ','.join(new_df.columns) == 'hamburger,bananas'
