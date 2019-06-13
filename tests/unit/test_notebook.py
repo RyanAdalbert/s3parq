@@ -16,6 +16,7 @@ class Test:
         s3_client = boto3.client('s3')
         s3_client.create_bucket(Bucket=ENV_BUCKET)
 
+    @patch('core.helpers.notebook.ENVIRONMENT','prod')
     def test_output_path(self):
         self.setup()
         output_contract = "asdf/1234/merp/boomboom"
@@ -24,6 +25,7 @@ class Test:
         prefix = f"s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/boomboom"
         assert re.match(f"^{prefix}.*$", output_path)
 
+    @patch('core.helpers.notebook.ENVIRONMENT','prod')
     def test_output_url(self):
         self.setup()
         output_path = "s3://{ENV_BUCKET}/notebooks/asdf/1234/merp/shared.raw.extract.ipynb"
