@@ -41,12 +41,12 @@ class Contract(LoggerMixin):
             Does not support customer / brand aliases
         '''
 
+        self._set_env()
+
         self.parent = parent
         self.child = child
         self.state = state
         self._contract_type = "state"
-
-        self._set_env()
 
         if branch is None:
             self._branch = branch
@@ -60,7 +60,7 @@ class Contract(LoggerMixin):
 
     @branch.setter
     def branch(self, branch: str)->None:
-        self._branch = self._validate_part(branch)
+        self._branch = self._validate_branch(branch)
 
     @property
     def env(self)->str:
@@ -194,9 +194,19 @@ class Contract(LoggerMixin):
 
     # private
 
+    def _validate_branch(self, branch: str)->str:
+        branch = branch.lower()
+
+        if (self.env == self.DEV) & (branch in ['master','uat','prod']):
+                raise ValueError(
+                    f'Cannot use this branch in development. Currently using branch: {branch} when master, uat, prod are restricted branches.')
+        else:
+            return self._validate_part(branch)
+
     def _validate_part(self, part: str)->str:
-        val = s3Name().validate_part(part.lower(), allow_prefix=False)
+        part = part.lower()
+        val = s3Name().validate_part(part, allow_prefix=False)
         if val[0]:
-            return part.lower()
+            return part
         else:
             raise ValueError(val[1])
