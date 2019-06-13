@@ -5,7 +5,6 @@ from core.models.configuration import Pipeline
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 import core.airflow.dagbuilder.dag_builder as dag_builder
 
-
 @patch('core.airflow.dagbuilder.dag_builder.SessionHelper', autospec=True)
 class Test:
 
@@ -15,7 +14,7 @@ class Test:
         return mock_config.get_session()
 
     def test_get_active_pipelines(self, helper_session):
-
+        
         type(helper_session.return_value).session = PropertyMock(
             return_value=self.setup())
         dbuilder = dag_builder.DagBuilder()

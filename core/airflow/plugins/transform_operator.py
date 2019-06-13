@@ -1,3 +1,5 @@
+from sqlalchemy.orm.exc import NoResultFound 
+from sqlalchemy.exc import SQLAlchemyError 
 from airflow.utils.decorators import apply_defaults
 from airflow.contrib.operators.awsbatch_operator import AWSBatchOperator
 from airflow.contrib.operators.ssh_operator import SSHOperator
@@ -86,8 +88,12 @@ class TransformOperator(InheritOperator):
         """
         self.session = SessionHelper().session
         transform_config = config.Transformation
-        transform = self.session.query(transform_config).filter(
+        ## if the transform is missing for some reason, we want a clear error 
+        try:
+            transform = self.session.query(transform_config).filter(
             transform_config.id == self.transform_id).one()
+        except NoResultFound as ex:
+            raise SQLAlchemyError(f"Transform id {self.transform_id} was not found in the configuration database.")
         return transform
 
     def _generate_task_id(self) -> str:
