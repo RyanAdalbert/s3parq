@@ -11,8 +11,9 @@ from typing import List
 
 class Contract(LoggerMixin):
     ''' This class is the base contracts for all other typed contracts.
+        It should not be used directly.
         The s3 contract is how we structure our data lake. 
-        This contract defines the output structure of data into S3.
+        This contract defines the base of the output structure of data into S3.
         *-------------------------------------------------------*
         | contract structure in s3:                             |
         |                                                       |
@@ -60,7 +61,12 @@ class Contract(LoggerMixin):
 
     @branch.setter
     def branch(self, branch: str)->None:
-        self._branch = self._validate_branch(branch)
+        try:
+            self._branch = self._validate_branch(branch)
+        except:
+            self.logger.error(
+                f'Your git branch name : {branch} : cannot be used as a contract branch path.')
+            raise
 
     @property
     def env(self)->str:
@@ -140,11 +146,7 @@ class Contract(LoggerMixin):
         # set branch default to the git branch.
         # if we need to override this, set the branch param first.
         if self._branch is None:
-            try:
-                self.branch = BRANCH_NAME
-            except:
-                raise ValueError(
-                    f'Your git branch name {branch_name} cannot be used as a contract branch path.')
+            self.branch = BRANCH_NAME
 
     @property
     def s3_path(self)->str:
@@ -200,7 +202,7 @@ class Contract(LoggerMixin):
 
         if (self.env == self.DEV) & (branch in protected_branches):
                 raise ValueError(
-                    f'Cannot use this branch in development. Currently using branch: {branch} when {protected_branches} are restricted branches.')
+                    f'Cannot use this branch in development. Currently using branch : {branch} : when {protected_branches} are restricted branches.')
         else:
             return self._validate_part(branch)
 
