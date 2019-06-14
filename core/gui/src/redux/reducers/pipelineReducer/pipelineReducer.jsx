@@ -41,7 +41,8 @@ const pipelineReducer = (state = INITIAL_STATE, action) => {
       });
     case MODAL_CLOSE:
       return Object.assign({}, state, {
-        modalShow: action.modalStatus
+        modalShow: action.modalStatus,
+        modalProps: action.modalProps
       });
     default:
       return state;

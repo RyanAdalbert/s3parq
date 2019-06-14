@@ -4,6 +4,9 @@ import Modal from 'react-bootstrap/Modal';
 
 class PipelineModal extends React.Component {
   render() {
+    if (this.props.show === false) {
+      return null;
+    }
     return (
       <Modal
         {...this.props}
@@ -12,13 +15,14 @@ class PipelineModal extends React.Component {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">Title</Modal.Title>
+          <Modal.Title id="contained-modal-title-vcenter">
+            {this.props.pipelineInfo.name}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <h4>hi</h4>
           <p>hi</p>
           <h3>hi</h3>
-          {console.log(this.props.onHide)}
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.props.onHide}>Close</Button>

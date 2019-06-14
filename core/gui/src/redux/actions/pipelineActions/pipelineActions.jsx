@@ -39,7 +39,8 @@ export const modalOpen = (modalStatus, modalProps) => ({
   modalProps
 });
 
-export const modalClose = modalStatus => ({
+export const modalClose = (modalStatus, modalProps) => ({
   type: 'MODAL_CLOSE',
-  modalStatus
+  modalStatus,
+  modalProps
 });

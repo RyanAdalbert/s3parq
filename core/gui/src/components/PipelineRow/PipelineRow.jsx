@@ -9,7 +9,7 @@ import {
 //Pipeline row component
 export default class PipelineRow extends PureComponent {
   render() {
-    const { pipelines, setFilters, dispatch } = this.props;
+    const { pipelines, setFilters, dispatch, modalProps } = this.props;
 
     const filtered = multiFilter(pipelines, setFilters);
 
@@ -20,7 +20,7 @@ export default class PipelineRow extends PureComponent {
     };
 
     const closeModal = () => {
-      dispatch(modalClose(false));
+      dispatch(modalClose(false, {}));
     };
 
     const pipelineRow = filtered.map(pipeline => {
@@ -37,10 +37,16 @@ export default class PipelineRow extends PureComponent {
             <td>{pipeline.pharma_company}</td>
             <td>{pipeline.status}</td>
             <td>{pipeline.run_freq}</td>
-            {/*console.log(pipeline)*/}
           </tr>
 
-          <PipelineModal show={this.props.modalShow} onHide={closeModal} />
+          {/* Need to add a conditional statement here to keep from rendering all the time */}
+          {/* However, we run into an issue with getting access to the component itself after we do that */}
+
+          <PipelineModal
+            show={this.props.modalShow}
+            onHide={closeModal}
+            pipelineInfo={modalProps}
+          />
         </>
       );
     });
