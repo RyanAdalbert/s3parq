@@ -5,7 +5,9 @@ import { API_HOST } from '../../constants';
 export const pipelineConstants = {
   FETCH_PIPELINES: 'FETCH_PIPELINES',
   FETCH_PIPELINES_SUCCESS: 'FETCH_PIPELINES_SUCCESS',
-  FETCH_PIPELINE_FAILURE: 'FETCH_PIPELINES_FAILURE'
+  FETCH_PIPELINE_FAILURE: 'FETCH_PIPELINES_FAILURE',
+  MODAL_OPEN: 'MODAL_OPEN',
+  MODAL_CLOSE: 'MODAL_CLOSE'
 };
 
 //Fetch Pipeline with redux-api-middleware
@@ -29,4 +31,16 @@ export const fetchPipelines = oAuthToken => ({
       'FETCH_PIPELINES_FAILURE'
     ]
   }
+});
+
+export const modalOpen = (modalStatus, modalProps) => ({
+  type: 'MODAL_OPEN',
+  modalStatus,
+  modalProps
+});
+
+export const modalClose = (modalStatus, modalProps) => ({
+  type: 'MODAL_CLOSE',
+  modalStatus,
+  modalProps
 });

@@ -3,6 +3,10 @@ import yaml
 from .helpers.project_root import ProjectRoot
 from git import Repo
 
+## DYNAMICS
+# AWS_ACCOUNT default is set to PROD_AWS_ACCOUNT for prod and uat, DEV_AWS_ACCOUNT otherwise
+# BATCH_JOB_QUEUE default is set to '<ENVIRONMENT>-core'
+# ENV_BUCKET default is set to 'ichain-<ENVIRONMENT>' 
 
 def reset_constants():
     ''' sets (or resets) constants based on hierarchy of 
@@ -64,6 +68,5 @@ def reset_constants():
     globals()['ENV_BUCKET'] = get_env_bucket()
     globals()['AWS_ACCOUNT'] = get_aws_account()
     globals()['BATCH_JOB_QUEUE'] = get_batch_job_queue()
-
 
 reset_constants()

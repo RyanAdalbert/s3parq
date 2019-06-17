@@ -6,7 +6,7 @@ services:
             - POSTGRES_USER=airflow
             - POSTGRES_PASSWORD=airflow
             - POSTGRES_DB=airflow
-
+        
     airflow:
         build:
             dockerfile: ./dockerfiles/core.dockerfile
@@ -65,6 +65,9 @@ services:
             - POSTGRES_DB=configuration_application
         ports: 
             - "5432:5432"
+        command: postgres -c config_file=/etc/postgresql.conf
+        volumes:
+            - ./config/postgresql.conf:/etc/postgresql.conf
 
     flaskapi:
         build:

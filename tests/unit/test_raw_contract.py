@@ -26,10 +26,10 @@ def _s3_mock_setup():
 
 def _contract_setup():
     contract = RawContract(branch='master',
-                        parent='Merck',
-                        child='Wonder_Drug',
-                        state='raw'
-                        )
+                           parent='Merck',
+                           child='Wonder_Drug',
+                           state='raw'
+                           )
     return contract
 
 
@@ -97,7 +97,6 @@ def test_list_files():
         _file.write(text)
         _file.seek(0)
         contract.publish_raw_file(_file.name)
-
 
         f_time = os.stat(_file.name).st_mtime
         key = f'master/merck/wonder_drug/raw/{os.path.split(_file.name)[1]}'
