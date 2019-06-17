@@ -23,18 +23,19 @@ def filters():
     brands = set()
     companies = set()
     types = set()
-    status = set()
+    activeStatus = set()
     for pl in query:
       brands.add(pl.brand.name)
       companies.add(pl.brand.pharmaceutical_company.name)
       types.add(pl.pipeline_type.name)
       if pl.is_active:
-        status.add('Active')
+        activeStatus.add('Active')
       else:
-        status.add('Inactive')
+        activeStatus.add('Inactive')
     filters['brands'] = list(brands)
     filters['companies'] = list(companies)
     filters['types'] = list(types)
-    filters['status'] = list(status)
+    filters['activeStatus'] = list(activeStatus)
     mainObj = {"data" : filters}
+    sess.close()
     return json.dumps(mainObj), 200
