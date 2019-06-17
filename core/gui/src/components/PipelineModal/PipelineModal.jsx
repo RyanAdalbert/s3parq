@@ -4,7 +4,6 @@ import Modal from 'react-bootstrap/Modal';
 
 class PipelineModal extends React.Component {
   render() {
-    console.log(this.props);
     if (this.props.show === false) {
       return null;
     }
@@ -21,11 +20,11 @@ class PipelineModal extends React.Component {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <h4>Description</h4>
+          <h3>Description:</h3>
           <p>{this.props.pipelineInfo.description}</p>
-          <h3>Type</h3>
+          <h4>Type:</h4>
           <p>{this.props.pipelineInfo.type}</p>
-          <h3>States</h3>
+          <h4>States:</h4>
           <div>
             <ul>
               {this.props.pipelineInfo.states.map((stateInfo, index) => (
@@ -33,7 +32,7 @@ class PipelineModal extends React.Component {
               ))}
             </ul>
           </div>
-          <h3>Transforms</h3>
+          <h4>Transforms:</h4>
           <div>
             <ul>
               {this.props.pipelineInfo.transformations.map(
