@@ -11,11 +11,11 @@ import moto
 @pytest.fixture
 def _contract():
     contract = DatasetContract(
-            branch="fine-feature-branch",
-            parent="Merck",
-            child="Wonder_Drug",
-            state="ingest",
-            dataset="valid_dataset"
+        branch="fine-feature-branch",
+        parent="Merck",
+        child="Wonder_Drug",
+        state="ingest",
+        dataset="valid_dataset"
     )
     return contract
 
@@ -48,17 +48,18 @@ def test_quick_set(_contract):
 def test_valid_partitions(_contract):
     contract = _contract
     contract.partitions = ['date', 'segment']
-    assert contract.partitions == ['date', 'segment'], "partitions not correctly set"
+    assert contract.partitions == [
+        'date', 'segment'], "partitions not correctly set"
 
 
 @pytest.fixture
 def _contract_type():
     contract = DatasetContract(branch='fine-feature-branch',
-                        parent='Merck',
-                        child='Wonder_Drug',
-                        state='ingest',
-                        dataset="valid_dataset"
-                        )
+                               parent='Merck',
+                               child='Wonder_Drug',
+                               state='ingest',
+                               dataset="valid_dataset"
+                               )
     return contract
 
 
@@ -91,9 +92,9 @@ def test_fetch_from_s3(_contract):
         contract.dataset = 'valid_dataset'
 
         key = contract.key
-        filters = [{"partition":"hamburger",
-                    "comparison":"==",
-                    "values":['McDonalds']}]
+        filters = [{"partition": "hamburger",
+                    "comparison": "==",
+                    "values": ['McDonalds']}]
 
         fake_df = contract.fetch(filters)
 
@@ -104,9 +105,11 @@ def test_fetch_from_s3(_contract):
 
         assert isinstance(fake_df, pd.DataFrame)
 
+
 def test_publish_to_s3(_contract):
     with patch('core.dataset_contract.publish', autospec=True) as publish:
-        df = dfmock.DFMock(count = 100, columns = {"fake":"boolean","partition":"string","option":{"option_count":4,"option_type":"string"}})
+        df = dfmock.DFMock(count=100, columns={"fake": "boolean", "partition": "string", "option": {
+                           "option_count": 4, "option_type": "string"}})
         df.generate_dataframe()
         patch.return_value = None
         contract = _contract
@@ -117,7 +120,7 @@ def test_publish_to_s3(_contract):
         contract.dataset = 'valid_dataset'
 
         key = contract.key
-        fake_parts = ["fake","option"]
+        fake_parts = ["fake", "option"]
         contract.partitions = fake_parts
 
         pub = contract.publish(dataframe=df.dataframe)
@@ -127,5 +130,5 @@ def test_publish_to_s3(_contract):
             dataframe=df.dataframe,
             key=key,
             partitions=fake_parts
-            )
+        )
         assert pub is None

@@ -32,5 +32,5 @@ test yo stuff! options:\n-log\tprints stdout during py.test runs (this includes 
     shift
  
 done
-
+pip3 install -r requirements/api.txt
 coverage run --source core /usr/local/bin/pytest $LOG tests/unit && coverage report $LINE
