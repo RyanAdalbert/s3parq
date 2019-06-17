@@ -4,6 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 
 class PipelineModal extends React.Component {
   render() {
+    console.log(this.props);
     if (this.props.show === false) {
       return null;
     }

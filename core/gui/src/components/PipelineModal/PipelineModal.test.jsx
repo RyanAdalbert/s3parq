@@ -4,6 +4,11 @@ const setUp = (props = {}) => {
   const wrapper = shallow(<PipelineModal {...props} />);
   return wrapper;
 };
+function createTestProps(props) {
+  return {
+    show: true
+  };
+}
 
 describe('<PipelineModal /> rendering', () => {
   let wrapper;

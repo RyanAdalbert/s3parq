@@ -12,7 +12,7 @@ describe('<Header /> rendering', () => {
   });
 
   it('should render without errors', () => {
-    console.log(wrapper.debug());
+    // console.log(wrapper.debug());
 
     expect(wrapper.exists()).toBe(true);
   });

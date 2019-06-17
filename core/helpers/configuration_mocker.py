@@ -68,8 +68,9 @@ class ConfigurationMocker(LoggerMixin):
             a(id=1, first_name = "Fox", last_name = "Mulder", email_address="fwm@integrichain.com"),
             a(id=2, first_name = "Dana", last_name = "Skully", email_address="dks@integrichain.com"),
             a(id=3, first_name = "Alec", last_name="Wertheimer", email_address="ajw@integrichain.com"),
-            a(id=4, first_name = "Natie", last_name="Bohnel", email_address="njb@integrichain.com"),
-            a(id=5, first_name = "Justin", last_name="Lewis", email_address="jlewis@integrichain.com")
+            a(id=4, first_name = "Natie", last_name="Bohnel", email_address="njb@integrichain.com"), 
+            a(id=5, first_name = "Justin", last_name="Lewis", email_address="jlewis@integrichain.com"),
+            a(id=6, first_name = "Jacob", last_name="Tobias", email_address="jtobias@integrichain.com") 
         ])
         self.session.commit()
         self.logger.debug('Done generating administrator mocks.')
