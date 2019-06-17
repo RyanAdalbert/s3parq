@@ -1,6 +1,6 @@
 import pytest
 import os
-import dfmock 
+import dfmock
 import pandas as pd
 from unittest.mock import patch
 from core.contract import Contract
@@ -13,10 +13,10 @@ import moto
 @pytest.fixture
 def _contract():
     contract = Contract(
-            branch="master",
-            parent="Merck",
-            child="Wonder_Drug",
-            state="ingest"
+        branch="master",
+        parent="Merck",
+        child="Wonder_Drug",
+        state="ingest"
     )
     yield contract
 
@@ -25,7 +25,8 @@ def test_set_env_valid(_contract):
     contract = _contract
     assert contract.env == f'{ENV_BUCKET}', 'failed to set to the current environment'
 
-@patch("core.contract.ENVIRONMENT","Pretend-RSE")
+
+@patch("core.contract.ENVIRONMENT", "Pretend-RSE")
 def test_set_env_invalid():
     with pytest.raises(ValueError):
         contract = Contract(
@@ -59,6 +60,7 @@ def test_alias_brand(_contract):
     contract.brand = brand
     assert contract.brand == brand.lower(), "brand alias not set"
     assert contract.child == brand.lower(), "brand does not alias to child"
+
 
 def test_alias_customer(_contract):
     contract = _contract

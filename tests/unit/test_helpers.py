@@ -1,4 +1,9 @@
+import yaml
 import pytest
+import tempfile
+import core.helpers.postgres_toggle as postgres_toggle
+from dfmock import DFMock
+from core.helpers.drop_metadata import drop_metadata
 from unittest.mock import patch
 import os
 from sqlalchemy.orm.session import Session
@@ -40,9 +45,6 @@ def test_session_helper_dev(ENV):
     assert isinstance(session.session, Session)
 
 
-
-
-
 class secret_mock():
     def __init__(self):
         self.user = 'test_user'
@@ -77,30 +79,93 @@ def test_get_file_type(paramiko_trans, paramiko_sftp):
     ft = fm.get_file_type(test_file, fd)
     assert ft, "dont_move"
 
-## SessionHelper
+# SessionHelper
+
 
 @patch("core.helpers.session_helper.config")
 @patch("core.helpers.session_helper.CMock")
-@patch("core.helpers.session_helper.ENVIRONMENT","prod")
+@patch("core.helpers.session_helper.ENVIRONMENT", "prod")
 def test_session_helper_prod(mock_cmock, mock_config):
     session = SessionHelper().session
     assert mock_config.GenerateEngine.called
     assert mock_config.Session.called
     assert not mock_cmock.called
 
+
 @patch("core.helpers.session_helper.config")
 @patch("core.helpers.session_helper.CMock")
-@patch("core.helpers.session_helper.ENVIRONMENT","uat")
+@patch("core.helpers.session_helper.ENVIRONMENT", "uat")
 def test_session_helper_uat(mock_cmock, mock_config):
     session = SessionHelper().session
     assert mock_config.GenerateEngine.called
     assert mock_config.Session.called
     assert not mock_cmock.called
 
+
 @patch("core.helpers.session_helper.config")
 @patch("core.helpers.session_helper.CMock")
-@patch("core.helpers.session_helper.ENVIRONMENT","dev")
+@patch("core.helpers.session_helper.ENVIRONMENT", "dev")
 def test_session_helper_dev(mock_cmock, mock_config):
     session = SessionHelper().session
     assert not mock_config.GenerateEngine.called
     assert mock_cmock.called
+
+
+def test_drop_metadata():
+    columns = {"hamburger": "string",
+               "__metadata_app_version": "float",
+               "__metadata_output_contract": "string",
+               "__metadata_run_timestamp": "datetime",
+               "bananas": "integer"
+               }
+    df = DFMock(count=100, columns=columns)
+
+    df.generate_dataframe()
+
+    new_df = drop_metadata(df.dataframe)
+
+    assert ','.join(new_df.columns) == 'hamburger,bananas'
+
+
+@patch('core.helpers.postgres_toggle.logger.debug')
+def test_postgres_toggle_on_already(debug):
+    """ log that pg was already on for this session."""
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(b'FORCE_POSTGRES: true')
+        postgres_toggle.yaml_path = f.name
+        f.seek(0)
+        postgres_toggle.postgres()
+        debug.assert_called_with(
+            "Session helper is already set to use postgres.")
+
+
+@patch('core.helpers.postgres_toggle.logger.debug')
+def test_postgres_toggle_off_already(debug):
+    """ log that cmock was already on for this session."""
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(b'FORCE_POSTGRES: false')
+        postgres_toggle.yaml_path = f.name
+        f.seek(0)
+        postgres_toggle.cmock()
+        debug.assert_called_with(
+            "Session helper is already set to use configuration mocker.")
+
+
+def test_postgres_toggle_on_new():
+    """ overwrite the config to turn on pg."""
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(b'FORCE_POSTGRES: false')
+        postgres_toggle.yaml_path = f.name
+        f.seek(0)
+        postgres_toggle.postgres()
+        assert yaml.load(f)['FORCE_POSTGRES'] == True
+
+
+def test_postgres_toggle_off_new():
+    """ overwite the config to turn off pg."""
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(b'FORCE_POSTGRES: true')
+        postgres_toggle.yaml_path = f.name
+        f.seek(0)
+        postgres_toggle.cmock()
+        assert yaml.load(f)['FORCE_POSTGRES'] == False
