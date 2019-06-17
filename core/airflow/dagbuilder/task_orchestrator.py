@@ -112,7 +112,7 @@ class TaskOrchestrator(LoggerMixin):
                         return spacer
             spacer = DummyOperator(task_id=spacer_format)
             spacer.dag = dag
-            spacer.depends_on_past = True
+            spacer.depends_on_past = False
 
             return spacer
 
@@ -131,7 +131,7 @@ class TaskOrchestrator(LoggerMixin):
 
             for task in task_group:
                 task.dag = dag
-                task.depends_on_past = True
+                task.depends_on_past = False
                 self.logger.debug(
                     f"Set downstream on {spacers[index].task_id} to {task.task_id}.")
                 spacers[index] >> task
