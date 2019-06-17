@@ -10,3 +10,4 @@ htmlcov/
 *.DS_Store
 dist/
 output_notebooks/
+node_modules/
