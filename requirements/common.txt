@@ -4,7 +4,7 @@ pandas==0.24.2
 pytz==2019.1
 pyarrow==0.13.0
 s3fs==0.2.1
-s3parq==1.0.0
+s3parq==2.0.0
 boto3==1.9.83
 GitPython==2.1.11
 sqlalchemy==1.2.16
@@ -12,3 +12,4 @@ psycopg2==2.7.6.1
 papermill==0.17.1
 dfmock==0.0.14
 paramiko==2.4.2
+mysql-connector==2.2.9

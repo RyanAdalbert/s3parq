@@ -1,4 +1,4 @@
-from core.constants import ENVIRONMENT
+from core.constants import ENVIRONMENT, FORCE_POSTGRES
 from core.helpers.configuration_mocker import ConfigurationMocker as CMock
 import core.models.configuration as config
 from sqlalchemy.orm.session import Session
@@ -12,17 +12,19 @@ class SessionHelper(LoggerMixin):
 
     def __init__(self):
         self._session = None
-        self.logger.info(f"Creating session for {ENVIRONMENT} environment...")
-        if ENVIRONMENT == "dev":
-            cmock = CMock()
-            cmock.generate_mocks()
-            self._session = cmock.get_session()
-            self.logger.info("Done. Created dev session with mock data.")    
-        if ENVIRONMENT in ("prod", "uat"):
+        self.logger.info(f"Creating session for {ENVIRONMENT} environment...")  
+        if FORCE_POSTGRES:
+            self.logger.info("Forcing postgres instead of configuration mocker...")
+        if ENVIRONMENT in ("prod", "uat") or FORCE_POSTGRES:
             engine = config.GenerateEngine().get_engine()
             session = config.Session(engine)
             self._session = session.get_session()
             self.logger.info(f"Done. Created {ENVIRONMENT} session.")
+        elif ENVIRONMENT == "dev":
+            cmock = CMock()
+            cmock.generate_mocks()
+            self._session = cmock.get_session()
+            self.logger.info("Done. Created dev session with mock data.")  
 
     @property
     def session(self)-> Session:

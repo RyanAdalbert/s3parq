@@ -9,7 +9,6 @@ if [ "$1" == "--build" ]; then
     docker-compose build;
     TYPE=$2
 fi
-xterm -e echo hello world --hold
 AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
 AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
 docker-compose up -d;
@@ -17,7 +16,9 @@ if [ "$TYPE" == "--gui" ]; then
     open -a Terminal ./script/gui_api
 fi
 
-docker-compose exec notebook /bin/bash -c "cd core/core/database && alembic upgrade head"
+docker-compose exec notebook /bin/bash -c "cd core/core/database && \
+alembic upgrade head"
+
 
 
 ## adding the ssh daemon here so we don't run it in prod by accident
@@ -27,7 +28,9 @@ mkdir /var/run/sshd && \
 useradd -ms /bin/bash corebot_remote && \
  echo -e 'corebot_remote\ncorebot_remote' | passwd corebot_remote && \
 ssh-keygen -R notebook && \
-service ssh start" 
+service ssh start && \
+cp -r /host/home/.aws /home/corebot_remote/.aws && \
+chown corebot_remote /home/corebot_remote/.aws/* && \
+chmod -R u+rx /home/corebot_remote/.aws"  
 script/dev_shell $TYPE
 
-##useradd -p $(openssl passwd -1 corebot_remote) -ms /bin/bash corebot_remote
