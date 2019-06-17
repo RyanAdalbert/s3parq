@@ -75,6 +75,7 @@ class DagBuilder(LoggerMixin):
             pipelines = session.query(Pipeline).filter(Pipeline.is_active)
         else:
             pipelines = session.query(Pipeline)
+
         self.logger.debug(
             f"Done getting pipelines, {len([x for x in pipelines])} pipelines found.")
         session.close()
