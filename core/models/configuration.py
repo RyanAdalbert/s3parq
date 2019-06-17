@@ -138,6 +138,10 @@ class PipelineType(UniversalWithPrimary, Base):
     segment = relationship("Segment", back_populates='pipeline_types')
 
 
+class RunEvent(UniversalWithPrimary, Base):
+    __tablename__ = 'run_events'
+
+
 class Segment(UniversalWithPrimary, Base):
     __tablename__ = 'segments'
     name = Column(String, nullable=False)
