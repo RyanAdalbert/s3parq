@@ -34,3 +34,10 @@ This API works as an interface between the React frontend and the configuration 
  		- `transformations`: list of all transformations a pipelines uses. Right now, this is limited to the name of a TransformationTemplate
 
 * /config_api/filters
+ 	- Precondition: Successfully login using a valid access token. Pass that access token in the Authorization header of a GET request
+ 	- Function: Queries all pipelines in the Configuration DB. Constructs a JSON object with keys corresponding to each filter field in the GUI
+ 	- Postcondition: Returns an error code/message if the request is invalid. With a valid request, returns a 200 OK Response along with a JSON-formatted string object. The outer JSON object contains a single key `data` with value containing the filter structure. The `key`/value pairs of this inner JSON object are as follows:
+ 		- `brands`: set of unique brand names across all pipelines
+ 		- `companies`: set of unique pharma companies across all pipelines
+ 		- `types`: set of pipeline types, e.g. patient, payer
+ 		- `activeStatus`: 'Active' or 'Inactive' based on each pipeline's `is_active` bool

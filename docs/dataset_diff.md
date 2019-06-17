@@ -13,6 +13,6 @@ First, construct a `DatasetDiff` object. The construction of `DatasetDiff` takes
 DatasetDiff has a single method, `get_diff()`. `get_diff()` takes 2 arguments: 
 
 * `transform_name`: The name of the transformation to diff against the DatasetDiff transformation.
-* `partition`: (_optional_) The name of the partition to return. By default, this partition is `__metadata_run_timestamp`, a partition created for all datasets.
+* `partition`: (_optional_) The name of the partition to return. By default, this partition is `__metadata_run_id`, a partition created for all datasets set during a RunEvent.
 
 `get_diff()` returns a pandas DataFrame containing all values in the transformation constructed with DatasetDiff not present in the transformation specified in `get_diff()`. `get_diff()` can be run any number of times using any number of transformations, but all diffs will compare against DatasetDiff's constructed transformation.
