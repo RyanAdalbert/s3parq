@@ -1,10 +1,9 @@
-import os
-import paramiko
-import re
-import stat
+import os, paramiko, re, stat
+from core.secret import Secret
 from typing import NamedTuple
+from core.raw_contract import RawContract
 
-from core.logging import LoggerMixin
+from core.logging import LoggerMixin, get_logger
 
 
 class FileDestination(NamedTuple):
@@ -13,7 +12,7 @@ class FileDestination(NamedTuple):
 
 
 class FileMover(LoggerMixin):
-    def __init__(self,secret):
+    def __init__(self, secret: Secret):
         user = secret.user
         password = secret.password
         host = secret.host
@@ -43,7 +42,10 @@ class FileMover(LoggerMixin):
         self.sftp.get(remote_path, local_path)
         os.utime(local_path, (utime,utime))
 
-    def get_file_type(self, filename, file_dest_map):
+    def put_file(self, remote_path: str, local_path: str):
+        self.sftp.put(localpath=local_path, remotepath=remote_path)
+
+    def get_file_type(self, filename: str, file_dest_map: str):
         # Check if file is matching to the prefix, otherwise don't move
         file_type = [x.file_type for x in file_dest_map if re.match(x.regex, filename)]
         if len(file_type) < 1:
@@ -59,8 +61,9 @@ class FileMover(LoggerMixin):
         # List all files on remote
         return self.sftp.listdir_attr(sftp_prefix)
 
+logger = get_logger("file_mover")
 
-def get_files(tmp_dir:str,prefix: str, remote_path: str, secret):
+def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
     # Set file filtering
     files_dest = [FileDestination(f"^{prefix}.*$","do_move")]
 
@@ -73,6 +76,20 @@ def get_files(tmp_dir:str,prefix: str, remote_path: str, secret):
                 remote_file_path = remote_path + "/" + remote_file.filename
                 # Set file name to include the path, in case of duplicate file names in different locations
                 local_file_name = remote_file_path.replace("/",".")
+                local_file_name = local_file_name.lstrip(".")
                 local_file_path = os.path.join(tmp_dir, local_file_name)
                 
                 fm.get_file(remote_file_path, local_file_path)
+
+def publish_file(local_path: str, remote_path: str, secret: Secret):
+    # Open SFTP connection
+    with FileMover(secret=secret) as fm:
+        local_file = os.path.basename(local_path)
+        remote_files = set()
+        for file in fm.list_files(remote_path):
+            remote_files.add(file.filename)
+        if local_file in remote_files: # we don't want to overwrite any existing files on external FTP
+            logger.debug("Error: File already exists on remote FTP server.")
+            raise ValueError("Error: File already exists on remote FTP server.")
+        remote_file = remote_path + "/" + local_file
+        fm.put_file(remote_path=remote_file, local_path=local_path)

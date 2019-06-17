@@ -32,13 +32,13 @@
 #     contract_key = output_contract.get_key()
 #     client.upload_file(Bucket=ENV_BUCKET, Filename= t_file_old.name, Key=contract_key+file_name_old
 #         , ExtraArgs={"Metadata": {"source_modified_time": str(n_time - time_delta)}})
-    
+
 #     t_file_new = tempfile.NamedTemporaryFile()
 #     t_file_new.write(b'Gobias some new coffee!')
 #     file_name_new = get_filename_from_path(t_file_new)
 #     client.upload_file(Bucket=ENV_BUCKET, Filename= t_file_new.name, Key=contract_key+file_name_new
 #         , ExtraArgs={"Metadata": {"source_modified_time": str(n_time + time_delta)}})
-    
+
 #     return (t_file_old, t_file_new, output_contract, time_delta)
 
 
@@ -55,8 +55,8 @@
 #     file_name = get_filename_from_path(t_file_old)
 #     s3_time = float(client.head_object(Bucket=ENV_BUCKET, Key=output_contract.get_key()+file_name)[
 #                     'Metadata']['source_modified_time'])
-    
-#     assert math.isclose(os.stat(t_file_old.name).st_mtime, s3_time, rel_tol=0.01)      
+
+#     assert math.isclose(os.stat(t_file_old.name).st_mtime, s3_time, rel_tol=0.01)
 
 
 # @moto.mock_s3
@@ -77,7 +77,7 @@
 
 #     s3_time_after = float(client.head_object(
 #         Bucket=ENV_BUCKET, Key=key)['Metadata']['source_modified_time'])
-    
+
 #     assert s3_time_after == s3_time_before
 
 

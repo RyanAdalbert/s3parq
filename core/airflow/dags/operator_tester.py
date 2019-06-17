@@ -26,7 +26,7 @@ if ENVIRONMENT == "dev":
 
 
     # Needs to pass in the required transformation ID
-    transform_task = TransformOperator(transform_id=1000, dag=dag)
+    #transform_task = TransformOperator(transform_id=1000, dag=dag)
 
     # put them in order
-    kickoff_task >> transform_task
+    #kickoff_task >> transform_task
