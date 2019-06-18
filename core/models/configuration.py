@@ -143,7 +143,7 @@ class RunEvent(UniversalWithPrimary, Base):
     __tablename__ = 'run_events'
     updated_at = Column(TIMESTAMP(timezone=True), nullable=True)
     pipeline_id = Column(Integer, ForeignKey('pipelines.id'), nullable=False) 
-    pipeline = relationship("Pipeline",  back_populates='run_event')
+    pipeline = relationship("Pipeline",  back_populates='run_events')
 
 
 class Segment(UniversalWithPrimary, Base):
