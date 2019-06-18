@@ -140,6 +140,9 @@ class PipelineType(UniversalWithPrimary, Base):
 
 class RunEvent(UniversalWithPrimary, Base):
     __tablename__ = 'run_events'
+    updated_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    pipeline_id = Column(Integer, ForeignKey('pipelines.id'), nullable=False) 
+    pipeline = relationship("Pipeline")
 
 
 class Segment(UniversalWithPrimary, Base):

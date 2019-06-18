@@ -1038,9 +1038,9 @@ class ConfigurationMocker(LoggerMixin):
       self.logger.debug('Generating run_events mocks.')
       t = config.RunEvent
       self.session.add_all([
-         t(id=1),
-         t(id=2),
-         t(id=3)
+         t(id=1, pipeline_id=11),
+         t(id=2, pipeline_id=12),
+         t(id=3, pipeline_id=13)
       ])
       self.session.commit()
       self.logger.debug('Done generating run_events mocks.')
