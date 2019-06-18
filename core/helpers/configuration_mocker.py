@@ -37,6 +37,7 @@ class ConfigurationMocker(LoggerMixin):
         self._mock_transformation_templates_tags()
         self._mock_transformations()
         self._mock_transformation_variables()
+        self._mock_run_events()
 
     def _mock_transformation_templates_tags(self)->None:
         self.logger.debug(
@@ -1032,6 +1033,17 @@ class ConfigurationMocker(LoggerMixin):
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_variables mocks.')
+
+    def _mock_run_events(self)->None:
+      self.logger.debug('Generating run_events mocks.')
+      t = config.RunEvent
+      self.session.add_all([
+         t(id=1, pipeline_id=11),
+         t(id=2, pipeline_id=12),
+         t(id=3, pipeline_id=13)
+      ])
+      self.session.commit()
+      self.logger.debug('Done generating run_events mocks.')
 
 
 def setup_base_session():
