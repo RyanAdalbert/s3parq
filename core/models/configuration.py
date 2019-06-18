@@ -113,7 +113,7 @@ class Pipeline(UniversalWithPrimary, Base):
     run_frequency = Column(String)
     description = Column(String)
     pipeline_states = relationship("PipelineState", back_populates='pipeline')
-    run_event = relationship("RunEvent", back_populates='pipeline')
+    run_events = relationship("RunEvent", back_populates='pipeline')
 
 
 class PipelineState(UniversalWithPrimary, Base):
