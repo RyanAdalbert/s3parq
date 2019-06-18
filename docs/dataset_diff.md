@@ -13,7 +13,7 @@ First, construct a `DatasetDiff` object. The construction of `DatasetDiff` takes
 DatasetDiff has a single method, `get_diff()`. `get_diff()` takes up to 2 arguments: 
 
 * `transform_name`: The name of the transformation to diff against the DatasetDiff transformation.
-* `value`: The values to compare `partition` to using the `comparison` operator. This is a list of one or more values with type matching the `partition` datatype
+* `values`: The values to compare `partition` to using the `comparison` operator. This is a list of one or more values with type matching the `partition` datatype
 * `partition`: (_optional_) The name of the partition to return. By default, this partition is `__metadata_run_id`, a partition created for all datasets set during a RunEvent.
 * `comparison`: (_optional_) The type of operation to use between `part_vals` and the values found in `partition`. Specify using string arguments ">", ">=", etc. By default, comparison is set to "==".
 
