@@ -6,6 +6,8 @@ from typing import List
 
 from core.constants import CORE_VERSION
 from core.contract import Contract
+from core.helpers.session_helper import SessionHelper as SHelp
+from core.models.configuration import RunEvent
 
 class DatasetContract(Contract):
     ''' The s3 contract is how we structure our data lake. 
@@ -100,15 +102,23 @@ class DatasetContract(Contract):
         '''
         self._contract_type = "dataset"
 
-    def _set_dataset_metadata(self, df):
-        run_timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-        df['__metadata_app_version'] = CORE_VERSION
-        df['__metadata_output_contract'] = self.s3_path
-        
-        if not "__metadata_run_timestamp" in df.columns:
-            df['__metadata_run_timestamp'] = run_timestamp
+    def _get_run_timestamp(self, run_id: int):
+        sess = SHelp().session
+        run = sess.query(RunEvent).filter(RunEvent.id==run_id).one() # this SHOULD throw an error if passed an invalid run_id
+        sess.close()
+        return run.created_at
 
-        partitions = ['__metadata_run_timestamp']
+    def _set_dataset_metadata(self, df: pd.DataFrame, run_id: int):
+        if not "__metadata_run_id" in df.columns:
+            df["__metadata_run_id"] = run_id
+            df["__metadata_run_timestamp"] = self._get_run_timestamp(run_id=run_id)
+            df["__metadata_app_version"] = CORE_VERSION
+            
+        transform_timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        df['__metadata_transform_timestamp'] = transform_timestamp
+        df['__metadata_output_contract'] = self.s3_path
+
+        partitions = ['__metadata_run_id']
         return (df, partitions)
 
     # functions for use
@@ -125,7 +135,7 @@ class DatasetContract(Contract):
                         key = self.key,
                         filters = filters )
 
-    def publish(self, dataframe: pd.DataFrame)->None:
+    def publish(self, dataframe: pd.DataFrame, run_id: int)->None:
         if self.contract_type != "dataset":
             raise ValueError(
                 f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
@@ -133,9 +143,9 @@ class DatasetContract(Contract):
         self.logger.info(
             f'Publishing dataframe to s3 location {self.s3_path}.')
 
-        dataframe, time_partition = self._set_dataset_metadata(df=dataframe)
-        if time_partition not in self.partitions:
-            self.partitions.extend(time_partition)
+        dataframe, run_partition = self._set_dataset_metadata(df=dataframe, run_id=run_id)
+        if run_partition not in self.partitions:
+            self.partitions.extend(run_partition)
 
         publish(
             bucket=self.env,
