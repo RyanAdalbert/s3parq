@@ -11,6 +11,6 @@ def cli(): # pragma: no cover
 @click.argument('id', type=int)
 @click.argument('run_id', type=int)
 def run(id, run_id):
-    notebook_url = notebook.run_transform(id)
+    notebook_url = notebook.run_transform(id, run_id)
     print("See your notebook output at:")
     print(notebook_url)
