@@ -11,8 +11,9 @@ from typing import List
 
 class Contract(LoggerMixin):
     ''' This class is the base contracts for all other typed contracts.
+        It should not be used directly.
         The s3 contract is how we structure our data lake. 
-        This contract defines the output structure of data into S3.
+        This contract defines the base of the output structure of data into S3.
         *-------------------------------------------------------*
         | contract structure in s3:                             |
         |                                                       |
@@ -41,12 +42,12 @@ class Contract(LoggerMixin):
             Does not support customer / brand aliases
         '''
 
+        self._set_env()
+
         self.parent = parent
         self.child = child
         self.state = state
         self._contract_type = "state"
-
-        self._set_env()
 
         if branch is None:
             self._branch = branch
@@ -60,7 +61,12 @@ class Contract(LoggerMixin):
 
     @branch.setter
     def branch(self, branch: str)->None:
-        self._branch = self._validate_part(branch)
+        try:
+            self._branch = self._validate_branch(branch)
+        except:
+            self.logger.error(
+                f'Your git branch name : {branch} : cannot be used as a contract branch path.')
+            raise
 
     @property
     def env(self)->str:
@@ -140,11 +146,7 @@ class Contract(LoggerMixin):
         # set branch default to the git branch.
         # if we need to override this, set the branch param first.
         if self._branch is None:
-            try:
-                self.branch = BRANCH_NAME
-            except:
-                raise ValueError(
-                    f'Your git branch name {branch_name} cannot be used as a contract branch path.')
+            self.branch = BRANCH_NAME
 
     @property
     def s3_path(self)->str:
@@ -194,9 +196,20 @@ class Contract(LoggerMixin):
 
     # private
 
+    def _validate_branch(self, branch: str)->str:
+        branch = branch.lower()
+        protected_branches = ['master','test','rse','uat','prod']
+
+        if (self.env == self.DEV) & (branch in protected_branches):
+                raise ValueError(
+                    f'Cannot use this branch in development. Currently using branch : {branch} : when {protected_branches} are restricted branches.')
+        else:
+            return self._validate_part(branch)
+
     def _validate_part(self, part: str)->str:
-        val = s3Name().validate_part(part.lower(), allow_prefix=False)
+        part = part.lower()
+        val = s3Name().validate_part(part, allow_prefix=False)
         if val[0]:
-            return part.lower()
+            return part
         else:
             raise ValueError(val[1])
