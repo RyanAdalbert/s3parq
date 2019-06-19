@@ -34,7 +34,7 @@ Invoke the `fetch()` command to query a given contract. Some things to know:
 - To invoke fetch a contract must be at the grain of dataset. This is because file names and partitions to read from will be set by the command params.
 - fetch allows for basic filtering on partitioned columns only.
 - fetch returns a single pandas dataframe based on the filter criterion.
-- see `docs/dataset_diff.md` for retrieving the diff of 2 datasets.
+- see `docs/dataset_diff.md` for retrieving a diff on a partitioned dataset.
 
 ### Partitioning Datasets
 Invoke the `partitions()` command to set partitions for a given contract. Some things to know:
