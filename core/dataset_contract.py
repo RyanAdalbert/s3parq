@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, fromtimestamp
 import pandas as pd
 from s3parq import fetch, publish
 
@@ -106,7 +106,8 @@ class DatasetContract(Contract):
         sess = SHelp().session
         run = sess.query(RunEvent).filter(RunEvent.id==run_id).one() # this SHOULD throw an error if passed an invalid run_id
         sess.close()
-        return run.created_at
+        timestamp = fromtimestamp(run.created_at)
+        return timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
     def _set_dataset_metadata(self, df: pd.DataFrame, run_id: int):
         if not '__metadata_run_id' in df.columns:
