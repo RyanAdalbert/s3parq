@@ -115,7 +115,7 @@ def test_drop_metadata():
     columns = {"hamburger": "string",
                "bananas": "integer"
                }
-    columns.update()
+    columns.update(get_meta_cols())
     df = DFMock(count=100, columns=columns)
 
     df.generate_dataframe()
