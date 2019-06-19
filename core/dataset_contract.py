@@ -8,6 +8,7 @@ from core.constants import CORE_VERSION
 from core.contract import Contract
 from core.helpers.session_helper import SessionHelper as SHelp
 from core.models.configuration import RunEvent
+from sqlalchemy.orm.exc import NoResultFound
 
 class DatasetContract(Contract):
     ''' The s3 contract is how we structure our data lake. 
@@ -96,6 +97,9 @@ class DatasetContract(Contract):
 
         return path
 
+    def _format_datetime(self, date: datetime)->str:
+        return date.strftime('%Y-%m-%d %H:%M:%S')
+
     def _set_contract_type(self)->None:
         ''' INTENT: sets what type of contract this is - raw or dataset
             RETURNS: None
@@ -104,10 +108,13 @@ class DatasetContract(Contract):
 
     def _get_run_timestamp(self, run_id: int):
         sess = SHelp().session
-        run = sess.query(RunEvent).filter(RunEvent.id==run_id).one() # this SHOULD throw an error if passed an invalid run_id
+        try:
+            run = sess.query(RunEvent).filter(RunEvent.id==run_id).one()
+        except NoResultFound:
+            raise KeyError("No RunEvent found with id = " + str(run_id) + ".")
         sess.close()
         timestamp = datetime.utcfromtimestamp(run.created_at)
-        return timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        return self._format_datetime(timestamp)
 
     def _set_dataset_metadata(self, df: pd.DataFrame, run_id: int):
         if not '__metadata_run_id' in df.columns:
@@ -115,8 +122,7 @@ class DatasetContract(Contract):
             df['__metadata_run_timestamp'] = self._get_run_timestamp(run_id=run_id)
             df['__metadata_app_version'] = CORE_VERSION
             
-        transform_timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-        df['__metadata_transform_timestamp'] = transform_timestamp
+        df['__metadata_transform_timestamp'] = self._format_datetime(datetime.utcnow())
         df['__metadata_output_contract'] = self.s3_path
 
         partitions = ['__metadata_run_id']
