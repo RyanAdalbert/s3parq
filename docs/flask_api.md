@@ -22,7 +22,7 @@ This API works as an interface between the React frontend and the configuration 
 * /config_api/index
  	- Precondition: Successfully login using a valid access token. Pass that access token in the Authorization header of a GET request
  	- Function: Queries all pipelines in the Configuration DB. Constructs a nested dict to be returned as a nested JSON object of various attributes of each pipeline in the query.
- 	- Postcondition: Returns an error code/message if the request is invalid. With a valid request, returns a 200 OK Response along with a JSON-formatted string object. This object has a key matching the primary key of the Pipeline table, and a value which is another JSON object with `key`/value pairs containing various data about the pipeline. The `key`/value pairs of this inner JSON object are as follows:
+ 	- Postcondition: Returns an error code/message if the request is invalid. With a valid request, returns a 200 OK Response along with a JSON-formatted string object. This is a JSON object containing an array of individual JSON objects. Each of these objects has a key matching the primary key of the Pipeline table, and a value which is another JSON object with `key`/value pairs containing various data about the pipeline. The `key`/value pairs of this inner JSON object are as follows:
  		- `name`: name of the pipeline
  		- `brand`: name of the brand a pipeline belongs to
  		- `pharma_company`: name of the pharmaceutical company a pipeline belongs to
@@ -33,11 +33,48 @@ This API works as an interface between the React frontend and the configuration 
  		- `states`: list of all states a pipeline uses. Right now, this is limited to the name of a PipelineState
  		- `transformations`: list of all transformations a pipelines uses. Right now, this is limited to the name of a TransformationTemplate
 
-* /config_api/filters
- 	- Precondition: Successfully login using a valid access token. Pass that access token in the Authorization header of a GET request
- 	- Function: Queries all pipelines in the Configuration DB. Constructs a JSON object with keys corresponding to each filter field in the GUI
- 	- Postcondition: Returns an error code/message if the request is invalid. With a valid request, returns a 200 OK Response along with a JSON-formatted string object. The outer JSON object contains a single key `data` with value containing the filter structure. The `key`/value pairs of this inner JSON object are as follows:
- 		- `brands`: set of unique brand names across all pipelines
- 		- `companies`: set of unique pharma companies across all pipelines
- 		- `types`: set of pipeline types, e.g. patient, payer
- 		- `activeStatus`: 'Active' or 'Inactive' based on each pipeline's `is_active` bool
+Here's what the /index return object looks like:
+```
+{
+  "data": [
+    {
+      "1": {
+        "name": "bluth_banana_regression",
+        "brand": "Cornballer",
+        "pharma_company": "Sitwell",
+        "type": "regression",
+        "status": "Active",
+        "description": null,
+        "run_freq": "daily",
+        "states": [
+          "raw",
+          "ingest",
+          "master"
+        ],
+        "transformations": [
+          "extract_from_ftp",
+          "initial_ingest"
+        ]
+      }
+    },
+    {
+      "2": {
+        "name": "bluth_profitability",
+        "brand": "Cornballer",
+        "pharma_company": "Sitwell",
+        "type": "profitability",
+        "status": "Active",
+        "description": null,
+        "run_freq": "hourly",
+        "states": [
+          "raw"
+        ],
+        "transformations": [
+          "extract_from_ftp",
+          "extract_from_ftp"
+        ]
+      }
+    }
+  ]
+}
+```
