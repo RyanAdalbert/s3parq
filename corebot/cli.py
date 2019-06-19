@@ -8,9 +8,9 @@ def cli(): # pragma: no cover
 
 # Adjusting locked env variable from local -> dev for proper run, until env vars are adjusted per DC-157
 @cli.command()
-@click.argument('id', type=int)
+@click.argument('transform_id', type=int)
 @click.argument('run_id', type=int)
-def run(id, run_id):
-    notebook_url = notebook.run_transform(id, run_id)
+def run(transform_id, run_id):
+    notebook_url = notebook.run_transform(transform_id, run_id)
     print("See your notebook output at:")
     print(notebook_url)
