@@ -109,10 +109,10 @@ class DatasetContract(Contract):
         return run.created_at
 
     def _set_dataset_metadata(self, df: pd.DataFrame, run_id: int):
-        if not "__metadata_run_id" in df.columns:
-            df["__metadata_run_id"] = run_id
-            df["__metadata_run_timestamp"] = self._get_run_timestamp(run_id=run_id)
-            df["__metadata_app_version"] = CORE_VERSION
+        if not '__metadata_run_id' in df.columns:
+            df['__metadata_run_id'] = run_id
+            df['__metadata_run_timestamp'] = self._get_run_timestamp(run_id=run_id)
+            df['__metadata_app_version'] = CORE_VERSION
             
         transform_timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         df['__metadata_transform_timestamp'] = transform_timestamp
