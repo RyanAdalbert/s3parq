@@ -106,20 +106,18 @@ class DatasetContract(Contract):
         '''
         self._contract_type = "dataset"
 
-    def _get_run_timestamp(self, run_id: int):
+    def _set_dataset_metadata(self, df: pd.DataFrame, run_id: int):
         sess = SHelp().session
         try:
             run = sess.query(RunEvent).filter(RunEvent.id==run_id).one()
         except NoResultFound:
             raise KeyError("No RunEvent found with id = " + str(run_id) + ".")
         sess.close()
-        timestamp = datetime.utcfromtimestamp(run.created_at)
-        return self._format_datetime(timestamp)
 
-    def _set_dataset_metadata(self, df: pd.DataFrame, run_id: int):
         if not '__metadata_run_id' in df.columns:
             df['__metadata_run_id'] = run_id
-            df['__metadata_run_timestamp'] = self._get_run_timestamp(run_id=run_id)
+            timestamp = datetime.utcfromtimestamp(run.created_at)
+            df['__metadata_run_timestamp'] = self._format_datetime(timestamp)
             df['__metadata_app_version'] = CORE_VERSION
             
         df['__metadata_transform_timestamp'] = self._format_datetime(datetime.utcnow())
