@@ -41,7 +41,8 @@ class TransformOperator(InheritOperator):
         run_command = [
             'corebot',
             'run',
-            f'{transform_id}'
+            f'{transform_id}',
+            f'{run_id}'
         ]
 
         """ Run location control: this class inherits SSHOperator for dev, 
