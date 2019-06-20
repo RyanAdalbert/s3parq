@@ -13,12 +13,12 @@ logger = LoggerSingleton().logger
 
 def is_postgres():
     with open(yaml_path) as f:
-        doc = yaml.load(f)
+        doc = yaml.safe_load(f)
     return doc[db_field]
 
 def postgres():
     with open(yaml_path) as f:
-        doc = yaml.load(f)
+        doc = yaml.safe_load(f)
     if doc[db_field] == False:
         doc[db_field] = True
         with open(yaml_path, 'w') as f:
@@ -29,7 +29,7 @@ def postgres():
 
 def cmock():
     with open(yaml_path) as f:
-        doc = yaml.load(f)
+        doc = yaml.safe_load(f)
 
     if doc[db_field] == True:
         doc[db_field] = False
