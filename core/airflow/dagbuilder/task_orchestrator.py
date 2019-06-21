@@ -3,6 +3,8 @@ from airflow.operators.dummy_operator import DummyOperator
 from core.models.configuration import Pipeline
 from operator import attrgetter
 from core.airflow.plugins.transform_operator import TransformOperator
+from airflow.contrib.operators.python_operator import PythonOperator
+from core.airflow.plugins.runevent_operator import get_run_id
 from core.logging import LoggerMixin
 
 
@@ -47,7 +49,14 @@ class TaskOrchestrator(LoggerMixin):
             raise ValueError(except_message)
 
         all_pipeline_tasks = []
+        get_run_id_task = PythonOperator(
+            task_id= 'get_run_id',
+            python_callable = get_run_id,
+            dag=self._dag
+        )
+        all_pipeline_tasks.append(get_run_id_task)
         for state in self._pipeline.pipeline_states:
+
             self.logger.debug(
                 f"Ordering transforms in state {state.pipeline_state_type.name}...")
             transformations = self._order_transformations_within_group(
