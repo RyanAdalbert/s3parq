@@ -11,11 +11,6 @@ yaml_path = os.path.join(top, yaml_loc)
 
 logger = LoggerSingleton().logger
 
-def is_postgres():
-    with open(yaml_path) as f:
-        doc = yaml.safe_load(f)
-    return doc[db_field]
-
 def postgres():
     with open(yaml_path) as f:
         doc = yaml.safe_load(f)
