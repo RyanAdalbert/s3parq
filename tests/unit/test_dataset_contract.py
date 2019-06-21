@@ -11,7 +11,7 @@ import moto
 @pytest.fixture
 def _contract():
     contract = DatasetContract(
-        branch="master",
+        branch="fine-feature-branch",
         parent="Merck",
         child="Wonder_Drug",
         state="ingest",
@@ -24,20 +24,20 @@ def test_dataset_only(_contract):
     contract = _contract
     path = contract.s3_path
 
-    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset', 'path was incorrectly built.'
+    assert path == f's3://{ENV_BUCKET}/fine-feature-branch/merck/wonder_drug/ingest/valid_dataset', 'path was incorrectly built.'
 
 
 def test_with_partitions(_contract):
     contract = _contract
     contract.partitions = ['partition_1', 'partition_2']
     path = contract.s3_path
-    assert path == f's3://{ENV_BUCKET}/master/merck/wonder_drug/ingest/valid_dataset', 'path was incorrectly built with partitions.'
+    assert path == f's3://{ENV_BUCKET}/fine-feature-branch/merck/wonder_drug/ingest/valid_dataset', 'path was incorrectly built with partitions.'
 
 
 def test_quick_set(_contract):
     contract = _contract
 
-    assert contract.branch == 'master', 'failed to set branch'
+    assert contract.branch == 'fine-feature-branch', 'failed to set branch'
     assert contract.env == f'{ENV_BUCKET}', 'failed to set env'
     assert contract.parent == 'merck', 'failed to set parent'
     assert contract.child == 'wonder_drug', 'failed to set parent'
@@ -54,7 +54,7 @@ def test_valid_partitions(_contract):
 
 @pytest.fixture
 def _contract_type():
-    contract = DatasetContract(branch='master',
+    contract = DatasetContract(branch='fine-feature-branch',
                                parent='Merck',
                                child='Wonder_Drug',
                                state='ingest',
@@ -85,8 +85,8 @@ def test_fetch_from_s3(_contract):
     with patch('core.dataset_contract.fetch', autospec=True) as fetch:
         fetch.return_value = pd.DataFrame()
         contract = _contract
-        contract.branch = 'master'
-        contract.parent = 'Merck'
+        contract.branch = 'fine-feature-branch'
+        contract.parent ='Merck'
         contract.child = 'Wonder_Drug'
         contract.state = 'ingest'
         contract.dataset = 'valid_dataset'
@@ -113,7 +113,7 @@ def test_publish_to_s3(_contract):
         df.generate_dataframe()
         patch.return_value = None
         contract = _contract
-        contract.branch = 'master'
+        contract.branch = 'fine-feature-branch'
         contract.parent = 'Merck'
         contract.child = 'Wonder_Drug'
         contract.state = 'ingest'

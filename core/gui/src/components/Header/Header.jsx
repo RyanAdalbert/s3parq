@@ -38,7 +38,7 @@ export default class Header extends PureComponent {
       <HeaderSec>
         <div className="user-info">
           <h5>Welcome, {userName}</h5>
-          <p class="log-out" onClick={logOutHandler}>
+          <p className="log-out" onClick={logOutHandler}>
             Log out
           </p>
         </div>
