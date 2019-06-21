@@ -30,8 +30,6 @@ class TransformOperator(InheritOperator):
 
         self.transform_id = transform_id
 
-        #run_id = kwargs['ti'].xcom_pull(task_ids='RunEvent', key="run_id")
-        run_id = 0
         task_id = self._generate_task_id()
 
         params = self._generate_contract_params()
@@ -40,12 +38,8 @@ class TransformOperator(InheritOperator):
         job_name = f'{params.parent}_{params.child}_{params.state}_{params.dataset}'
         job_queue = BATCH_JOB_QUEUE
 
-        run_command = [
-            'corebot',
-            'run',
-            f'{transform_id}',
-            f'{run_id}'
-        ]
+        run_command = f"corebot run {transform_id} "
+        run_command += "{{ ti.pull_xcom(task_ids='RunEvent', key='run_id') }}"
 
         """ Run location control: this class inherits SSHOperator for dev, 
             AWSBatchOperator for prod  
@@ -63,7 +57,8 @@ class TransformOperator(InheritOperator):
                 f"Running Corebot command `{run_command}` locally in notebook container...")
             super(TransformOperator, self).__init__(task_id=task_id,
                                                     ssh_hook=hook,
-                                                    command=" ".join(run_command),  # SSH can only take a string here :(
+                                                    provide_context=True,
+                                                    command=run_command,  # SSH can only take a string here :(
                                                     *args,
                                                     **kwargs
                                                     )
@@ -81,6 +76,7 @@ class TransformOperator(InheritOperator):
                                                     job_name=job_name,
                                                     job_definition=job_def_name,
                                                     job_queue=job_queue,
+                                                    provide_context=True,
                                                     overrides=job_container_overrides,
                                                     *args,
                                                     **kwargs
