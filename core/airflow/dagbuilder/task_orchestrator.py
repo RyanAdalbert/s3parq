@@ -51,7 +51,7 @@ class TaskOrchestrator(LoggerMixin):
         all_pipeline_tasks = []
         get_run_id_task = PythonOperator(
             task_id= 'get_run_id',
-            pyton_callable = get_run_id,
+            python_callable = get_run_id,
             dag=self._dag
         )
         all_pipeline_tasks.append(get_run_id_task)
