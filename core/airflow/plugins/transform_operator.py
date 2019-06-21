@@ -16,7 +16,6 @@ from core.logging import get_logger
 # inherit based on environment
 InheritOperator = SSHOperator if ENVIRONMENT == 'dev' else AWSBatchOperator
 
-
 class TransformOperator(InheritOperator):
 
     @apply_defaults
@@ -30,10 +29,13 @@ class TransformOperator(InheritOperator):
             ".".join([self.__module__, self.__class__.__name__]))
 
         self.transform_id = transform_id
+
+        #run_id = kwargs['ti'].xcom_pull(task_ids='RunEvent', key="run_id")
+        run_id = 0
         task_id = self._generate_task_id()
 
         params = self._generate_contract_params()
-
+        
         job_def_name = get_core_job_def_name()
         job_name = f'{params.parent}_{params.child}_{params.state}_{params.dataset}'
         job_queue = BATCH_JOB_QUEUE
