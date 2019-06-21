@@ -1,36 +1,50 @@
 import boto3
 import moto
 import pytest
-from core.constants import AWS_REGION
+from core.constants import AWS_REGION, ENV_BUCKET
+from core.helpers import drop_metadata
 from core import dataset_contract
 from dfmock import DFMock
+from unittest.mock import patch
 
 @pytest.fixture
-def df():
-    columns = {"hamburger": "string",
-               "bananas": "integer"
-               }
-    df = DFMock(count=100, columns=columns)
-    yield df
+def contract():
+    contract = dataset_contract.DatasetContract(parent="p", child="c", state="raw", dataset="test")
+    yield contract
 
-@moto.mock.s3
-@pytest.fixture
-def bucket():
-    bucket = "test-bucket"
-    conn = boto3.resource('s3', region_name=AWS_REGION, aws_access_key_id="this_is_not_a_real_id",
-                aws_secret_access_key="this_is_not_a_real_key")
-    conn.create_bucket(Bucket=bucket)
-    client = boto3.client('s3', region_name=AWS_REGION)
-    yield bucket
-
-
-
-@moto.mock.s3
-def test_no_metadata(bucket):
+def test_no_metadata(contract): 
+    with patch('s3parq.publish', autospec=True) as pub:
+        columns = {"hamburger": "string",
+                "bananas": "integer"}
+        meta_cols = list(drop_metadata.get_meta_cols().keys())
+        df = DFMock(count=100, columns=columns)
+        df.generate_dataframe()
+        df = df.dataframe
+        for col in meta_cols:
+            assert col not in df.columns
+        contract._set_dataset_metadata(df=df, run_id=1)
+        for col in meta_cols:
+            assert col in df.columns
     
+def test_has_metadata(contract): # don't overwrite __metadata cols if they exist
+    columns = {"hamburger": "string",
+               "bananas": "integer"}
+    columns.update(drop_metadata.get_meta_cols())
+    df = DFMock(count=50, columns=columns)
+    df.generate_dataframe()
+    df = df.dataframe
+    id_col = df.loc[:, "__metadata_run_id"].copy()
+    contract._set_dataset_metadata(df=df, run_id=1)
+    assert df.loc[:, "__metadata_run_id"].all() == id_col.all()
 
-@moto.mock.s3
-def test_has_metadata(bucket):
-
-@moto.mock.s3
-def test_bad_run_id(bucket):
+def test_bad_run_id(contract):
+    columns = {"hamburger": "string",
+               "bananas": "integer"}
+    df = DFMock(count=100, columns=columns)
+    df.generate_dataframe()
+    df = df.dataframe
+    try:
+        contract.publish(dataframe=df, run_id=24359)
+        assert False
+    except KeyError:
+        assert True

@@ -1,14 +1,13 @@
-from datetime import datetime
-import pandas as pd
-from s3parq import fetch, publish
-
 from typing import List
-
+from datetime import datetime
+from pytz import timezone
+import pandas as pd
+from sqlalchemy.orm.exc import NoResultFound
+from s3parq import fetch, publish
 from core.constants import CORE_VERSION
 from core.contract import Contract
 from core.helpers.session_helper import SessionHelper as SHelp
 from core.models.configuration import RunEvent
-from sqlalchemy.orm.exc import NoResultFound
 
 class DatasetContract(Contract):
     ''' The s3 contract is how we structure our data lake. 
@@ -111,12 +110,13 @@ class DatasetContract(Contract):
         try:
             run = sess.query(RunEvent).filter(RunEvent.id==run_id).one()
         except NoResultFound:
-            raise KeyError("No RunEvent found with id = " + str(run_id) + ".")
+            raise KeyError("No RunEvent found with id=" + str(run_id) + ".")
         sess.close()
 
         if not '__metadata_run_id' in df.columns:
             df['__metadata_run_id'] = run_id
-            timestamp = datetime.utcfromtimestamp(run.created_at)
+            timestamp = run.created_at
+            timestamp = timestamp.replace(tzinfo=timezone('UTC'))
             df['__metadata_run_timestamp'] = self._format_datetime(timestamp)
             df['__metadata_app_version'] = CORE_VERSION
             
