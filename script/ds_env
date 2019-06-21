@@ -12,19 +12,3 @@ docker-compose up -d notebook configurationpg;
 
 docker-compose exec notebook /bin/bash -c "cd core/core/database && \
 alembic upgrade head"
-
-
-
-## adding the ssh daemon here so we don't run it in prod by accident
-docker-compose exec notebook /bin/bash -c "apt-get update && \
-apt-get install -y openssh-server && \
-mkdir /var/run/sshd && \
-useradd -ms /bin/bash corebot_remote && \
- echo -e 'corebot_remote\ncorebot_remote' | passwd corebot_remote && \
-ssh-keygen -R notebook && \
-service ssh start && \
-cp -r /host/home/.aws /home/corebot_remote/.aws && \
-chown corebot_remote /home/corebot_remote/.aws/* && \
-chmod -R u+rx /home/corebot_remote/.aws"  
-script/dev_shell $TYPE
-
