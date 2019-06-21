@@ -5,3 +5,5 @@ By default, CORE's SessionHelper will use the in-memory SQLite `configuration_mo
 
 ### How do I use it?
 postgres_toggle has two functions, `postgres()` and `cmock()`. The former sets `FORCE_POSTGRES` to true, and the latter sets `FORCE_POSTGRES` to false. Neither take any arguments. In the event that `FORCE_POSTGRES` is already set to the value of the method, the config file remains unchanged and the module will log that it is already set to True or False.
+
+postgres_toggle can also be called from main to quickly switch values. It takes exactly one flag, `-p` or `-m`, to specify using postgres or the mocker. 
