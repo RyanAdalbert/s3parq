@@ -39,7 +39,7 @@ Invoke the `fetch()` command to query a given contract. Some things to know:
 ### Partitioning Datasets
 Invoke the `partitions()` command to set partitions for a given contract. Some things to know:
 - partitions requires a parameter `partitions`, a list of column names to partition on. Partitions are applied in the order they appear in the list.
-- by default, all datasets include a single partition, \_\_metadata\_run\_timestamp. 
+- by default, all datasets include a single partition, \_\_metadata\_run\_id, the RunEvent ID of an executed pipeline
 
 **Notables**:
 {dataset\_contract}.bucket returns the bucket part of the dataset contract structure (usually just the environment).
