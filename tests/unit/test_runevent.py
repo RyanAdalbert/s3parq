@@ -17,7 +17,7 @@ class MockSession:
         return True
 
 
-class MockXComm:
+class MockTaskInstance:
 
     def xcom_push(self, **kwargs):
         return True
@@ -25,8 +25,8 @@ class MockXComm:
 
 def test_xcomm_push_called_with_42(monkeypatch):
     session_mock = MockSession()
-    xcomm_mock = MockXComm()
-    xcomm_mock.xcom_push = MagicMock()
+    ti_mock = MockTaskInstance()
+    ti_mock.xcom_push = MagicMock()
     monkeypatch.setattr(SessionHelper, "session", session_mock)
-    ret(1, ti=xcomm_mock)
-    xcomm_mock.xcom_push.assert_called_with(key="run_id", value=42)
+    ret(1, ti=ti_mock)
+    ti_mock.xcom_push.assert_called_with(key="run_id", value=42)
