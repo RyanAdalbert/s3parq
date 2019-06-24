@@ -3,8 +3,8 @@ from airflow.operators.dummy_operator import DummyOperator
 from core.models.configuration import Pipeline
 from operator import attrgetter
 from core.airflow.plugins.transform_operator import TransformOperator
-from airflow.contrib.operators.python_operator import PythonOperator
-from core.airflow.plugins.runevent_operator import get_run_id
+from airflow.operators.python_operator import PythonOperator
+from core.airflow.plugins.runevent_operator import RunEvent_task
 from core.logging import LoggerMixin
 
 
@@ -37,7 +37,7 @@ class TaskOrchestrator(LoggerMixin):
 
     @tasks.setter
     def tasks(self, tasks: list)->None:
-        error_messge = 'TaskOrchestrator.tasks must not be set directly.'
+        error_message = 'TaskOrchestrator.tasks must not be set directly.'
         self.logger.critical(error_message)
         raise ValueError(error_message)
 
@@ -49,12 +49,6 @@ class TaskOrchestrator(LoggerMixin):
             raise ValueError(except_message)
 
         all_pipeline_tasks = []
-        get_run_id_task = PythonOperator(
-            task_id= 'get_run_id',
-            python_callable = get_run_id,
-            dag=self._dag
-        )
-        all_pipeline_tasks.append(get_run_id_task)
         for state in self._pipeline.pipeline_states:
 
             self.logger.debug(
@@ -151,5 +145,16 @@ class TaskOrchestrator(LoggerMixin):
                 prepaired_tasks.append(task)
 
         prepaired_tasks += spacers
+
+        runevent_operator = PythonOperator(
+            task_id='RunEvent',
+            python_callable = RunEvent_task,
+            provide_context=True,
+            op_args=[self._pipeline.id]
+        )
+        runevent_operator.dag = dag
+        runevent_operator >> spacers[0]
+
+        prepaired_tasks.insert(0, runevent_operator)
 
         return tuple(prepaired_tasks)

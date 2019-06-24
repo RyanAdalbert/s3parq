@@ -3,7 +3,7 @@ import pytest
 import tempfile
 import core.helpers.postgres_toggle as postgres_toggle
 from dfmock import DFMock
-from core.helpers.drop_metadata import drop_metadata
+from core.helpers.drop_metadata import drop_metadata, get_meta_cols
 from unittest.mock import patch
 import os
 from sqlalchemy.orm.session import Session
@@ -113,11 +113,9 @@ def test_session_helper_dev(mock_cmock, mock_config):
 
 def test_drop_metadata():
     columns = {"hamburger": "string",
-               "__metadata_app_version": "float",
-               "__metadata_output_contract": "string",
-               "__metadata_run_timestamp": "datetime",
                "bananas": "integer"
                }
+    columns.update(get_meta_cols())
     df = DFMock(count=100, columns=columns)
 
     df.generate_dataframe()
