@@ -150,7 +150,7 @@ class TaskOrchestrator(LoggerMixin):
             task_id='RunEvent',
             python_callable = RunEvent_task,
             provide_context=True,
-            op_args=[self.pipeline.id]
+            op_args=[self._pipeline.id]
         )
         runevent_operator.dag = dag
         runevent_operator >> spacers[0]
