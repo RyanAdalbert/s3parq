@@ -1,5 +1,5 @@
 import history from '../../../utils/history';
-
+import { API_HOST } from '../../constants.jsx';
 //User Constants
 export const userConstants = {
   STORE_TOKEN: 'STORE_TOKEN',
@@ -45,9 +45,9 @@ export const storeToken = (oAuthToken, userName) => ({
 
 //login action creator
 export const login = oAuthToken => {
-  const HOST = 'localhost';
-  return dispatch =>
-    fetch(`http://${HOST}:5000/config_api/login`, {
+  return dispatch => {
+    dispatch(loginRequest());
+    return fetch(`${API_HOST}/config_api/login`, {
       method: 'GET',
       headers: {
         Authorization: oAuthToken
@@ -67,11 +67,10 @@ export const login = oAuthToken => {
       .catch(error => {
         console.log('request failed', error);
       });
+  };
 };
 
 //logout action creator
-export const logOut = () => {
-  return {
-    type: 'USER_LOGOUT'
-  };
-};
+export const logOut = () => ({
+  type: 'USER_LOGOUT'
+});

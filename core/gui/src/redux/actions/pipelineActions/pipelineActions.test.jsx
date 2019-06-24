@@ -2,8 +2,6 @@ import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import * as actions from './pipleineActions';
 import pipelineConstants from './pipelineActions';
-import { italic } from 'ansi-colors';
-import { types } from '@babel/core';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -25,6 +23,6 @@ describe('pipeline actions', () => {
       type: types.ADD_TODO,
       text
     };
-    expectedAction(store.getActions()).toEquak(expectedAction);
+    expectedAction(store.getActions()).toEqual(expectedAction);
   });
 });

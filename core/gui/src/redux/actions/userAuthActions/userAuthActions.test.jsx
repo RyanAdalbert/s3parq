@@ -1,15 +1,40 @@
-import * as actions from './userAuthActions';
-import { userConstants } from './userAuthActions';
+// import * as actions from './userAuthActions';
+// import configureMockStore from 'redux-mock-store';
+// import thunk from 'redux-thunk';
+// import fetchMock from 'fetch-mock';
 
-describe('Authentication Actions', () => {
-  it('should create an action to store token, and user name', () => {
-    const token = '1234';
-    const user = 'The Night King';
-    const expectedAction = {
-      type: userConstants.STORE_TOKEN,
-      token,
-      user
-    };
-    expectedAction(actions.storeToken(token, user).toEqual.expectedAction);
-  });
-});
+// import { userConstants } from './userAuthActions';
+
+// const middlewares = [ thunk ];
+// const mockStore = configureMockStore(middlewares);
+
+// const mockResult = mockGoogleObj;
+
+// describe('action creators', () => {
+//   it('should create LOGIN_SUCCESS when loging in', () => {
+//     fetchMock.mock(`path:/config_api/login`, mockResult)
+
+//     const expectedActions = [
+//       { type: userConstants.LOGIN_ATTEMPT },
+//       { type: userConstants.LOGIN_SUCCESS, response: mockResult.body  }
+//     ]
+
+//     const store = mockStore({ search: {
+//       result: {}
+//     }})
+
+//     return store.dispatch(actions.login())
+//       .then((data) => { // return of async actions
+//         expect(store.getActions()).toEqual(expectedActions)
+//     })
+//   })
+// })
+
+// describe('Logout Action', () => {
+//   it('should create an action to log the user out of the gui', () => {
+//     const expectedAction = {
+//       type: userConstants.USER_LOGOUT,
+//     }
+//     expect(actions.logOut()).toEqual(expectedAction)
+//   })
+// })
