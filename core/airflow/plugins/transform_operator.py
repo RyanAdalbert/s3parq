@@ -19,7 +19,7 @@ InheritOperator = SSHOperator if ENVIRONMENT == 'dev' else AWSBatchOperator
 class TransformOperator(InheritOperator):
 
     @apply_defaults
-    def __init__(self, transform_id: int, *args, **kwargs) -> None:
+    def __init__(self, transform_id: int, **kwargs) -> None:
         """ Transformation operator for DAGs. 
                 **kwargs are direct passed into super - PythonOperator from Airflow
                 returns a valid task object for use in DAGs only
@@ -38,14 +38,16 @@ class TransformOperator(InheritOperator):
         job_name = f'{params.parent}_{params.child}_{params.state}_{params.dataset}'
         job_queue = BATCH_JOB_QUEUE
 
+        run_id = "{{ ti.xcom_pull(task_ids='RunEvent', key='run_id') }}"
+
         run_command = f"corebot run {transform_id} "
-        run_command += "{{ ti.pull_xcom(task_ids='RunEvent', key='run_id') }}"
+        run_command += run_id
 
         """ Run location control: this class inherits SSHOperator for dev, 
             AWSBatchOperator for prod  
         """
         if isinstance(self, SSHOperator):
-
+            self.session.close()
             hook = SSHHook(remote_host='notebook',
                            port=22,
                            username='corebot_remote',
@@ -59,12 +61,12 @@ class TransformOperator(InheritOperator):
                                                     ssh_hook=hook,
                                                     provide_context=True,
                                                     command=run_command,  # SSH can only take a string here :(
-                                                    *args,
                                                     **kwargs
                                                     )
             self.__logger.info(
                 "Done. Corebot ran successfully in notebook container.")
         else:
+            self.session.close()
             self.__logger.info(
                 f"Running Corebot run command string: {run_command} in AWS Batch.")
             job_container_overrides = {
@@ -78,12 +80,10 @@ class TransformOperator(InheritOperator):
                                                     job_queue=job_queue,
                                                     provide_context=True,
                                                     overrides=job_container_overrides,
-                                                    *args,
                                                     **kwargs
                                                     )
             self.__logger.info(
                 f"Done. AWSBatchOperator executed for {job_name}.")
-            self.session.close()
 
     def _get_transform_info(self):
         """ Gets full queried info for the transform.
@@ -96,7 +96,7 @@ class TransformOperator(InheritOperator):
         try:
             transform = self.session.query(transform_config).filter(
                 transform_config.id == self.transform_id).one()
-        except NoResultFound as ex:
+        except NoResultFound:
             raise SQLAlchemyError(
                 f"Transform id {self.transform_id} was not found in the configuration database.")
         return transform
