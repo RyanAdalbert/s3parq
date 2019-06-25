@@ -7,7 +7,7 @@ s3fs==0.2.1
 s3parq==2.0.0
 boto3==1.9.83
 GitPython==2.1.11
-sqlalchemy==1.2.16
+sqlalchemy==1.3.5
 psycopg2==2.7.6.1
 papermill==0.17.1
 dfmock==0.0.14
