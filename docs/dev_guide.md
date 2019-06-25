@@ -155,12 +155,7 @@ login creds, host URLS, and other security-minded bits are managed by aws secret
 Note that env should be passed from some environment-aware variable.    
 
 ### Loading Configuration seed data via SQL
-You can batch load data into the Configuration DB using SQL. After running `script/dev_env`, you can connect to the postgres DB using:
-`psql -h localhost -p 5432 -d configuration_application -U configurator -W`
-
-From there, you can load your SQL seed data using
-`\i /Users/youruser/path/to/file.sql`
-
+You can batch load data into the Configuration DB using SQL. After running `script/dev_env`, you can add the path to your seed file to `script/load_seeds` and run the script to seed to postgres.
 
 ## Pipeline Runs: an Airflow Story
 
