@@ -6,7 +6,7 @@ DEV_BUCKET: ichain-dev
 DEV_CONFIGURATION_APPLICATION_CONN_STRING: postgresql://configurator:configurator@core_configurationpg_1/configuration_application
 DOCKER_REPO: ichain/core
 ENVIRONMENT: dev
-FORCE_POSTGRES: true
+FORCE_POSTGRES: false
 LOGGING_CONFIG: logging.yaml
 PROD_AWS_ACCOUNT: '687531504312'
 PROD_BUCKET: ichain-production
