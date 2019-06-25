@@ -32,6 +32,12 @@ class Test:
         session.commit()
         return session
 
+    @pytest.fixture
+    def pipeline(self):
+        session = self.setup_mock()
+        pl = session.query(Pipeline).filter(Pipeline.id == 1).one()
+        yield pl
+
     def setup_in_state_transforms(self):
         session = self.setup_mock()
         # Now for the in-state transforms
@@ -62,14 +68,14 @@ class Test:
             for t in ordered_groups[x]:
                 assert t.graph_order == x, f"graph order incorrect for set number {x}"
 
-    def test_assign_deps_to_ordered_tasks(self):
+    def test_assign_deps_to_ordered_tasks(self, pipeline):
         dag = DAG("test_dag", start_date=datetime(
             2000, 6, 1), schedule_interval="@daily")
         ordered_transform_operators = [tuple(["raw", {TransformOperator(transform_id=1), TransformOperator(transform_id=2)}]),
                                        tuple(
                                            ["ingest", {TransformOperator(transform_id=3), TransformOperator(transform_id=4)}]),
                                        tuple(["ingest", {TransformOperator(transform_id=5)}])]
-        to = TaskOrchestrator()
+        to = TaskOrchestrator(pipeline=pipeline)
 
         dep_assigned_tasks = to._apply_deps_to_ordered_tasks(
             ordered_transform_operators, dag)
@@ -100,5 +106,5 @@ class Test:
             for transform in state.transformations:
                 tasks.append(transform)
 
-        # same number of tasks: in the case of id==1, we get 3 extra tasks that are state grouping tasks
-        assert len(to.tasks) == len(tasks) + 3
+        # same number of tasks: in the case of id==1, we get 3 extra tasks that are state grouping tasks, and the RunEvent task (4 tasks total)
+        assert len(to.tasks) == len(tasks) + 4
