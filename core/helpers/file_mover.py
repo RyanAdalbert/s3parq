@@ -38,6 +38,7 @@ class FileMover(LoggerMixin):
     def get_file(self, remote_path: str, local_path: str):
         # Fetch file from remote
         #   Set local file time to match remote for comparison to S3 modified time
+        import pdb; pdb.set_trace()
         utime = self.sftp.stat(remote_path).st_mtime
         self.sftp.get(remote_path, local_path)
         os.utime(local_path, (utime,utime))
