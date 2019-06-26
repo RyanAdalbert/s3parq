@@ -36,13 +36,12 @@ export default class PipelineRow extends PureComponent {
 
             {/* Need to add a conditional statement here to keep from rendering all the time */}
             {/* However, we run into an issue with getting access to the component itself after we do that */}
-
-            <PipelineModal
-              show={this.props.modalShow}
-              onHide={closeModal}
-              pipelineInfo={modalProps}
-            />
           </tr>
+          <PipelineModal
+            show={this.props.modalShow}
+            onHide={closeModal}
+            pipelineInfo={modalProps}
+          />
         </>
       );
     });

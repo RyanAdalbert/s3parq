@@ -1,5 +1,6 @@
 import history from '../../../utils/history';
 import { API_HOST } from '../../constants.jsx';
+
 //User Constants
 export const userConstants = {
   STORE_TOKEN: 'STORE_TOKEN',
@@ -9,7 +10,7 @@ export const userConstants = {
   USER_LOGOUT: 'USER_LOGOUT'
 };
 
-export const loginRequest = oAuthToken => {
+export const loginAttempt = oAuthToken => {
   return {
     type: 'LOGIN_ATTEMPT',
     oAuthToken
@@ -46,7 +47,6 @@ export const storeToken = (oAuthToken, userName) => ({
 //login action creator
 export const login = oAuthToken => {
   return dispatch => {
-    dispatch(loginRequest());
     return fetch(`${API_HOST}/config_api/login`, {
       method: 'GET',
       headers: {
