@@ -2,7 +2,7 @@ import os, paramiko, re, stat
 from core.secret import Secret
 from typing import NamedTuple
 from core.raw_contract import RawContract
-
+import time
 from core.logging import LoggerMixin, get_logger
 
 
@@ -21,9 +21,9 @@ class FileMover(LoggerMixin):
         self.logger.debug(f"Connecting to host: {host} on port: {port}")
         
         if port is None:
-            self.transport = paramiko.Transport((host), default_window_size=paramiko.common.MAX_WINDOW_SIZE)
+            self.transport = paramiko.Transport((host), default_window_size=paramiko.common.MAX_WINDOW_SIZE, default_max_packet_size=3276800)
         else:
-            self.transport = paramiko.Transport((host, port), default_window_size=paramiko.common.MAX_WINDOW_SIZE)
+            self.transport = paramiko.Transport((host, port), default_window_size=paramiko.common.MAX_WINDOW_SIZE, default_max_packet_size=3276800)
         
         self.transport.connect(username=user, password=password)
         self.sftp = paramiko.SFTPClient.from_transport(self.transport)
@@ -38,9 +38,25 @@ class FileMover(LoggerMixin):
     def get_file(self, remote_path: str, local_path: str):
         # Fetch file from remote
         #   Set local file time to match remote for comparison to S3 modified time
-        import pdb; pdb.set_trace()
         utime = self.sftp.stat(remote_path).st_mtime
-        self.sftp.get(remote_path, local_path)
+        #self.sftp.get(remote_path, local_path)
+        try:
+            with self.sftp.open(remote_path, 'r') as remote:
+                
+                start = time.time()
+                with open(local_path, 'w') as local:
+                    for line in remote:
+                        local.write(line)
+                end = time.time()
+                print(end - start)
+                #import pdb; pdb.set_trace()
+        except Exception as e: 
+            print(e)
+        # finally:
+        #     if self.sftp:
+        #         self.sftp.close()
+        #     if self.transport:
+        #         self.transport.close()
         os.utime(local_path, (utime,utime))
 
     def put_file(self, remote_path: str, local_path: str):
