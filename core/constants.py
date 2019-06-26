@@ -3,6 +3,9 @@ import yaml
 from .helpers.project_root import ProjectRoot
 from git import Repo
 
+## IMPORTANT: config/core_project.yaml is in core's .gitignore, be sure to remove it before making
+## any changes to constants
+
 ## DYNAMICS
 # AWS_ACCOUNT default is set to PROD_AWS_ACCOUNT for prod and uat, DEV_AWS_ACCOUNT otherwise
 # BATCH_JOB_QUEUE default is set to '<ENVIRONMENT>-core'
