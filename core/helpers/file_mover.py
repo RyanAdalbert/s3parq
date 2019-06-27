@@ -38,13 +38,13 @@ class FileMover(LoggerMixin):
     def get_file(self, remote_path: str, local_path: str):
         # Fetch file from remote
         #   Set local file time to match remote for comparison to S3 modified time
-        utime = self.sftp.stat(remote_path).st_mtime
+        utime = self.sftp.stat(remote_path).st_mtime 
         #self.sftp.get(remote_path, local_path)
         try:
-            with self.sftp.open(remote_path, 'r') as remote:
+            with self.sftp.open(remote_path, 'rb') as remote:
                 
                 start = time.time()
-                with open(local_path, 'w') as local:
+                with open(local_path, 'wb') as local:
                     for line in remote:
                         local.write(line)
                 end = time.time()
