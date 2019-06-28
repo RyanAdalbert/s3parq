@@ -85,7 +85,8 @@ class ConfigurationMocker(LoggerMixin):
             b(id=1, name="Teamocil", display_name="Teamocil",
               pharmaceutical_company_id=1),
             b(id=2, name="Cornballer", display_name="Corn Baller",
-              pharmaceutical_company_id=2)])
+              pharmaceutical_company_id=2)
+        ])
         self.session.commit()
         self.logger.debug('Done generating brand mocks.')
 
@@ -94,8 +95,8 @@ class ConfigurationMocker(LoggerMixin):
         p = config.PharmaceuticalCompany
         self.session.add_all([
             p(id=1, display_name="Natural Life Food Company", name='Nfoods'),
-            p(id=2, display_name="Sitwell Home Construction", name="Sitwell"),
-            p(id=3, display_name="Stephanie", name="Stephanie")])
+            p(id=2, display_name="Sitwell Home Construction", name="Sitwell")
+        ])
         self.session.commit()
         self.logger.debug('Done generating pharmaceutical company mocks.')
 
@@ -108,9 +109,8 @@ class ConfigurationMocker(LoggerMixin):
             p(id=2, name="bluth_profitability", brand_id=2,
               pipeline_type_id=2, run_frequency='hourly'),
             p(id=3, name="temocil_profitablility", brand_id=1,
-              pipeline_type_id=1, run_frequency='daily'),
-            p(id=500, name="bluth_banana_regression_deprecated", brand_id=2,
-              pipeline_type_id=1, is_active=False, run_frequency='hourly')])
+              pipeline_type_id=1, run_frequency='daily', is_active=False)
+        ])
         self.session.commit()
         self.logger.debug('Done generating pipeline mocks.')
 
@@ -120,9 +120,9 @@ class ConfigurationMocker(LoggerMixin):
         self.session.add_all([
             p(id=1, pipeline_state_type_id=1, pipeline_id=1, graph_order=0),
             p(id=2, pipeline_state_type_id=2, pipeline_id=1, graph_order=1),
-            p(id=3, pipeline_state_type_id=3, pipeline_id=1, graph_order=2),
-            p(id=4, pipeline_state_type_id=1, pipeline_id=2, graph_order=0),
-            p(id=5, pipeline_state_type_id=1, pipeline_id=4, graph_order=0)])
+            p(id=3, pipeline_state_type_id=1, pipeline_id=2, graph_order=0),
+            p(id=4, pipeline_state_type_id=2, pipeline_id=2, graph_order=1)
+        ])
         self.session.commit()
         self.logger.debug('Done generating pipeline state mocks.')
 
@@ -166,19 +166,13 @@ class ConfigurationMocker(LoggerMixin):
             t(id=1, transformation_template_id=1,
               pipeline_state_id=1, graph_order=0),
             t(id=2, transformation_template_id=2,
-              pipeline_state_id=5, graph_order=0),
+              pipeline_state_id=2, graph_order=0),
             t(id=3, transformation_template_id=1,
-              pipeline_state_id=2, graph_order=1),
-            t(id=4, transformation_template_id=1,
+              pipeline_state_id=3, graph_order=0),
+            t(id=4, transformation_template_id=2,
               pipeline_state_id=4, graph_order=0),
-            t(id=5, transformation_template_id=1,
-              pipeline_state_id=4, graph_order=0),
-            t(id=6, transformation_template_id=1,
-              pipeline_state_id=4, graph_order=1),
-            t(id=7, transformation_template_id=1,
-              pipeline_state_id=4, graph_order=1),
-            t(id=1000, transformation_template_id=1000,
-              pipeline_state_id=2, graph_order=2)
+            t(id=5, transformation_template_id=2,
+              pipeline_state_id=4, graph_order=1)
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation mocks.')
@@ -200,9 +194,6 @@ class ConfigurationMocker(LoggerMixin):
                 "encoding":{"datatype":"string","description":"the encoding of the input file"},
                 "input_file_prefix":{"datatype":"string","description":"the prefix of the selected input files"}
                 }''',
-                pipeline_state_type_id=2),
-            tt(id=1000, name="hello_world",
-                variable_structures=''' {"noun":{"datatype":"string","description":"the thing we are saying hello to!"}}''',
                 pipeline_state_type_id=2)
         ])
         self.session.commit()
@@ -212,13 +203,11 @@ class ConfigurationMocker(LoggerMixin):
         self.logger.debug('Generating transformation_variables mocks')
         tv = config.TransformationVariable
         self.session.add_all([
-            tv(id=1, name='filesystem_path', transformation_id=2,
-               value='/upload/sha_dry_run_test_raw_fetch'),
-            tv(id=2, name='prefix', transformation_id=2, value='INTEGRICHAIN_SUN_'),
-            tv(id=3, name='secret_name', transformation_id=2, value='test-sftp'),
-            tv(id=4, name='secret_type_of', transformation_id=2, value='FTP'),
-
-            tv(id=1000, name="noun", transformation_id=1000, value="world")
+            tv(id=1, name='filesystem_path', transformation_id=3,
+               value='/this/is/a/path'),
+            tv(id=2, name='prefix', transformation_id=3, value='PREFIX_'),
+            tv(id=3, name='secret_name', transformation_id=3, value='test-sftp'),
+            tv(id=4, name='secret_type_of', transformation_id=3, value='FTP')
         ])
         self.session.commit()
         self.logger.debug('Done generating transformation_variables mocks.')
