@@ -153,7 +153,7 @@ class TaskOrchestrator(LoggerMixin):
             op_args=[self._pipeline.id]
         )
         runevent_operator.dag = dag
-        runevent_operator >> spacers[0]
+        if spacers: runevent_operator >> spacers[0]
 
         prepaired_tasks.insert(0, runevent_operator)
 
