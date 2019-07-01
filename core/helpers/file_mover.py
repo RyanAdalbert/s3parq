@@ -41,20 +41,15 @@ class FileMover(LoggerMixin):
         utime = self.sftp.stat(remote_path).st_mtime 
         try:
             with self.sftp.open(remote_path, 'rb') as remote:
+                
                 start = time.time()
                 with open(local_path, 'wb') as local:
                     for line in remote:
                         local.write(line)
                 end = time.time()
-                print(end - start)
-                #import pdb; pdb.set_trace()
+                self.logger.debug(f'It took {end - start} seconds to move {remote_path} to {local_path}')
         except Exception as e: 
             print(e)
-        # finally:
-        #     if self.sftp:
-        #         self.sftp.close()
-        #     if self.transport:
-        #         self.transport.close()
         os.utime(local_path, (utime,utime))
 
     def put_file(self, remote_path: str, local_path: str):
