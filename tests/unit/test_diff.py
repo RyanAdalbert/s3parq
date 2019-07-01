@@ -8,7 +8,7 @@ fetch_diff = "s3parq.fetch_parq.fetch_diff"  # patch target
 
 def test_good_diff(mocker):
     mocker.patch(fetch_diff, return_value=DataFrame())
-    diff = DatasetDiff(12)
+    diff = DatasetDiff(1)
     retval = diff.get_diff(transform_name="extract_from_ftp", values=[1])
     assert type(retval) == DataFrame and retval.empty
 

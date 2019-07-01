@@ -39,7 +39,7 @@ class Test:
 
         bucket = ENV_BUCKET
         key = "notebooks/dev/important_business/raw/extract/shared.test.hello_world.ipynb"
-        tid = 2
+        tid = 1
         tbranch = "test_branch"
         tstate = "raw"
         tparent = "merck"
