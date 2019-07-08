@@ -11,3 +11,4 @@ htmlcov/
 dist/
 output_notebooks/
 node_modules/
+config/core_project.yaml
