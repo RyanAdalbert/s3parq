@@ -6,10 +6,11 @@ node {
     }
     stage('Build') {
         echo "Building..."
+
     }
     stage('Test') {
         echo "Testing..."
-        sh "script/ci_test"
+        sh "script/test"
     }
     stage ('Deploy') {
         echo "We are currently working on branch: ${env.BRANCH_NAME}"
@@ -25,6 +26,9 @@ node {
                 break;
             case 'prod': 
                 env.DEPLOYMENT_ENVIRONMENT = 'prod';
+                break;
+            case 'jenkins-deploy': 
+                env.DEPLOYMENT_ENVIRONMENT = 'test';
                 break;
             default: env.DEPLOYMENT_ENVIRONMENT = 'no_deploy';
         }
