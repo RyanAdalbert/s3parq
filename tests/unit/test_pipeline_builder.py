@@ -32,20 +32,4 @@ def test_get_or_create_not_exists():
     assert co.id == test_id
     assert co.name == "bananaco"
     session.close()
-
-"""
-def test_adds_new_pipeline():
-    pipe = dict()
-    for val in ("company","brand","dataset",):
-        pipe[val] = rand_string()
-    pipe["state"] = "ingest"
-    pipeline_id, transform_id = pb.build(company=pipe["company"],
-                                         brand=pipe["brand"],
-                                         state=pipe["state"],
-                                         dataset=pipe["dataset"])
-    session = SessionHelper().session
     
-    t = session.query(Transform).filter(Transform.id = transform_id).one()
-    
-    assert t.pipeline_id == pipeline_id
-"""
