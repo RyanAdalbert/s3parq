@@ -1,11 +1,13 @@
-from datetime import datetime
-import pandas as pd
-from s3parq import fetch, publish
-
 from typing import List
-
+from datetime import datetime
+from pytz import timezone
+import pandas as pd
+from sqlalchemy.orm.exc import NoResultFound
+from s3parq import fetch, publish
 from core.constants import CORE_VERSION
 from core.contract import Contract
+from core.helpers.session_helper import SessionHelper as SHelp
+from core.models.configuration import RunEvent
 
 class DatasetContract(Contract):
     ''' The s3 contract is how we structure our data lake. 
@@ -94,21 +96,34 @@ class DatasetContract(Contract):
 
         return path
 
+    def _format_datetime(self, date: datetime)->str:
+        return date.strftime('%Y-%m-%d %H:%M:%S')
+
     def _set_contract_type(self)->None:
         ''' INTENT: sets what type of contract this is - raw or dataset
             RETURNS: None
         '''
         self._contract_type = "dataset"
 
-    def _set_dataset_metadata(self, df):
-        run_timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-        df['__metadata_app_version'] = CORE_VERSION
-        df['__metadata_output_contract'] = self.s3_path
-        
-        if not "__metadata_run_timestamp" in df.columns:
-            df['__metadata_run_timestamp'] = run_timestamp
+    def _set_dataset_metadata(self, df: pd.DataFrame, run_id: int):
+        sess = SHelp().session
+        try:
+            run = sess.query(RunEvent).filter(RunEvent.id==run_id).one()
+        except NoResultFound:
+            raise KeyError("No RunEvent found with id=" + str(run_id) + ".")
+        sess.close()
 
-        partitions = ['__metadata_run_timestamp']
+        if not '__metadata_run_id' in df.columns:
+            df['__metadata_run_id'] = run_id
+            timestamp = run.created_at
+            timestamp = timestamp.replace(tzinfo=timezone('UTC'))
+            df['__metadata_run_timestamp'] = self._format_datetime(timestamp)
+            df['__metadata_app_version'] = CORE_VERSION
+            
+        df['__metadata_transform_timestamp'] = self._format_datetime(datetime.utcnow())
+        df['__metadata_output_contract'] = self.s3_path
+
+        partitions = ['__metadata_run_id']
         return (df, partitions)
 
     # functions for use
@@ -125,7 +140,7 @@ class DatasetContract(Contract):
                         key = self.key,
                         filters = filters )
 
-    def publish(self, dataframe: pd.DataFrame)->None:
+    def publish(self, dataframe: pd.DataFrame, run_id: int)->None:
         if self.contract_type != "dataset":
             raise ValueError(
                 f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
@@ -133,9 +148,9 @@ class DatasetContract(Contract):
         self.logger.info(
             f'Publishing dataframe to s3 location {self.s3_path}.')
 
-        dataframe, time_partition = self._set_dataset_metadata(df=dataframe)
-        if time_partition not in self.partitions:
-            self.partitions.extend(time_partition)
+        dataframe, run_partition = self._set_dataset_metadata(df=dataframe, run_id=run_id)
+        if run_partition not in self.partitions:
+            self.partitions.extend(run_partition)
 
         publish(
             bucket=self.env,

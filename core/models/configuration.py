@@ -113,6 +113,7 @@ class Pipeline(UniversalWithPrimary, Base):
     run_frequency = Column(String)
     description = Column(String)
     pipeline_states = relationship("PipelineState", back_populates='pipeline')
+    run_events = relationship("RunEvent", back_populates='pipeline')
 
 
 class PipelineState(UniversalWithPrimary, Base):
@@ -136,6 +137,13 @@ class PipelineType(UniversalWithPrimary, Base):
     name = Column(String, nullable=False)
     segment_id = Column(Integer, ForeignKey('segments.id'), nullable=False)
     segment = relationship("Segment", back_populates='pipeline_types')
+
+
+class RunEvent(UniversalWithPrimary, Base):
+    __tablename__ = 'run_events'
+    updated_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    pipeline_id = Column(Integer, ForeignKey('pipelines.id'), nullable=False) 
+    pipeline = relationship("Pipeline",  back_populates='run_events')
 
 
 class Segment(UniversalWithPrimary, Base):

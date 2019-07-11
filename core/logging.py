@@ -59,7 +59,7 @@ class LoggerMixin(object):
 
 
 class LoggerSingleton(object):
-    """ logger attribute class for use in a procdeural module.
+    """ logger attribute class for use in a procedeural module.
     Usage:
     
     ```
