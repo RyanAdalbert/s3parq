@@ -32,4 +32,3 @@ def test_get_or_create_not_exists():
     assert co.id == test_id
     assert co.name == "bananaco"
     session.close()
-    

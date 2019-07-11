@@ -50,4 +50,3 @@ def build(pharma_company: str, brand: str, state: str, transformation: str, sess
     session.close()
 
     return ids
-    
