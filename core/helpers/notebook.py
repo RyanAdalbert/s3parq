@@ -11,7 +11,7 @@ root = project_root.ProjectRoot().get_path()
 
 logger = LoggerSingleton().logger
 
-def run_transform(transform_id:int) -> str:
+def run_transform(transform_id:int, run_id: int) -> str:
     ## notebook name == transform_template.name
     t_configs = get_transform(transform_id)
     notebook = t_configs.transformation_template.name
@@ -27,7 +27,7 @@ def run_transform(transform_id:int) -> str:
     papermill.execute_notebook(
         path,
         output_path(output_contract.key),       
-        parameters = dict(transform_id=transform_id),
+        parameters = dict(transform_id=transform_id, run_id=run_id),
         cwd=root
     )
 

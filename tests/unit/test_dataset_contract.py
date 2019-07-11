@@ -123,7 +123,7 @@ def test_publish_to_s3(_contract):
         fake_parts = ["fake", "option"]
         contract.partitions = fake_parts
 
-        pub = contract.publish(dataframe=df.dataframe)
+        pub = contract.publish(dataframe=df.dataframe, run_id=1)
 
         publish.assert_called_once_with(
             bucket=f'{ENV_BUCKET}',

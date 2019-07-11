@@ -16,11 +16,10 @@ from core.logging import get_logger
 # inherit based on environment
 InheritOperator = SSHOperator if ENVIRONMENT == 'dev' else AWSBatchOperator
 
-
 class TransformOperator(InheritOperator):
 
     @apply_defaults
-    def __init__(self, transform_id: int, *args, **kwargs) -> None:
+    def __init__(self, transform_id: int, **kwargs) -> None:
         """ Transformation operator for DAGs. 
                 **kwargs are direct passed into super - PythonOperator from Airflow
                 returns a valid task object for use in DAGs only
@@ -30,25 +29,24 @@ class TransformOperator(InheritOperator):
             ".".join([self.__module__, self.__class__.__name__]))
 
         self.transform_id = transform_id
+
         task_id = self._generate_task_id()
 
         params = self._generate_contract_params()
-
+        
         job_def_name = get_core_job_def_name()
         job_name = f'{params.parent}_{params.child}_{params.state}_{params.dataset}'
         job_queue = BATCH_JOB_QUEUE
 
-        run_command = [
-            'corebot',
-            'run',
-            f'{transform_id}'
-        ]
+        run_id = "{{ ti.xcom_pull(task_ids='RunEvent', key='run_id') }}"
+
+        run_command = f"corebot run {transform_id} "
+        run_command += run_id
 
         """ Run location control: this class inherits SSHOperator for dev, 
             AWSBatchOperator for prod  
         """
         if isinstance(self, SSHOperator):
-
             hook = SSHHook(remote_host='notebook',
                            port=22,
                            username='corebot_remote',
@@ -60,8 +58,8 @@ class TransformOperator(InheritOperator):
                 f"Running Corebot command `{run_command}` locally in notebook container...")
             super(TransformOperator, self).__init__(task_id=task_id,
                                                     ssh_hook=hook,
-                                                    command=" ".join(run_command),  # SSH can only take a string here :(
-                                                    *args,
+                                                    provide_context=True,
+                                                    command=run_command,  # SSH can only take a string here :(
                                                     **kwargs
                                                     )
             self.__logger.info(
@@ -78,26 +76,24 @@ class TransformOperator(InheritOperator):
                                                     job_name=job_name,
                                                     job_definition=job_def_name,
                                                     job_queue=job_queue,
+                                                    provide_context=True,
                                                     overrides=job_container_overrides,
-                                                    *args,
                                                     **kwargs
                                                     )
             self.__logger.info(
                 f"Done. AWSBatchOperator executed for {job_name}.")
-            self.session.close()
 
-    def _get_transform_info(self):
+    def _get_transform_info(self, session):
         """ Gets full queried info for the transform.
                 Uses SessionHelper to grab it based on the transform ID
                 TODO: Throw detailed exception if no transform exists
         """
-        self.session = SessionHelper().session
         transform_config = config.Transformation
         # if the transform is missing for some reason, we want a clear error
         try:
-            transform = self.session.query(transform_config).filter(
+            transform = session.query(transform_config).filter(
                 transform_config.id == self.transform_id).one()
-        except NoResultFound as ex:
+        except NoResultFound:
             raise SQLAlchemyError(
                 f"Transform id {self.transform_id} was not found in the configuration database.")
         return transform
@@ -108,10 +104,12 @@ class TransformOperator(InheritOperator):
                 ID format = {pipeline_name}_{pipeline_state_type}_{transform_name}_{transform_id}
                     All set to lower case for matching up
         """
-        transform = self._get_transform_info()
+        session = SessionHelper().session
+        transform = self._get_transform_info(session)
         p_name = transform.pipeline_state.pipeline.name
         p_stname = transform.pipeline_state.pipeline_state_type.name
         t_name = transform.transformation_template.name
+        session.close()
         task_id = f"{p_name}_{p_stname}_{t_name}_{self.transform_id}".lower()
         self.__logger.debug(f"task_id: {task_id}")
         return task_id
@@ -121,11 +119,13 @@ class TransformOperator(InheritOperator):
             This passes them over in string form, since contracts cant be directly passed that way
                 allowing the receiving functions to quickly create without touching the configs schema
         """
-        transform = self._get_transform_info()
+        session = SessionHelper().session
+        transform = self._get_transform_info(session)
         parent = transform.pipeline_state.pipeline.brand.pharmaceutical_company.name.lower()
         child = transform.pipeline_state.pipeline.brand.name.lower()
         state = transform.pipeline_state.pipeline_state_type.name.lower()
         dataset = transform.transformation_template.name.lower()
+        session.close()
         self.__logger.debug(
             f"Named contract params:: branch = {BRANCH_NAME}, parent = {parent}, child = {child}, state = {state}, dataset = {dataset}")
         contract_tuple = namedtuple(

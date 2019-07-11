@@ -39,12 +39,12 @@ class Test:
 
         bucket = ENV_BUCKET
         key = "notebooks/dev/important_business/raw/extract/shared.test.hello_world.ipynb"
-        tid = 2
+        tid = 1
         tbranch = "test_branch"
         tstate = "raw"
         tparent = "merck"
         tchild = "prilosec"
-        notebook_url = notebook.run_transform(transform_id=tid)
+        notebook_url = notebook.run_transform(transform_id=tid, run_id=1)
 
         mock_papermill.execute_notebook.assert_called
         """

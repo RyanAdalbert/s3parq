@@ -17,7 +17,7 @@ We develop in a docker-compose orchestrated environment. We work in containers, 
 **Select a container shell with flags**
 `--flask` gives you the flask api container
 `--gui` gives you the gui container
-`--notebook` gives you the notebook container (this is also the default workspace if no flag is set)
+`default (no flag)` gives you the notebook container
 
 example: 
 
@@ -48,7 +48,10 @@ _important notes_:
     $core: ## prompt from inside the container
 - if you suddenly get weird errors (usually sqlalchemy related) for no reason when building, your docker may be out of memory from all the stale images. Clean it up!
 To do so run `docker images prune` 
-- python testing can be done with coverage and debugging using the `script/test` bash script from _inside_ any of the shells. This will run the py.test suite. for debugging add the `--log` flag. For line numbers of uncovered code add the `--line` flag.   
+- python testing can be done with coverage and debugging using the `script/test` bash script from _inside_ any of the shells. This will run the py.test suite. for debugging add the `--log` flag. For line numbers of uncovered code add the `--line` flag.
+
+### Data Science with Docker
+If you only are working in Jupyter, you can use `script/ds_env` to launch only the `notebook` and `configurationpg` containers. To use pipeline configurations in Jupyter via postgres rather than via the configuration mock database, see the [force_postgres documentation](./helpers/force_postgres.md).
 
 ### AWS Credentials and Accounts
 There are two AWS accounts here at Integrichain, one is `sandbox` and the other is `main`. Basically, `sandbox` is dev and `main` houses both `prod` and `uat`. You should have 2 separate sets of AWS Access key pairs, but only have 1 key pair in the `credentials` file at a time. If you want to switch accounts, just copy the appropriate credentials file over `credentials`.
@@ -81,12 +84,7 @@ We manage these configurations via a configuration application, which in turn st
 
 To acces these configurations you use the [Configurations module](../core/models/configuration.py)
 
-You use [SQLAlchemy Sessions](https://docs.sqlalchemy.org/en/rel_1_2/orm/tutorial.html#querying) to query that class.
-
-~~In development it can be useful to get the functionality without setting up and migrating a database, so we have a helper class that builds an in-memory sqlite instance and can populate mock data.~~
-
-**UPDATED:** We now have the `SessionHelper` class. Just create an instance of SessionHelper and use that session - it handles environment configs and automatically mocks for dev environments. 
-
+To query the configuration DB, use the `SessionHelper` class. Just create an instance of SessionHelper - it handles environment configs and automatically mocks for dev environments. You can access the [SQLAlchemy Session](https://docs.sqlalchemy.org/en/rel_1_2/orm/tutorial.html#querying) created by `SessionHelper` with `SessionHelper.session`. **Be sure to close the `.session` attribute when you are finished reading/writing, as it does not presently close automatically.** 
 
 If you do still need to make configuration mock manually, here's how:
     # using configurations
@@ -156,7 +154,8 @@ login creds, host URLS, and other security-minded bits are managed by aws secret
 
 Note that env should be passed from some environment-aware variable.    
 
-
+### Loading Configuration seed data via SQL
+You can batch load data into the Configuration DB using SQL. After running `script/dev_env`, you can add the path to your seed file to `script/load_seeds` and run the script to seed to postgres.
 
 ## Pipeline Runs: an Airflow Story
 
@@ -170,8 +169,9 @@ This is how we manage the transform DAG within a pipeline:
 Dags (and tasks) are generated _dynamically_ based on the records in the configuration application. A single set of files [dag\_builder.py](../core/airflow/dagbuilder/dag_builder.py) and [task\_orchestrator.py](../core/airflow/task_orchestrator.py) are all the mechanics of this process, and they feed into [executor.py](../core/airflow/dags/executor.py) which simply exposes the generated DAGs to airflow in scope. 
 
 ### Spacers
-To avoid adding sub-dags or structuring DAG chains from state to state, we use a grouping method for tasks that relies on **spacers**. By mathematical definition a DAG progresses to a singular outcome - which means multiple bi-directional dependencies on the same task break the DAG. To implement stepped dependencies, spacers allow for multiple sources to act as upstream deps for a single downstream target, which in turn acts as the upstream dep for multiple downstream targets. in the diagram above you can see each point where the DAG compresses to a single task, like the narrow point of a sideways hourglass. These single spacer tasks do not actually run any code (use the DummyOperator) but act to orchestrate the overall DAG flow.  
+To avoid adding sub-dags or structuring DAG chains from state to state, we use a grouping method for tasks that relies on **spacers**. By mathematical definition a DAG progresses to a singular outcome - which means multiple bi-directional dependencies on the same task break the DAG. To implement stepped dependencies, spacers allow for multiple sources to act as upstream deps for a single downstream target, which in turn acts as the upstream dep for multiple downstream targets. in the diagram above you can see each point where the DAG compresses to a single task, like the narrow point of a sideways hourglass. These single spacer tasks do not actually run any code (use the DummyOperator) but act to orchestrate the overall DAG flow.
 
+From a more pragmatic perspective, spacers illustrate which [state](https://integrichain.atlassian.net/wiki/spaces/Core/pages/722731374/Marketecture+Core+Contract) the data is currently in and give a numeric order of operations for the DAG. When each spacer executes, the previous step of the pipeline is completed and published to S3.
 
 ### Testing Operators
 tasks are instances of operators. To test operators, use the [operator\_tester.py](../core/airflow/dags/operator_tester.py) dag - this will create a simple DAG for your operator that can be run manually from the airflow GUI. 
