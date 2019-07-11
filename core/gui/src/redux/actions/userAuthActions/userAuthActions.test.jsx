@@ -9,7 +9,56 @@ import { API_HOST } from '../../constants';
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
-describe('Loging In', () => {
+describe('Autorization results', () => {
+  it('Login Attempt', () => {
+    const oAuthToken = '9999999';
+    const expectedAction = {
+      type: userConstants.LOGIN_ATTEMPT,
+      oAuthToken
+    };
+    expect(actions.loginAttempt(oAuthToken)).toEqual(expectedAction);
+  });
+
+  it('Login Success', () => {
+    const status = undefined;
+
+    const expectedAction = {
+      type: userConstants.LOGIN_SUCCESS,
+      status
+    };
+
+    let retnFunc = actions.loginSuccess();
+    retnFunc(receivedAction => {
+      expect(receivedAction).toEqual(expectedAction);
+    });
+  });
+
+  it('Login Error', () => {
+    const response = 'Error';
+    const expectedAction = {
+      type: userConstants.LOGIN_FAIL,
+      response
+    };
+    expect(actions.loginError(response)).toEqual(expectedAction);
+  });
+
+  it('Stores the token', () => {
+    const userInfo = {
+      oAuthToken: '99999',
+      userName: 'Nova'
+    };
+    const expectedAction = {
+      type: userConstants.STORE_TOKEN,
+      payload: {
+        oAuthToken: userInfo.oAuthToken,
+        userName: userInfo.userName
+      }
+    };
+    expect(actions.storeToken(userInfo)).toEqual(expectedAction);
+  });
+});
+
+describe('Authorization', () => {
   afterEach(() => {
     fetchMock.restore();
   });
@@ -24,7 +73,7 @@ describe('Loging In', () => {
       {
         type: userConstants.LOGIN_ATTEMPT,
         type: userConstants.LOGIN_SUCCESS,
-        response: { status: 200 }
+        status: { status: 200 }
       }
     ];
 

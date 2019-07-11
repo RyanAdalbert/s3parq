@@ -25,22 +25,22 @@ export const loginError = response => {
   };
 };
 
-export const loginSuccess = response => {
+export const loginSuccess = status => {
   return dispatch => {
     dispatch({
       type: 'LOGIN_SUCCESS',
-      response
+      status
     });
     history.push('/admin/pipelineindex');
   };
 };
 
 // store token action creator
-export const storeToken = (oAuthToken, userName) => ({
+export const storeToken = userInfo => ({
   type: 'STORE_TOKEN',
   payload: {
-    oAuthToken,
-    userName
+    oAuthToken: userInfo.oAuthToken,
+    userName: userInfo.userName
   }
 });
 
