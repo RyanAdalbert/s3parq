@@ -18,10 +18,10 @@ export const loginAttempt = oAuthToken => {
 };
 
 // login flow action creators
-export const loginError = error => {
+export const loginError = response => {
   return {
     type: 'LOGIN_FAIL',
-    error
+    response
   };
 };
 
@@ -56,11 +56,10 @@ export const login = oAuthToken => {
     })
       .then(response => {
         if (response.status === 200) {
-          dispatch(loginSuccess(response));
+          dispatch(loginSuccess({ status: response.status }));
         } else {
+          dispatch(loginError({ status: response.status }));
           const error = new Error(response.statusText);
-          error.response = response;
-          dispatch(loginError(error));
           throw error;
         }
       })
