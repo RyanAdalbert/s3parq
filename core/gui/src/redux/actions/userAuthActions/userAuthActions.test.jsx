@@ -9,7 +9,7 @@ import { API_HOST } from '../../constants';
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
-describe('Autorization results', () => {
+describe('Authorization results', () => {
   it('Login Attempt', () => {
     const oAuthToken = '9999999';
     const expectedAction = {
