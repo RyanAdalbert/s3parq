@@ -30,6 +30,7 @@ const userReducer = (state = INITIAL_STATE, action) => {
     case STORE_TOKEN:
       const { oAuthToken, userName } = action.payload;
       return Object.assign({}, state, {
+        isLoggedIn: true,
         oAuthToken,
         userName
       });

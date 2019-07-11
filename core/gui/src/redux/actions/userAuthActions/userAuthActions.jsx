@@ -1,4 +1,5 @@
 import history from '../../../utils/history';
+import { API_HOST } from '../../constants.jsx';
 
 //User Constants
 export const userConstants = {
@@ -9,7 +10,7 @@ export const userConstants = {
   USER_LOGOUT: 'USER_LOGOUT'
 };
 
-export const loginRequest = oAuthToken => {
+export const loginAttempt = oAuthToken => {
   return {
     type: 'LOGIN_ATTEMPT',
     oAuthToken
@@ -17,37 +18,36 @@ export const loginRequest = oAuthToken => {
 };
 
 // login flow action creators
-export const loginError = error => {
+export const loginError = response => {
   return {
     type: 'LOGIN_FAIL',
-    error
+    response
   };
 };
 
-export const loginSuccess = response => {
+export const loginSuccess = status => {
   return dispatch => {
     dispatch({
       type: 'LOGIN_SUCCESS',
-      response
+      status
     });
     history.push('/admin/pipelineindex');
   };
 };
 
 // store token action creator
-export const storeToken = (oAuthToken, userName) => ({
+export const storeToken = userInfo => ({
   type: 'STORE_TOKEN',
   payload: {
-    oAuthToken,
-    userName
+    oAuthToken: userInfo.oAuthToken,
+    userName: userInfo.userName
   }
 });
 
 //login action creator
 export const login = oAuthToken => {
-  const HOST = 'localhost';
-  return dispatch =>
-    fetch(`http://${HOST}:5000/config_api/login`, {
+  return dispatch => {
+    return fetch(`${API_HOST}/config_api/login`, {
       method: 'GET',
       headers: {
         Authorization: oAuthToken
@@ -56,22 +56,20 @@ export const login = oAuthToken => {
     })
       .then(response => {
         if (response.status === 200) {
-          dispatch(loginSuccess(response));
+          dispatch(loginSuccess({ status: response.status }));
         } else {
+          dispatch(loginError({ status: response.status }));
           const error = new Error(response.statusText);
-          error.response = response;
-          dispatch(loginError(error));
           throw error;
         }
       })
       .catch(error => {
         console.log('request failed', error);
       });
+  };
 };
 
 //logout action creator
-export const logOut = () => {
-  return {
-    type: 'USER_LOGOUT'
-  };
-};
+export const logOut = () => ({
+  type: 'USER_LOGOUT'
+});
