@@ -2,6 +2,7 @@ from typing import List
 from datetime import datetime
 from pytz import timezone
 import pandas as pd
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 from s3parq import fetch, publish
 from core.constants import CORE_VERSION
@@ -105,21 +106,18 @@ class DatasetContract(Contract):
         '''
         self._contract_type = "dataset"
 
-    def _set_dataset_metadata(self, df: pd.DataFrame, run_id: int):
-        sess = SHelp().session
+    def _set_dataset_metadata(self, df: pd.DataFrame, run_id: int, session: Session):
         try:
-            run = sess.query(RunEvent).filter(RunEvent.id==run_id).one()
+            run = session.query(RunEvent).filter(RunEvent.id==run_id).one()
         except NoResultFound:
             raise KeyError("No RunEvent found with id=" + str(run_id) + ".")
-        sess.close()
 
-        if not '__metadata_run_id' in df.columns:
-            df['__metadata_run_id'] = run_id
-            timestamp = run.created_at
-            timestamp = timestamp.replace(tzinfo=timezone('UTC'))
-            df['__metadata_run_timestamp'] = self._format_datetime(timestamp)
-            df['__metadata_app_version'] = CORE_VERSION
-            
+        timestamp = run.created_at
+        timestamp = timestamp.replace(tzinfo=timezone('UTC'))
+
+        df['__metadata_run_id'] = run_id
+        df['__metadata_run_timestamp'] = self._format_datetime(timestamp)
+        df['__metadata_app_version'] = CORE_VERSION
         df['__metadata_transform_timestamp'] = self._format_datetime(datetime.utcnow())
         df['__metadata_output_contract'] = self.s3_path
 
@@ -140,15 +138,15 @@ class DatasetContract(Contract):
                         key = self.key,
                         filters = filters )
 
-    def publish(self, dataframe: pd.DataFrame, run_id: int)->None:
+    def publish(self, dataframe: pd.DataFrame, run_id: int, session: Session)->None:
         if self.contract_type != "dataset":
             raise ValueError(
                 f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
 
         self.logger.info(
-            f'Publishing dataframe to s3 location {self.s3_path}.')
+            f'Publishing dataframe to s3 location {self.s3_path} with run ID {run_id}.')
 
-        dataframe, run_partition = self._set_dataset_metadata(df=dataframe, run_id=run_id)
+        dataframe, run_partition = self._set_dataset_metadata(df=dataframe, run_id=run_id, session=session)
         if run_partition not in self.partitions:
             self.partitions.extend(run_partition)
 
