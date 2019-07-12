@@ -15,14 +15,19 @@ def test_new_build():
 def test_existing_build():
     # make sure we reference existing records in cmocker if they exist
     session = SessionHelper().session
-    mock_brand = "Teamocil"
-    mock_pharma = "Nfoods"
-    brand_id = session.query(config.Brand).filter_by(name=mock_brand).one().id
-    pharma_id = session.query(config.PharmaceuticalCompany).filter_by(name=mock_pharma).one().id
+    mock_brand = "existing_brand"
+    mock_pharma = "existing_pharma"
+    pharma = config.PharmaceuticalCompany(name=mock_pharma, display_name=mock_pharma)
+    brand = config.Brand(name=mock_brand, display_name=mock_brand, pharmaceutical_company_id=pharma.id)
+    session.add(pharma)
+    session.add(brand)
+    session.commit()
     tr_id = pb.build(mock_pharma, mock_brand, "raw", "test", session)[0]
     transform = session.query(config.Transformation).filter_by(id=tr_id).one()
-    brand = transform.pipeline_state.pipeline.brand
-    assert brand.id == brand_id and brand.pharmaceutical_company.id == pharma_id
+    t_brand = transform.pipeline_state.pipeline.brand
+    assert t_brand.id == brand.id and t_brand.pharmaceutical_company.id == pharma.id
+    session.close()
+
 
 def test_get_or_create_exists():
     session = SessionHelper().session
