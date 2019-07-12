@@ -5,16 +5,24 @@ import core.models.configuration as config
 import random
 import string
 
-
-def rand_string()->str:
-    return "".join([random.choice(string.ascii_lowercase) for _ in range(random.randint(10,25))])
-
 def test_new_build():
     session = SessionHelper().session
     tr_id = pb.build("foo", "bar", "new_state", "new_transform", session)[0]
     tr = session.query(config.Transformation).filter_by(id=tr_id).one()
     assert tr.transformation_template.name == "new_transform"
     session.close()
+
+def test_existing_build():
+    # make sure we reference existing records in cmocker if they exist
+    session = SessionHelper().session
+    mock_brand = "Teamocil"
+    mock_pharma = "Nfoods"
+    brand_id = session.query(config.Brand).filter_by(name=mock_brand).one().id
+    pharma_id = session.query(config.PharmaceuticalCompany).filter_by(name=mock_pharma).one().id
+    tr_id = pb.build(mock_pharma, mock_brand, "raw", "test", session)[0]
+    transform = session.query(config.Transformation).filter_by(id=tr_id).one()
+    brand = transform.pipeline_state.pipeline.brand
+    assert brand.id == brand_id and brand.pharmaceutical_company.id == pharma_id
 
 def test_get_or_create_exists():
     session = SessionHelper().session
