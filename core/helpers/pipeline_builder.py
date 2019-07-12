@@ -14,8 +14,8 @@ def _get_or_create(session: Session, model, find:dict):
         ARGS:
             session: SQLalchemy session
             model: the model class to look up 
-            find: the key value dict to look up existing instance with
-        RETURNS: model instace of the found/created class 
+            find: the key value dict to look up existing instance with, or create a new instance with
+        RETURNS: model instance of the found/created class 
     """
     try:
         return session.query(model).filter_by(**find).one()
@@ -26,6 +26,18 @@ def _get_or_create(session: Session, model, find:dict):
         return new_model
 
 def build(pharma_company: str, brand: str, state: str, transformation: str, session: Session):
+    """ adds configurations for the specified NAMEs to the session. This results in a single
+        transformation "pipeline" which can be used to configure our Jupyter transformation template
+        ARGS:
+            pharma_company: Name of the pharmaceutical company
+            brand: Name of the brand
+            state: Name of the state {transformation} runs in (must be a valid state name to publish)
+            transformation: The name of the transformation (should generally correspond to a Jupyter filename)
+            session: The SQLAlchemy session to commit to
+        RETURNS: A list of 2 items: [transformation_id, run_id] where transformation_id corresponds
+        to the configuration created/found for {transformation} and run_id is a randomly generated 6 digit
+        number (to avoid publishing to the same place with the same dataset)
+    """
     logger.debug("Adding/getting mocks for specified configurations...")
     find = dict(name=pharma_company, display_name=pharma_company)
     pc = _get_or_create(session, config.PharmaceuticalCompany, find)
