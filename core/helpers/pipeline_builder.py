@@ -59,6 +59,5 @@ def build(pharma_company: str, brand: str, state: str, transformation: str, sess
     session.add(run_event)
     session.commit()
     ids = [tr.id, run_event.id]
-    session.close()
 
     return ids
