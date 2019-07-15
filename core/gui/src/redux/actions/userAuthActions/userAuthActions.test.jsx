@@ -43,18 +43,17 @@ describe('Authorization results', () => {
   });
 
   it('Stores the token', () => {
-    const userInfo = {
-      oAuthToken: '99999',
-      userName: 'Nova'
-    };
+    const oAuthToken = '99999';
+    const userName = 'Nova';
+
     const expectedAction = {
       type: userConstants.STORE_TOKEN,
       payload: {
-        oAuthToken: userInfo.oAuthToken,
-        userName: userInfo.userName
+        oAuthToken: oAuthToken,
+        userName: userName
       }
     };
-    expect(actions.storeToken(userInfo)).toEqual(expectedAction);
+    expect(actions.storeToken(oAuthToken, userName)).toEqual(expectedAction);
   });
 });
 
