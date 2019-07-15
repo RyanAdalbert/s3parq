@@ -36,11 +36,11 @@ export const loginSuccess = status => {
 };
 
 // store token action creator
-export const storeToken = userInfo => ({
+export const storeToken = (oAuthToken, userName) => ({
   type: 'STORE_TOKEN',
   payload: {
-    oAuthToken: userInfo.oAuthToken,
-    userName: userInfo.userName
+    oAuthToken: oAuthToken,
+    userName: userName
   }
 });
 
