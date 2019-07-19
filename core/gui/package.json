@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "babel-jest": "^24.8.0",
     "bootstrap": "^4.3.1",
     "core-js": "^3.0.1",
     "enzyme-adapter-react-16": "^1.14.0",
@@ -59,17 +58,9 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "@types/jest": "^24.0.13",
-    "babel-eslint": "^9.0.0",
     "babel-preset-env": "^1.7.0",
     "enzyme": "^3.10.0",
     "enzyme-to-json": "^3.3.5",
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-plugin-flowtype": "^2.50.3",
-    "eslint-plugin-import": "^2.17.3",
-    "eslint-plugin-jsx-a11y": "^6.2.1",
-    "eslint-plugin-react": "^7.13.0",
     "fetch-mock": "^7.3.3",
     "redux-devtools-extension": "^2.13.8",
     "redux-mock-store": "^1.5.3"
