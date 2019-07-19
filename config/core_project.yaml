@@ -6,7 +6,7 @@ DEV_BUCKET: ichain-dev
 DEV_CONFIGURATION_APPLICATION_CONN_STRING: postgresql://configurator:configurator@core_configurationpg_1/configuration_application
 DOCKER_REPO: ichain/core
 ENVIRONMENT: dev
-FORCE_POSTGRES: false
+FORCE_POSTGRES: true
 LOGGING_CONFIG: logging.yaml
 PROD_AWS_ACCOUNT: '687531504312'
 PROD_BUCKET: ichain-production
@@ -21,4 +21,3 @@ REDSHIFT_REGION: us-east-1
 DEV_REDSHIFT_DB_HOST: core-sandbox-cluster-1.c3swieqn0nz0.us-east-1.redshift.amazonaws.com
 DEV_REDSHIFT_IAM_ROLE: arn:aws:iam::265991248033:role/mySpectrumRole
 DEV_REDSHIFT_CLUSTER_ID: core-sandbox-cluster-1
-
