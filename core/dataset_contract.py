@@ -5,7 +5,7 @@ import pandas as pd
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 from s3parq import fetch, publish
-from core.constants import CORE_VERSION
+import core.constants
 from core.contract import Contract
 from core.helpers.session_helper import SessionHelper as SHelp
 from core.models.configuration import RunEvent
@@ -96,6 +96,30 @@ class DatasetContract(Contract):
             path += f'/{self.dataset}'
 
         return path
+    
+    def redshift_configuration(self, run_id: int):
+        '''Returns the redshift_params for s3parq Redshift Spectrum. All of the configurations come from core_project.yaml
+        except for table_name which is set as the dataset name appended with the pipeline run ID.'''
+        redshift_params = dict()
+        if constants.ENVIRONMENT = "dev":
+            redshift_params['iam_role'] = constants.DEV_REDSHIFT_IAM_ROLE
+            redshift_params['cluster_id'] = constants.DEV_REDSHIFT_CLUSTER_ID
+            redshift_params['host'] = constants.DEV_REDSHIFT_DB_HOST
+        else:
+            redshift_params['iam_role'] = constants.REDSHIFT_IAM_ROLE
+            redshift_params['cluster_id'] = constants.REDSHIFT_CLUSTER_ID
+            redshift_params['host'] = constants.DEV_REDSHIFT_DB_HOST
+
+        redshift_params['db_name'] = constants.REDSHIFT_DB_NAME
+        redshift_params['schema_name'] = constants.REDSHIFT_SCHEMA_NAME
+        redshift_params['port'] = constants.REDSHIFT_DB_PORT
+        redshift_params['region'] = constants.REDSHIFT_REGION
+        redshift_params['table_name'] = f'{self.dataset}_{run_id}'
+
+        return redshift_params
+
+    def _redshift_table_name(self):
+
 
     def _format_datetime(self, date: datetime)->str:
         return date.strftime('%Y-%m-%d %H:%M:%S')
@@ -117,7 +141,7 @@ class DatasetContract(Contract):
 
         df['__metadata_run_id'] = run_id
         df['__metadata_run_timestamp'] = self._format_datetime(timestamp)
-        df['__metadata_app_version'] = CORE_VERSION
+        df['__metadata_app_version'] = constants.CORE_VERSION
         df['__metadata_transform_timestamp'] = self._format_datetime(datetime.utcnow())
         df['__metadata_output_contract'] = self.s3_path
 
@@ -155,4 +179,5 @@ class DatasetContract(Contract):
             key=self.key,
             dataframe=dataframe,
             partitions=self.partitions
+            redshift_params=self.redshift_configuration(run_id)
         )
