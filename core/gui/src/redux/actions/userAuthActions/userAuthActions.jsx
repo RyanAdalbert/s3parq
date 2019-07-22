@@ -55,6 +55,7 @@ export const login = oAuthToken => {
       credentials: 'include'
     })
       .then(response => {
+        console.log(response);
         if (response.status === 200) {
           dispatch(loginSuccess({ status: response.status }));
         } else {
