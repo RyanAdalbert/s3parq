@@ -35,7 +35,8 @@ class FileMover(LoggerMixin):
         self.sftp.close()
         self.transport.close()
 
-    def get_file(self, remote_path: str, local_path: str):
+    # Removed from get_file to get_raw_file, get_file is now a main function 
+    def get_raw_file(self, remote_path: str, local_path: str):
         # Fetch file from remote
         #   Set local file time to match remote for comparison to S3 modified time
         utime = self.sftp.stat(remote_path).st_mtime 
@@ -73,6 +74,31 @@ class FileMover(LoggerMixin):
 
 logger = get_logger("file_mover")
 
+# Adding list_remote_files so that remote files list can be accessed in notebook with function call
+def list_remote_files(remote_path: str, secret: Secret):
+    # Open SFTP connection
+    with FileMover(secret=secret) as fm:
+        file_list = fm.list_files(remote_path)
+
+        return file_list
+
+# Adding get_file function for single file transfer
+def get_file(tmp_dir: str, prefix: str, remote_path: str, remote_file: str, secret: Secret):
+    # Set file filtering
+    files_dest = [FileDestination(f"^{prefix}.*$","do_move")]
+
+    # Open SFTP connection
+    with FileMover(secret=secret) as fm:
+        # For every "file" in the remote list, make sure its not a directory and matches filters
+        if not (fm.is_dir(remote_file)) and (fm.get_file_type(remote_file.filename, files_dest)!='dont_move'):
+            remote_file_path = remote_path + "/" + remote_file.filename
+            # Set file name to include the path, in case of duplicate file names in different locations
+            local_file_name = remote_file_path.replace("/",".")
+            local_file_name = local_file_name.lstrip(".")
+            local_file_path = os.path.join(tmp_dir, local_file_name)
+            
+            fm.get_raw_file(remote_file_path, local_file_path)
+
 def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
     # Set file filtering
     files_dest = [FileDestination(f"^{prefix}.*$","do_move")]
@@ -89,7 +115,7 @@ def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
                 local_file_name = local_file_name.lstrip(".")
                 local_file_path = os.path.join(tmp_dir, local_file_name)
                 
-                fm.get_file(remote_file_path, local_file_path)
+                fm.get_raw_file(remote_file_path, local_file_path)
 
 def publish_file(local_path: str, remote_path: str, secret: Secret):
     # Open SFTP connection
