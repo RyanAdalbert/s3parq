@@ -5,7 +5,7 @@ import pandas as pd
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 from s3parq import fetch, publish
-import core.constants
+from core import constants
 from core.contract import Contract
 from core.helpers.session_helper import SessionHelper as SHelp
 from core.models.configuration import RunEvent
@@ -103,15 +103,15 @@ class DatasetContract(Contract):
         redshift_params = dict()
         if constants.ENVIRONMENT == "dev":
             redshift_params['iam_role'] = constants.DEV_REDSHIFT_IAM_ROLE
-            redshift_params['cluster_id'] = constants.DEV_REDSHIFT_CLUSTER_ID
+            redshift_params['cluster'] = constants.DEV_REDSHIFT_CLUSTER_ID
             redshift_params['host'] = constants.DEV_REDSHIFT_DB_HOST
         else:
             redshift_params['iam_role'] = constants.REDSHIFT_IAM_ROLE
-            redshift_params['cluster_id'] = constants.REDSHIFT_CLUSTER_ID
+            redshift_params['cluster'] = constants.REDSHIFT_CLUSTER_ID
             redshift_params['host'] = constants.DEV_REDSHIFT_DB_HOST
 
-        redshift_params['db_name'] = constants.REDSHIFT_DB_NAME
-        redshift_params['schema_name'] = constants.REDSHIFT_SCHEMA_NAME
+        redshift_params['db_name'] = constants.REDSHIFT_DB
+        redshift_params['schema_name'] = constants.REDSHIFT_SCHEMA
         redshift_params['port'] = constants.REDSHIFT_DB_PORT
         redshift_params['region'] = constants.REDSHIFT_REGION
         redshift_params['table_name'] = f'{self.dataset}_{run_id}'
@@ -159,7 +159,7 @@ class DatasetContract(Contract):
                         key = self.key,
                         filters = filters )
 
-    def publish(self, dataframe: pd.DataFrame, run_id: int, session: Session)->None:
+    def publish(self, dataframe: pd.DataFrame, run_id: int, session: Session, publish_to_redshift=True)->None:
         if self.contract_type != "dataset":
             raise ValueError(
                 f"contract.publish() method can only be called on contracts of type dataset. This contract is type {self.contract_type}.")
@@ -171,10 +171,15 @@ class DatasetContract(Contract):
         if run_partition not in self.partitions:
             self.partitions.extend(run_partition)
 
+        if publish_to_redshift:
+            redshift_params = self.redshift_configuration(run_id)
+        else:
+            redshift_params = None
+
         publish(
             bucket=self.env,
             key=self.key,
             dataframe=dataframe,
             partitions=self.partitions,
-            redshift_params=self.redshift_configuration(run_id)
+            redshift_params=redshift_params
         )
