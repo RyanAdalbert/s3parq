@@ -99,7 +99,7 @@ class DatasetContract(Contract):
     
     def redshift_configuration(self, run_id: int):
         '''Returns the redshift_params for s3parq Redshift Spectrum. All of the configurations come from core_project.yaml
-        except for table_name which is set as the dataset name appended with the pipeline run ID.'''
+        except for table_name which is set in the format PHARMACOMPANY_BRAND_DATASET_RUNID'''
         redshift_params = dict()
         if constants.ENVIRONMENT == "dev":
             redshift_params['iam_role'] = constants.DEV_REDSHIFT_IAM_ROLE
@@ -114,7 +114,7 @@ class DatasetContract(Contract):
         redshift_params['schema_name'] = constants.REDSHIFT_SCHEMA
         redshift_params['port'] = constants.REDSHIFT_DB_PORT
         redshift_params['region'] = constants.REDSHIFT_REGION
-        redshift_params['table_name'] = f'{self.dataset}_{run_id}'
+        redshift_params['table_name'] = f'{self.parent}_{self.child}_{self.dataset}_{run_id}'
 
         return redshift_params
 
