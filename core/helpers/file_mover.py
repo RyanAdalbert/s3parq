@@ -5,6 +5,8 @@ from core.raw_contract import RawContract
 import time
 from core.logging import LoggerMixin, get_logger
 
+import shutil
+
 
 class FileDestination(NamedTuple):
     regex: str
@@ -45,8 +47,7 @@ class FileMover(LoggerMixin):
                 
                 start = time.time()
                 with open(local_path, 'wb') as local:
-                    for line in remote:
-                        local.write(line)
+                    shutil.copyfileobj(remote, local)
                 end = time.time()
                 self.logger.debug(f'It took {end - start} seconds to move {remote_path} to {local_path}')
         except Exception as e: 
