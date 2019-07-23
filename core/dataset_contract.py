@@ -103,11 +103,11 @@ class DatasetContract(Contract):
         redshift_params = dict()
         if constants.ENVIRONMENT == "dev":
             redshift_params['iam_role'] = constants.DEV_REDSHIFT_IAM_ROLE
-            redshift_params['cluster'] = constants.DEV_REDSHIFT_CLUSTER_ID
+            redshift_params['cluster_id'] = constants.DEV_REDSHIFT_CLUSTER_ID
             redshift_params['host'] = constants.DEV_REDSHIFT_DB_HOST
         else:
             redshift_params['iam_role'] = constants.REDSHIFT_IAM_ROLE
-            redshift_params['cluster'] = constants.REDSHIFT_CLUSTER_ID
+            redshift_params['cluster_id'] = constants.REDSHIFT_CLUSTER_ID
             redshift_params['host'] = constants.DEV_REDSHIFT_DB_HOST
 
         redshift_params['db_name'] = constants.REDSHIFT_DB
@@ -173,6 +173,8 @@ class DatasetContract(Contract):
 
         if publish_to_redshift:
             redshift_params = self.redshift_configuration(run_id)
+            self.logger.debug(f"Publishing dataframe to Redshift Spectrum database {redshift_params['db_name']} to schema.table \
+                {redshift_params['schema_name']}.{redshift_params['table_name']}...")
         else:
             redshift_params = None
 
