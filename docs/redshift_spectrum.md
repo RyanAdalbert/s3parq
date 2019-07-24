@@ -26,6 +26,8 @@ Since we are creating many tables for different pipelines all under the same dat
 
 Existing datasets published with new run IDs added to Core will be added to the corresponding existing Redshift table. You can filter your data to a specific Run ID using the `__metadata_run_id` column of published Core datasets.
 
+**One More Thing:** Transforms in raw and ingest state are *not* queryable via AWS Redshift, due to inconsistency with dataset schemas. Transformations beginning in master state are queryable via Redshift Spectrum unless manually specified otherwise.
+
 ## Deleting Tables
 
 The data catalog that holds all of the metadata references to the data in S3 is [AWS Glue](https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html). You *must* delete tables through the Glue data catalog to remove them from Redshift Spectrum. Dropping tables via SQL, even on Redshift, will not delete the table references in the Glue data catalog.
