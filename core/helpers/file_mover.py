@@ -14,6 +14,8 @@ class FileDestination(NamedTuple):
 
 
 class FileMover(LoggerMixin):
+    """ Organizes the common methods used to retrieve and push files. 
+    """
     def __init__(self, secret: Secret):
         user = secret.user
         password = secret.password
@@ -37,10 +39,13 @@ class FileMover(LoggerMixin):
         self.sftp.close()
         self.transport.close()
 
-    # Removed from get_file to get_raw_file, get_file is now a main function 
     def get_raw_file(self, remote_path: str, local_path: str):
-        # Fetch file from remote
-        #   Set local file time to match remote for comparison to S3 modified time
+        """
+        Fetch a file from a remote SFTP server and move it to a specified local directory.
+        :param remote_path: The full path of the remote file
+        :param local_path: The full path of the local file
+        """
+        # Set local file time to match remote for comparison to S3 modified time
         utime = self.sftp.stat(remote_path).st_mtime 
         try:
             with self.sftp.open(remote_path, 'rb') as remote:
@@ -75,16 +80,27 @@ class FileMover(LoggerMixin):
 
 logger = get_logger("file_mover")
 
-# Adding list_remote_files so that remote files list can be accessed in notebook with function call
 def list_remote_files(remote_path: str, secret: Secret):
+    """
+    Generates a list of the files located in the remote path. Allows this list to be accessed in notebook with function call
+    :param remote_path: The full path of the remote file
+    :param secret: Authentication object 
+    :returns: A list of files in the remote path
+    """
     # Open SFTP connection
     with FileMover(secret=secret) as fm:
         file_list = fm.list_files(remote_path)
-
         return file_list
 
-# Adding get_file function for single file transfer
 def get_file(tmp_dir: str, prefix: str, remote_path: str, remote_file: str, secret: Secret):
+    """
+    SFTPs a single file from the remote dir to the local dir given the correct file prefix
+    :param tmp_dir: The local path
+    :param prefix: Prefix of the file that needs to be moved
+    :param remote_path: The full path of the remote file
+    :param remote_file: The name of the remote file
+    :param secret: Authentication object
+    """
     # Set file filtering
     files_dest = [FileDestination(f"^{prefix}.*$","do_move")]
 
@@ -97,10 +113,16 @@ def get_file(tmp_dir: str, prefix: str, remote_path: str, remote_file: str, secr
             local_file_name = remote_file_path.replace("/",".")
             local_file_name = local_file_name.lstrip(".")
             local_file_path = os.path.join(tmp_dir, local_file_name)
-            
             fm.get_raw_file(remote_file_path, local_file_path)
 
 def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
+    """
+    SFTPs multiple files from the remote dir to the local dir given the correct file prefix
+    :param tmp_dir: The local path
+    :param prefix: Prefix of the files that needs to be moved
+    :param remote_path: The full path of the remote files
+    :param secret: Authentication object
+    """
     # Set file filtering
     files_dest = [FileDestination(f"^{prefix}.*$","do_move")]
 
@@ -115,7 +137,6 @@ def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
                 local_file_name = remote_file_path.replace("/",".")
                 local_file_name = local_file_name.lstrip(".")
                 local_file_path = os.path.join(tmp_dir, local_file_name)
-                
                 fm.get_raw_file(remote_file_path, local_file_path)
 
 def publish_file(local_path: str, remote_path: str, secret: Secret):
