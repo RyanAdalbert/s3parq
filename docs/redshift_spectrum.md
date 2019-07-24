@@ -12,11 +12,11 @@ Any SQL client which supports the [Amazon Redshift JDBC Driver](https://docs.aws
 
 When adding a new database, DBeaver will first ask for the type of database to connect to. Select 'Redshift' and add the following connection settings:
 
-Host: core-sandbox-cluster-1.c3swieqn0nz0.us-east-1.redshift.amazonaws.com
-Database: ichain_core
-Port: 5439
-Username: awsuser
-Password: AWSUserPass4
+Host: core-sandbox-cluster-1.c3swieqn0nz0.us-east-1.redshift.amazonaws.com\
+Database: ichain_core\
+Port: 5439\
+Username: awsuser\
+Password: AWSUserPass4\
 
 Once you've configured Redshift, you should see a screen similar to this: 
 ![DBeaver screen](assets/dbeaver_redshift.png?raw=true)
