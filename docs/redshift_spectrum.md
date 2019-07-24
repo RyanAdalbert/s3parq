@@ -19,7 +19,7 @@ Username: awsuser
 Password: AWSUserPass4
 
 Once you've configured Redshift, you should see a screen similar to this: 
-[DBeaver screen](./assets/dbeaver_redshift.png)
+![DBeaver screen](assets/dbeaver_redshift.png?raw=true)
 If you've properly connected to Redshift, you should see your datasets published to the data_core schema in the ichain_core db.
 
 Tables are named with the convention {pharma company}\_{brand}\_{transformation}. The tables in the above screenshot are an example of a series of transformations run in a pipeline for Sun's Odomzo brand. Query tables in ichain_core using the table data_core.{your table name}.
@@ -31,7 +31,7 @@ Existing datasets published with new run IDs added to Core will be added to the 
 The data catalog that holds all of the metadata references to the data in S3 is [AWS Glue](https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html). You *must* delete tables through the Glue data catalog to remove them from Redshift Spectrum. Dropping tables via SQL, even on Redshift, will not delete the table references in the Glue data catalog.
 
 You can query tables in the Glue Data Catalog via the AWS console.
-[AWS Glue](./assets/glue_spectrum.png)
+![AWS Glue](assets/glue_spectrum.png?raw=true)
 
 Make sure to filter to the `ichain_core` database before deleting anything! Tables outside of this database are separate from Core.
 
