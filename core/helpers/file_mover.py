@@ -4,14 +4,11 @@ from typing import NamedTuple
 from core.raw_contract import RawContract
 import time
 from core.logging import LoggerMixin, get_logger
-
 import shutil
-
 
 class FileDestination(NamedTuple):
     regex: str
     file_type: str
-
 
 class FileMover(LoggerMixin):
     """ Organizes the common methods used to retrieve and push files. 
@@ -49,7 +46,6 @@ class FileMover(LoggerMixin):
         utime = self.sftp.stat(remote_path).st_mtime 
         try:
             with self.sftp.open(remote_path, 'rb') as remote:
-                
                 start = time.time()
                 with open(local_path, 'wb') as local:
                     shutil.copyfileobj(remote, local)
