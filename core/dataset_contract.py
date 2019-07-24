@@ -97,7 +97,8 @@ class DatasetContract(Contract):
 
         return path
     
-    def redshift_configuration(self, run_id: int):
+    @property
+    def redshift_configuration(self)->dict:
         '''Returns the redshift_params for s3parq Redshift Spectrum. All of the configurations come from core_project.yaml
         except for table_name which is set in the format PHARMACOMPANY_BRAND_DATASET_RUNID'''
         redshift_params = dict()
@@ -114,7 +115,7 @@ class DatasetContract(Contract):
         redshift_params['schema_name'] = constants.REDSHIFT_SCHEMA
         redshift_params['port'] = constants.REDSHIFT_DB_PORT
         redshift_params['region'] = constants.REDSHIFT_REGION
-        redshift_params['table_name'] = f'{self.parent}_{self.child}_{self.dataset}_{run_id}'
+        redshift_params['table_name'] = f'{self.parent}_{self.child}_{self.dataset}'
 
         return redshift_params
 
@@ -172,7 +173,7 @@ class DatasetContract(Contract):
             self.partitions.extend(run_partition)
 
         if publish_to_redshift:
-            redshift_params = self.redshift_configuration(run_id)
+            redshift_params = self.redshift_configuration
             self.logger.debug(f"Publishing dataframe to Redshift Spectrum database {redshift_params['db_name']} to schema.table \
                 {redshift_params['schema_name']}.{redshift_params['table_name']}...")
         else:
