@@ -27,11 +27,11 @@ RUN set -ex \
     && apt-get update -yqq \
     && apt-get upgrade -yqq \
     && apt-get install -yqq --no-install-recommends \
+        apt-utils \
         $buildDeps \
         freetds-bin \
         build-essential \
         default-libmysqlclient-dev \
-        apt-utils \
         curl \
         rsync \
         netcat \
@@ -50,7 +50,6 @@ RUN set -ex \
     && pip install apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
     && pip install 'redis>=2.10.5,<3' \
     # && if [ -n "${PYTHON_DEPS_FILE}" ]; then pip install -r ${PYTHON_DEPS_FILE}; fi \
-    && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get autoremove -yqq --purge \
     && apt-get clean \
     && rm -rf \
@@ -63,6 +62,7 @@ RUN set -ex \
 
 RUN apt-get update
 RUN apt-get install -y \
+    libpq-dev \
     apt-transport-https \
     ca-certificates \
     curl \

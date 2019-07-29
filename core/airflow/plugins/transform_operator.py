@@ -47,7 +47,6 @@ class TransformOperator(InheritOperator):
             AWSBatchOperator for prod  
         """
         if isinstance(self, SSHOperator):
-            self.session.close()
             hook = SSHHook(remote_host='notebook',
                            port=22,
                            username='corebot_remote',
@@ -66,7 +65,6 @@ class TransformOperator(InheritOperator):
             self.__logger.info(
                 "Done. Corebot ran successfully in notebook container.")
         else:
-            self.session.close()
             self.__logger.info(
                 f"Running Corebot run command string: {run_command} in AWS Batch.")
             job_container_overrides = {
@@ -85,16 +83,15 @@ class TransformOperator(InheritOperator):
             self.__logger.info(
                 f"Done. AWSBatchOperator executed for {job_name}.")
 
-    def _get_transform_info(self):
+    def _get_transform_info(self, session):
         """ Gets full queried info for the transform.
                 Uses SessionHelper to grab it based on the transform ID
                 TODO: Throw detailed exception if no transform exists
         """
-        self.session = SessionHelper().session
         transform_config = config.Transformation
         # if the transform is missing for some reason, we want a clear error
         try:
-            transform = self.session.query(transform_config).filter(
+            transform = session.query(transform_config).filter(
                 transform_config.id == self.transform_id).one()
         except NoResultFound:
             raise SQLAlchemyError(
@@ -107,10 +104,12 @@ class TransformOperator(InheritOperator):
                 ID format = {pipeline_name}_{pipeline_state_type}_{transform_name}_{transform_id}
                     All set to lower case for matching up
         """
-        transform = self._get_transform_info()
+        session = SessionHelper().session
+        transform = self._get_transform_info(session)
         p_name = transform.pipeline_state.pipeline.name
         p_stname = transform.pipeline_state.pipeline_state_type.name
         t_name = transform.transformation_template.name
+        session.close()
         task_id = f"{p_name}_{p_stname}_{t_name}_{self.transform_id}".lower()
         self.__logger.debug(f"task_id: {task_id}")
         return task_id
@@ -120,11 +119,13 @@ class TransformOperator(InheritOperator):
             This passes them over in string form, since contracts cant be directly passed that way
                 allowing the receiving functions to quickly create without touching the configs schema
         """
-        transform = self._get_transform_info()
+        session = SessionHelper().session
+        transform = self._get_transform_info(session)
         parent = transform.pipeline_state.pipeline.brand.pharmaceutical_company.name.lower()
         child = transform.pipeline_state.pipeline.brand.name.lower()
         state = transform.pipeline_state.pipeline_state_type.name.lower()
         dataset = transform.transformation_template.name.lower()
+        session.close()
         self.__logger.debug(
             f"Named contract params:: branch = {BRANCH_NAME}, parent = {parent}, child = {child}, state = {state}, dataset = {dataset}")
         contract_tuple = namedtuple(
