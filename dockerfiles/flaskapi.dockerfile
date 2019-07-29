@@ -17,6 +17,7 @@ RUN pip install --upgrade pip \
     && pip install -r /core/requirements/api.txt
 WORKDIR /core
 EXPOSE 5000
+RUN aws configure set region us-east-1
 #ENTRYPOINT ["python3"]
 #CMD ["./core/api/app.py"]
 CMD tail -f /dev/null
