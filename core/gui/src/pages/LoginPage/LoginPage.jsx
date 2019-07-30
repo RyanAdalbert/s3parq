@@ -76,7 +76,6 @@ class LoginPage extends React.Component {
       //get authorization from api to login user
       dispatch(login(accessToken));
     };
-
     return (
       <LoginWrapper>
         <div className="LoginContainer">
