@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 
 import multiFilter from '../../utils/multiFilter/multiFilter';
 import PipelineModal from '../PipelineModal/PipelineModal';
@@ -25,8 +25,8 @@ export default class PipelineRow extends PureComponent {
     const pipelineRow = filtered.map(pipeline => {
       return (
         // creates modals
-        <>
-          <tr key={pipeline.run_id} onClick={() => handleClick(true, pipeline)}>
+        <Fragment key={pipeline.run_id.toString()}>
+          <tr onClick={() => handleClick(true, pipeline)}>
             <td>{pipeline.run_id}</td>
             <td>{pipeline.name}</td>
             <td>{pipeline.brand}</td>
@@ -42,7 +42,7 @@ export default class PipelineRow extends PureComponent {
             onHide={closeModal}
             pipelineInfo={modalProps}
           />
-        </>
+        </Fragment>
       );
     });
 

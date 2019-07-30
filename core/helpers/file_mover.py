@@ -4,14 +4,15 @@ from typing import NamedTuple
 from core.raw_contract import RawContract
 import time
 from core.logging import LoggerMixin, get_logger
-
+import shutil
 
 class FileDestination(NamedTuple):
     regex: str
     file_type: str
 
-
 class FileMover(LoggerMixin):
+    """ Organizes the common methods used to retrieve and push files. 
+    """
     def __init__(self, secret: Secret):
         user = secret.user
         password = secret.password
@@ -35,17 +36,19 @@ class FileMover(LoggerMixin):
         self.sftp.close()
         self.transport.close()
 
-    def get_file(self, remote_path: str, local_path: str):
-        # Fetch file from remote
-        #   Set local file time to match remote for comparison to S3 modified time
+    def get_raw_file(self, remote_path: str, local_path: str):
+        """
+        Fetch a file from a remote SFTP server and move it to a specified local directory.
+        :param remote_path: The full path of the remote file
+        :param local_path: The full path of the local file
+        """
+        # Set local file time to match remote for comparison to S3 modified time
         utime = self.sftp.stat(remote_path).st_mtime 
         try:
             with self.sftp.open(remote_path, 'rb') as remote:
-                
                 start = time.time()
                 with open(local_path, 'wb') as local:
-                    for line in remote:
-                        local.write(line)
+                    shutil.copyfileobj(remote, local)
                 end = time.time()
                 self.logger.debug(f'It took {end - start} seconds to move {remote_path} to {local_path}')
         except Exception as e: 
@@ -73,7 +76,49 @@ class FileMover(LoggerMixin):
 
 logger = get_logger("file_mover")
 
+def list_remote_files(remote_path: str, secret: Secret):
+    """
+    Generates a list of the files located in the remote path. Allows this list to be accessed in notebook with function call
+    :param remote_path: The full path of the remote file
+    :param secret: Authentication object 
+    :returns: A list of files in the remote path
+    """
+    # Open SFTP connection
+    with FileMover(secret=secret) as fm:
+        file_list = fm.list_files(remote_path)
+        return file_list
+
+def get_file(tmp_dir: str, prefix: str, remote_path: str, remote_file: str, secret: Secret):
+    """
+    SFTPs a single file from the remote dir to the local dir given the correct file prefix
+    :param tmp_dir: The local path
+    :param prefix: Prefix of the file that needs to be moved
+    :param remote_path: The full path of the remote file
+    :param remote_file: The name of the remote file
+    :param secret: Authentication object
+    """
+    # Set file filtering
+    files_dest = [FileDestination(f"^{prefix}.*$","do_move")]
+
+    # Open SFTP connection
+    with FileMover(secret=secret) as fm:
+        # For every "file" in the remote list, make sure its not a directory and matches filters
+        if not (fm.is_dir(remote_file)) and (fm.get_file_type(remote_file.filename, files_dest)!='dont_move'):
+            remote_file_path = remote_path + "/" + remote_file.filename
+            # Set file name to include the path, in case of duplicate file names in different locations
+            local_file_name = remote_file_path.replace("/",".")
+            local_file_name = local_file_name.lstrip(".")
+            local_file_path = os.path.join(tmp_dir, local_file_name)
+            fm.get_raw_file(remote_file_path, local_file_path)
+
 def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
+    """
+    SFTPs multiple files from the remote dir to the local dir given the correct file prefix
+    :param tmp_dir: The local path
+    :param prefix: Prefix of the files that needs to be moved
+    :param remote_path: The full path of the remote files
+    :param secret: Authentication object
+    """
     # Set file filtering
     files_dest = [FileDestination(f"^{prefix}.*$","do_move")]
 
@@ -88,8 +133,7 @@ def get_files(tmp_dir: str, prefix: str, remote_path: str, secret: Secret):
                 local_file_name = remote_file_path.replace("/",".")
                 local_file_name = local_file_name.lstrip(".")
                 local_file_path = os.path.join(tmp_dir, local_file_name)
-                
-                fm.get_file(remote_file_path, local_file_path)
+                fm.get_raw_file(remote_file_path, local_file_path)
 
 def publish_file(local_path: str, remote_path: str, secret: Secret):
     # Open SFTP connection
