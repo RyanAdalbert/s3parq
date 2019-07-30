@@ -12,11 +12,11 @@ TRY_LOOP="20"
 : "${MYSQL_PASSWORD:="dummy-password"}"
 : "${MYSQL_DB:="dummy-db"}"
 
-: "${POSTGRES_HOST:="airflowpg"}"
+: "${POSTGRES_HOST:="airflow-backend.cnpgmka3dzjm.us-east-1.rds.amazonaws.com"}"
 : "${POSTGRES_PORT:="5432"}"
 : "${POSTGRES_USER:="airflow"}"
-: "${POSTGRES_PASSWORD:="airflow"}"
-: "${POSTGRES_DB:="airflow"}"
+: "${POSTGRES_PASSWORD:="airflow123"}"
+: "${POSTGRES_DB:="airflow_pg"}"
 
 # Defaults and back-compat
 : "${AIRFLOW__CORE__FERNET_KEY:=${FERNET_KEY:=$(python -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)")}}"
@@ -62,10 +62,13 @@ wait_for_port() {
 
 export AIRFLOW__CORE__BASE_LOG_FOLDER=/usr/local/airflow/logs
 
+echo "$AIRFLOW__CORE__EXECUTOR"
+
 if [ "$AIRFLOW__CORE__EXECUTOR" != "SequentialExecutor" ]; then
   AIRFLOW__CORE__SQL_ALCHEMY_CONN="postgresql+psycopg2://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB"
   AIRFLOW__CELERY__RESULT_BACKEND="db+postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB"
   wait_for_port "$DB_TYPE" "$POSTGRES_HOST" "$POSTGRES_PORT"
+  echo "Connected to $AIRFLOW__CORE__SQL_ALCHEMY_CONN."
 fi
 
 if [ "$AIRFLOW__CORE__EXECUTOR" = "CeleryExecutor" ]; then
@@ -75,7 +78,8 @@ fi
 
 case "$1" in
   webserver)
-    if [ "${INITDB:=n}" == "y" ]; then 
+    if [ "${INITDB:=n}" == "y" ]; then
+      echo "Initializing Airflow db..."
       airflow initdb
     fi
 
@@ -83,7 +87,8 @@ case "$1" in
       # With the "Local" executor it should all run in one container.
       airflow scheduler &
     fi
-    exec airflow webserver
+    echo "Launching Airflow webserver..."
+    exec airflow webserver -p 8008
     ;;
   worker|scheduler)
     # To give the webserver time to run initdb.
