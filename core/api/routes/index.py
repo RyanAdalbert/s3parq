@@ -23,6 +23,7 @@ def index():
     for pl in query:
         key = pl.id
         pl_data = {}
+        pl_data['run_id'] = pl.id
         pl_data['name'] = pl.name
         pl_data['brand'] = pl.brand.name
         pl_data['pharma_company'] = pl.brand.pharmaceutical_company.name

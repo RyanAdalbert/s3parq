@@ -29,9 +29,10 @@ const TableContainer = styled.div`
 
 class Pipelines extends React.Component {
   render() {
-    if (this.props.pipeline === 'undefined') {
+    if (this.props.pipelines === undefined) {
       return null;
     }
+
     return (
       <TableContainer>
         <h3>Pipeline Index</h3>

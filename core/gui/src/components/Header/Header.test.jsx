@@ -19,17 +19,8 @@ describe('<Header /> rendering', () => {
 });
 
 describe('<Header/> interaction', () => {
-  let wrapper;
   const mockOnClicked = jest.fn();
   beforeEach(() => {
     wrapper = setUp((onclick = { mockOnClicked }));
-  });
-
-  it('should call the onClick function when [Log out] is clicked', () => {
-    const component = wrapper.find('log-out');
-    console.log(component.debug());
-    expect(wrapper.find('log-out').simulate('clicked')).toHaveBeenCalledTimes(
-      1
-    );
   });
 });

@@ -94,7 +94,7 @@ class ConfigurationMocker(LoggerMixin):
         self.logger.debug('Generating pharmaceutical company mocks.')
         p = config.PharmaceuticalCompany
         self.session.add_all([
-            p(id=1, display_name="Natural Life Food Company", name='Nfoods'),
+            p(id=1, display_name="Nfoods", name='Nfoods'),
             p(id=2, display_name="Sitwell Home Construction", name="Sitwell")
         ])
         self.session.commit()
