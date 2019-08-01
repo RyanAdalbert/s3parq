@@ -14,11 +14,12 @@ TRY_LOOP="20"
 : "${MYSQL_DB:="dummy-db"}"
 
 # Local (default) configurations. Overridden by AWS environment variables in the cloud
-: "${POSTGRES_HOST:="airflow"}"
+: "${POSTGRES_HOST:="airflowpg"}"
 : "${POSTGRES_PORT:="5432"}"
 : "${POSTGRES_USER:="airflow"}"
 : "${POSTGRES_PASSWORD:="airflow"}"
 : "${POSTGRES_DB:="airflow"}"
+
 # Defaults and back-compat
 : "${AIRFLOW__CORE__FERNET_KEY:=${FERNET_KEY:=$(python -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)")}}"
 : "${AIRFLOW__CORE__EXECUTOR:=${EXECUTOR:-Local}Executor}"
@@ -33,7 +34,7 @@ export \
 
 
 # Load DAGs exemples (default: Yes)
-export AIRFLOW__CORE__LOAD_EXAMPLES=False
+AIRFLOW__CORE__LOAD_EXAMPLES=False
 
 # This now gets taken care of in the dockerfile
 # Install custom python package if requirements.txt is present
@@ -74,7 +75,7 @@ if [ "$AIRFLOW__CORE__EXECUTOR" != "SequentialExecutor" ]; then
 fi
 
 if [ "$AIRFLOW__CORE__EXECUTOR" = "CeleryExecutor" ]; then
-  export AIRFLOW__CELERY__BROKER_URL="redis://$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT/1"
+  AIRFLOW__CELERY__BROKER_URL="redis://$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT/1"
   wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
 fi
 
