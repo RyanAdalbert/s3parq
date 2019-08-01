@@ -6,18 +6,19 @@ TRY_LOOP="20"
 : "${REDIS_PORT:="6379"}"
 : "${REDIS_PASSWORD:=""}"
 
+# Dummy environment vars required for Airflow to run
 : "${MYSQL_HOST:="dummy-host"}"
 : "${MYSQL_PORT:="dummy-port"}"
 : "${MYSQL_USER:="dummy-user"}"
 : "${MYSQL_PASSWORD:="dummy-password"}"
 : "${MYSQL_DB:="dummy-db"}"
 
-: "${POSTGRES_HOST:="airflow-backend.cnpgmka3dzjm.us-east-1.rds.amazonaws.com"}"
+# Local (default) configurations. Overridden by AWS environment variables in the cloud
+: "${POSTGRES_HOST:="airflow"}"
 : "${POSTGRES_PORT:="5432"}"
 : "${POSTGRES_USER:="airflow"}"
-: "${POSTGRES_PASSWORD:="airflow123"}"
-: "${POSTGRES_DB:="airflow_pg"}"
-
+: "${POSTGRES_PASSWORD:="airflow"}"
+: "${POSTGRES_DB:="airflow"}"
 # Defaults and back-compat
 : "${AIRFLOW__CORE__FERNET_KEY:=${FERNET_KEY:=$(python -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)")}}"
 : "${AIRFLOW__CORE__EXECUTOR:=${EXECUTOR:-Local}Executor}"
@@ -32,7 +33,7 @@ export \
 
 
 # Load DAGs exemples (default: Yes)
-AIRFLOW__CORE__LOAD_EXAMPLES=False
+export AIRFLOW__CORE__LOAD_EXAMPLES=False
 
 # This now gets taken care of in the dockerfile
 # Install custom python package if requirements.txt is present
@@ -46,6 +47,7 @@ else
     REDIS_PREFIX=
 fi
 
+# Makes sure airflow can connect to its metadatabase
 wait_for_port() {
   local name="$1" host="$2" port="$3"
   local j=0
@@ -72,7 +74,7 @@ if [ "$AIRFLOW__CORE__EXECUTOR" != "SequentialExecutor" ]; then
 fi
 
 if [ "$AIRFLOW__CORE__EXECUTOR" = "CeleryExecutor" ]; then
-  AIRFLOW__CELERY__BROKER_URL="redis://$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT/1"
+  export AIRFLOW__CELERY__BROKER_URL="redis://$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT/1"
   wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
 fi
 
@@ -85,6 +87,7 @@ case "$1" in
 
     if [ "$AIRFLOW__CORE__EXECUTOR" = "LocalExecutor" ]; then
       # With the "Local" executor it should all run in one container.
+      echo "Launching Airflow scheduler..."
       airflow scheduler &
     fi
     echo "Launching Airflow webserver..."

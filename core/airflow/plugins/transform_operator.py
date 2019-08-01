@@ -39,9 +39,13 @@ class TransformOperator(InheritOperator):
         job_queue = BATCH_JOB_QUEUE
 
         run_id = "{{ ti.xcom_pull(task_ids='RunEvent', key='run_id') }}"
-
-        run_command = f"corebot run {transform_id} "
-        run_command += run_id
+        
+        run_command = [
+            'corebot',
+            'run',
+            f'{transform_id}',
+            f'{run_id}'
+        ]
 
         """ Run location control: this class inherits SSHOperator for dev, 
             AWSBatchOperator for prod  
@@ -59,7 +63,7 @@ class TransformOperator(InheritOperator):
             super(TransformOperator, self).__init__(task_id=task_id,
                                                     ssh_hook=hook,
                                                     provide_context=True,
-                                                    command=run_command,  # SSH can only take a string here :(
+                                                    command=" ".join(run_command),  # SSH can only take a string here :(
                                                     **kwargs
                                                     )
             self.__logger.info(
@@ -76,7 +80,6 @@ class TransformOperator(InheritOperator):
                                                     job_name=job_name,
                                                     job_definition=job_def_name,
                                                     job_queue=job_queue,
-                                                    provide_context=True,
                                                     overrides=job_container_overrides,
                                                     **kwargs
                                                     )
