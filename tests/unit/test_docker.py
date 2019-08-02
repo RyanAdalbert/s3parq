@@ -16,7 +16,7 @@ def with_env(env: str, module: str, f: Callable):
 
 class Test():
     def setup(self):
-        self.module = "core.helpers.docker"
+        self.module = "core.aws.docker"
 
     def test_get_core_tag(self):
         self.setup()
