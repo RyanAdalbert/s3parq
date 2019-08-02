@@ -32,24 +32,6 @@ class Test():
         with pytest.raises(Exception):
             with_env("invalid_environment", self.module, docker.get_core_tag)
 
-    def test_get_core_job_def_name(self):
-        self.setup()
-        dev_job_def_name = with_env(
-            "dev", self.module, docker.get_core_job_def_name)
-        assert dev_job_def_name == f"core_{BRANCH_NAME}"
-
-        uat_job_def_name = with_env(
-            "uat", self.module, docker.get_core_job_def_name)
-        assert uat_job_def_name == f"core_uat"
-
-        prod_job_def_name = with_env(
-            "prod", self.module, docker.get_core_job_def_name)
-        assert prod_job_def_name == f"core_prod"
-
-        with pytest.raises(Exception):
-            with_env("invalid_environment", self.module,
-                     docker.get_core_job_def_name)
-
     def test_get_aws_account(self):
         self.setup()
         dev_aws_account = with_env("dev", self.module, docker.get_aws_account)
