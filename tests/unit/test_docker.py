@@ -1,5 +1,5 @@
 import pytest
-from core.helpers import docker
+from core.aws import docker
 from core.constants import BRANCH_NAME
 import os
 from typing import Callable
