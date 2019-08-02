@@ -1,6 +1,5 @@
 from airflow.operators.python_operator import PythonOperator
 from core.helpers.session_helper import SessionHelper
-from core.helpers.docker import get_core_job_def_name
 from airflow.contrib.hooks.ssh_hook import SSHHook
 import core.models.configuration as config
 from core.logging import get_logger

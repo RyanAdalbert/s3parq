@@ -1,6 +1,6 @@
 # Running this script is a quick way to register the current local core.dockerfile image to AWS ECR
 
-from core.helpers.docker import CoreDocker as cd
+from core.aws.docker import CoreDocker
 from core.constants import DEV_AWS_ACCOUNT
 
 docker = cd()
