@@ -1,18 +1,47 @@
-import os
+import os, logging, time, shutil
 import paramiko
+from shutil import copyfile
 
-sftp_creds = {
+sftp_info = {
     'host': os.getenv('SFTP_HOST'),
     'user': os.getenv('SFTP_USER'),
     'password': os.getenv('SFTP_PASS'),
-    'port': os.getenv('SFTP_PORT') 
+    'port': int(os.getenv('SFTP_PORT'))
 }
 
 phi_columns = os.getenv('PHI_COLUMNS')
 
-print(sftp_creds)
-print(phi_columns)
+ 
+def connect(creds):
+        host = creds['host']
+        user = creds['user']
+        password = creds['password']
+        port = creds['port']
+        remote_path = os.getenv('')
+        local_path = './test2.txt'
 
+        logging.info(f"Connecting to host: {host} on port: {port}")
+
+        if port is None:
+            transport = paramiko.Transport((host), default_window_size=paramiko.common.MAX_WINDOW_SIZE, default_max_packet_size=3276800)
+        else:
+            transport = paramiko.Transport((host, port), default_window_size=paramiko.common.MAX_WINDOW_SIZE, default_max_packet_size=3276800)
+    
+        transport.connect(username=user, password=password)
+        sftp = paramiko.SFTPClient.from_transport(transport)
+
+        try:
+            with sftp.open(remote_path, 'rb') as remote:
+                start = time.time()
+                with open(local_path, 'wb') as local:
+                    shutil.copyfileobj(remote, local)
+                end = time.time()
+                logging.debug(f'It took {end - start} seconds to move {remote_path} to {local_path}')
+        except Exception as e: 
+            print(e)
+
+
+connect(sftp_creds)
 
 # def __run__(sftp_creds, phi_columns, directory, notification_emails):
 #         with (connect_to_server, sftp_creds) as sftp_srv:
