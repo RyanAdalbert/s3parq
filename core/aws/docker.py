@@ -58,8 +58,8 @@ class CoreDocker(LoggerMixin):
         self.d_api_client = self._build_docker_api_client()
         self.d_client = self._build_docker_client()
 
-    def _build_docker_api_client(self) -> docker.APIClient:
-        return docker.APIClient(base_url='unix://var/run/docker.sock')
+    def _build_docker_api_client(self) -> docker.api.client.APIClient:
+        return docker.api.client.APIClient(base_url='unix://var/run/docker.sock')
 
     def _build_docker_client(self) -> docker.DockerClient:
         return docker.DockerClient(base_url='unix://var/run/docker.sock')
