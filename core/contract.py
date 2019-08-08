@@ -199,7 +199,6 @@ class Contract(LoggerMixin):
     def _validate_branch(self, branch: str)->str:
         branch = branch.lower()
         protected_branches = ['master','test','rse','uat','prod']
-        self.logger.debug([self.env, ENVIRONMENT, self.DEV])
         if (self.env == self.DEV) and (branch in protected_branches):
             raise ValueError(
                 f'Cannot use this branch in development. Currently using branch : {branch} : when {protected_branches} are restricted branches.')
