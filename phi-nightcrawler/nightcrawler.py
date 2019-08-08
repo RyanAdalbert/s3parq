@@ -3,9 +3,11 @@ import paramiko
 from shutil import copyfile
 from stat import S_IWUSR, S_IWGRP, S_IWOTH
 
+# Set loggin level
 logging.basicConfig()
 logging.getLogger().setLevel(logging.DEBUG)
 
+# Set Environment Variables
 sftp_info = {
     'host': os.getenv('SFTP_HOST'),
     'user': os.getenv('SFTP_USER'),
@@ -15,6 +17,7 @@ sftp_info = {
 
 phi_dir = os.getenv('PHI_DIR')
 
+# Check if Directory Exists
 def dir_exists(sftp, path):
     try:
         sftp.stat(path)
@@ -22,13 +25,15 @@ def dir_exists(sftp, path):
     except FileNotFoundError:
         return False
 
+# Main Function
 def nightcrawler(creds, new_dir):
         host = creds['host']
         user = creds['user']
         password = creds['password']
         port = creds['port']
         logging.info(f"Connecting to host: {host} on port: {port}")
-
+        
+        # Create Paramiko Client Object
         if port is None:
             transport = paramiko.Transport((host), default_window_size=paramiko.common.MAX_WINDOW_SIZE, default_max_packet_size=3276800)
         else:
@@ -37,6 +42,7 @@ def nightcrawler(creds, new_dir):
         transport.connect(username=user, password=password)
         sftp = paramiko.SFTPClient.from_transport(transport)
 
+        # Create new_dir if does not exist
         try:
             if dir_exists(sftp, new_dir):
                 logging.info(f"Directory {new_dir} Already Exists")
