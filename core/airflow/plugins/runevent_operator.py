@@ -1,8 +1,6 @@
 from airflow.operators.python_operator import PythonOperator
 from core.helpers.session_helper import SessionHelper
-from airflow.contrib.hooks.ssh_hook import SSHHook
-import core.models.configuration as config
-from core.logging import get_logger
+from core.models.configuration import RunEvent
 
 def RunEvent_task(pipeline_id: int, **kwargs):
     """
