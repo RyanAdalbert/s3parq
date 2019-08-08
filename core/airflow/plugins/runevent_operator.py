@@ -7,7 +7,7 @@ def RunEvent_task(pipeline_id: int, **kwargs):
     Increments the run_event table id by one and returns the event as an xcom
     """
     session = SessionHelper().session
-    run_event = config.RunEvent(pipeline_id=pipeline_id)
+    run_event = RunEvent(pipeline_id=pipeline_id)
     session.add(run_event)
     session.commit()
     run_id = run_event.id

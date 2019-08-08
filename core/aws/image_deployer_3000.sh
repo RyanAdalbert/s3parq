@@ -1,5 +1,6 @@
 #!/bin/bash
 # No BS way to get an image on aws
+# FOR SANDBOX USE ONLY: the account id is hardcoded to sandbox
 
 # Build image
 . ~/Repos/natie_fork/core/script/script_setup

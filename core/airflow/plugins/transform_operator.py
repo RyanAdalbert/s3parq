@@ -26,24 +26,23 @@ class TransformOperator(InheritOperator):
 
         self.__logger = get_logger(
             ".".join([self.__module__, self.__class__.__name__]))
-
         self.transform_id = transform_id
+        self.task_id = self._generate_task_id()
+        self.run_id = "{{ ti.xcom_pull(task_ids='RunEvent', key='run_id') }}"
 
-        task_id = self._generate_task_id()
-
-        params = self._generate_contract_params()
+        contract = self._generate_contract_params()
         
         job_def_name = BATCH_JOB_DEFINITION_NAME
-        job_name = f'{params.parent}_{params.child}_{params.state}_{params.dataset}'
+        job_name = f'{contract.parent}_{contract.child}_{contract.state}_{contract.dataset}'
+        if len(job_name) > 128: job_name = job_name[-128:] # batch jobs have a 128 character limit
+
         job_queue = BATCH_JOB_QUEUE
 
-        run_id = "{{ ti.xcom_pull(task_ids='RunEvent', key='run_id') }}"
-        
         run_command = [
             'corebot',
             'run',
-            f'{transform_id}',
-            f'{run_id}'
+            f'{self.transform_id}',
+            f'{self.run_id}'
         ]
 
         """ Run location control: this class inherits SSHOperator for dev, 
@@ -59,7 +58,7 @@ class TransformOperator(InheritOperator):
 
             self.__logger.info(
                 f"Running Corebot command `{run_command}` locally in notebook container...")
-            super(TransformOperator, self).__init__(task_id=task_id,
+            super(TransformOperator, self).__init__(task_id=self.task_id,
                                                     ssh_hook=hook,
                                                     provide_context=True,
                                                     command=" ".join(run_command),  # SSH can only take a string here :(
@@ -75,7 +74,7 @@ class TransformOperator(InheritOperator):
             }
 
             self.__logger.info(f"Executing AWSBatchOperator for {job_name}.")
-            super(TransformOperator, self).__init__(task_id=task_id,
+            super(TransformOperator, self).__init__(task_id=self.task_id,
                                                     job_name=job_name,
                                                     job_definition=job_def_name,
                                                     job_queue=job_queue,
