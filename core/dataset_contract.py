@@ -9,7 +9,6 @@ from core import constants
 from core.contract import Contract
 from core.helpers.session_helper import SessionHelper as SHelp
 from core.models.configuration import RunEvent
-from core.constants import ENVIRONMENT
 
 class DatasetContract(Contract):
     ''' The s3 contract is how we structure our data lake. 
@@ -107,13 +106,14 @@ class DatasetContract(Contract):
             redshift_params['iam_role'] = constants.DEV_REDSHIFT_IAM_ROLE
             redshift_params['cluster_id'] = constants.DEV_REDSHIFT_CLUSTER_ID
             redshift_params['host'] = constants.DEV_REDSHIFT_DB_HOST
+            redshift_params['schema_name'] = f'{self.parent}_{self.child}_{self.dataset}' # dev schemas need to be unique, as only an external schema's creator can add tables
         else:
             redshift_params['iam_role'] = constants.REDSHIFT_IAM_ROLE
             redshift_params['cluster_id'] = constants.REDSHIFT_CLUSTER_ID
-            redshift_params['host'] = constants.DEV_REDSHIFT_DB_HOST
+            redshift_params['host'] = constants.REDSHIFT_DB_HOST
+            redshift_params['schema_name'] = constants.REDSHIFT_SCHEMA
 
         redshift_params['db_name'] = constants.REDSHIFT_DB
-        redshift_params['schema_name'] = constants.REDSHIFT_SCHEMA
         redshift_params['port'] = constants.REDSHIFT_DB_PORT
         redshift_params['region'] = constants.REDSHIFT_REGION
         redshift_params['table_name'] = f'{self.parent}_{self.child}_{self.dataset}'
