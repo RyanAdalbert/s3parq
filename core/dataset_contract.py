@@ -9,6 +9,7 @@ from core import constants
 from core.contract import Contract
 from core.helpers.session_helper import SessionHelper as SHelp
 from core.models.configuration import RunEvent
+from core.constants import ENVIRONMENT
 
 class DatasetContract(Contract):
     ''' The s3 contract is how we structure our data lake. 
