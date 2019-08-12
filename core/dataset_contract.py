@@ -2,9 +2,11 @@ from typing import List
 from datetime import datetime
 from pytz import timezone
 import pandas as pd
+import boto3
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 from s3parq import fetch, publish
+from s3parq.session_helper import SessionHelper as RHelp
 from core import constants
 from core.contract import Contract
 from core.helpers.session_helper import SessionHelper as SHelp
@@ -147,6 +149,19 @@ class DatasetContract(Contract):
         partitions = ['__metadata_run_id']
         return (df, partitions)
 
+    def _alter_redshift_schema(self):
+        redshift_params = self.redshift_configuration
+        iam_client = boto3.Session(region_name=redshift_params["region"]).boto_session.client('iam')
+        iam_user = iam_client.get_user()
+        iam_user = iam_user['User']['UserName']
+
+        query = f"ALTER SCHEMA {redshift_params['schema_name']} OWNER TO \"{iam_user}\";"
+
+        redshift = RHelp().configure_session_helper()
+        with redshift.db_session_scope() as scope:
+            self.logger.info(f'Altering schema {redshift_params["schema_name"]} owner to current IAM user {iam_user}...')
+            scope.execute(query)
+
     # functions for use
 
     def fetch(self, filters: List[dict] = [])->pd.DataFrame:
@@ -174,6 +189,8 @@ class DatasetContract(Contract):
             self.partitions.extend(run_partition)
 
         if publish_to_redshift:
+            if constants.environment == 'dev': self._alter_redshift_schema()
+
             redshift_params = self.redshift_configuration
             self.logger.debug(f"Publishing dataframe to Redshift Spectrum database {redshift_params['db_name']} to schema.table \
                 {redshift_params['schema_name']}.{redshift_params['table_name']}...")
