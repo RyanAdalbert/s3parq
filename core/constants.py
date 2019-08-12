@@ -66,10 +66,21 @@ def reset_constants():
         else:
             return f"{globals()['ENVIRONMENT']}-core"
 
+    def get_core_job_def_name():
+        if ENVIRONMENT == 'dev':
+            return f"core_{BRANCH_NAME}"
+        elif ENVIRONMENT == 'uat':
+            return "core_uat"
+        elif ENVIRONMENT == 'prod':
+            return "core_prod"    
+        else:
+            raise Exception(f"Can't create a core tag job definition name for environment {ENVIRONMENT}")
+
     # Dynamic (smart) Constants
     globals()['BRANCH_NAME'] = get_branch_name()
     globals()['ENV_BUCKET'] = get_env_bucket()
     globals()['AWS_ACCOUNT'] = get_aws_account()
     globals()['BATCH_JOB_QUEUE'] = get_batch_job_queue()
+    globals()['BATCH_JOB_DEFINITION_NAME'] = get_core_job_def_name()
 
 reset_constants()
