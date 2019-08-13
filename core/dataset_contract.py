@@ -8,7 +8,6 @@ import json
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 from s3parq import fetch, publish
-from s3parq.session_helper import SessionHelper as RHelp
 from core import constants
 from core.contract import Contract
 from core.helpers.session_helper import SessionHelper as SHelp
