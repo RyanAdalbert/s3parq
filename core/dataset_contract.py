@@ -3,6 +3,8 @@ from datetime import datetime
 from pytz import timezone
 import pandas as pd
 import boto3
+import os
+import json
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 from s3parq import fetch, publish
@@ -108,13 +110,12 @@ class DatasetContract(Contract):
             redshift_params['iam_role'] = constants.DEV_REDSHIFT_IAM_ROLE
             redshift_params['cluster_id'] = constants.DEV_REDSHIFT_CLUSTER_ID
             redshift_params['host'] = constants.DEV_REDSHIFT_DB_HOST
-            redshift_params['schema_name'] = f'{self.parent}_{self.child}_{self.dataset}' # dev schemas need to be unique, as only an external schema's creator can add tables
         else:
             redshift_params['iam_role'] = constants.REDSHIFT_IAM_ROLE
             redshift_params['cluster_id'] = constants.REDSHIFT_CLUSTER_ID
             redshift_params['host'] = constants.REDSHIFT_DB_HOST
-            redshift_params['schema_name'] = constants.REDSHIFT_SCHEMA
-
+            
+        redshift_params['schema_name'] = constants.REDSHIFT_SCHEMA
         redshift_params['db_name'] = constants.REDSHIFT_DB
         redshift_params['port'] = constants.REDSHIFT_DB_PORT
         redshift_params['region'] = constants.REDSHIFT_REGION
@@ -122,6 +123,20 @@ class DatasetContract(Contract):
 
         return redshift_params
 
+    def _set_dev_account(self):
+        '''
+        To prevent permission issues with Redshift Spectrum, we use a single Core AWS account which is configured via environment variables
+        stored in the DEV_AWS_SECRET
+        '''
+        self.logger.info("Setting environment variables to Core sandbox service account...")
+        session = boto3.session.Session()
+        client = session.client(service_name='secretsmanager', region_name=constants.AWS_REGION)
+        response = client.get_secret_value(SecretId=constants.DEV_AWS_SECRET)['SecretString']
+        response = json.loads(response) # The SecretString returned by AWS is a JSON-formatted string parsed as a dict here
+        os.environ['AWS_ACCESS_KEY_ID'] = response['AWS_ACCESS_KEY_ID']
+        os.environ['AWS_SECRET_ACCESS_KEY'] = response['AWS_SECRET_ACCESS_KEY']   
+        return
+        
     def _format_datetime(self, date: datetime)->str:
         return date.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -149,20 +164,20 @@ class DatasetContract(Contract):
         partitions = ['__metadata_run_id']
         return (df, partitions)
 
-    def _alter_redshift_schema(self):
-        redshift_params = self.redshift_configuration
-        rhelp_params = {k:v for k,v in redshift_params.items() if k in ['region', 'cluster_id', 'host', 'port', 'db_name']}
-        iam_client = boto3.Session(region_name=redshift_params["region"]).client('iam')
-        iam_user = iam_client.get_user()
-        iam_user = iam_user['User']['UserName']
+    # def _alter_redshift_schema(self):
+    #     redshift_params = self.redshift_configuration
+    #     rhelp_params = {k:v for k,v in redshift_params.items() if k in ['region', 'cluster_id', 'host', 'port', 'db_name']}
+    #     iam_client = boto3.Session(region_name=redshift_params["region"]).client('iam')
+    #     iam_user = iam_client.get_user()
+    #     iam_user = iam_user['User']['UserName']
 
-        query = f"ALTER SCHEMA {redshift_params['schema_name']} OWNER TO \"{iam_user}\";"
+    #     query = f"ALTER SCHEMA {redshift_params['schema_name']} OWNER TO \"{iam_user}\";"
 
-        redshift = RHelp(**rhelp_params)
-        redshift.configure_session_helper()
-        with redshift.db_session_scope() as scope:
-            self.logger.info(f'Altering schema {redshift_params["schema_name"]} owner to current IAM user {iam_user}...')
-            scope.execute(query)
+    #     redshift = RHelp(**rhelp_params)
+    #     redshift.configure_session_helper()
+    #     with redshift.db_session_scope() as scope:
+    #         self.logger.info(f'Altering schema {redshift_params["schema_name"]} owner to current IAM user {iam_user}...')
+    #         scope.execute(query)
 
     # functions for use
 
@@ -186,13 +201,13 @@ class DatasetContract(Contract):
         self.logger.info(
             f'Publishing dataframe to s3 location {self.s3_path} with run ID {run_id}.')
 
+        if constants.ENVIRONMENT == 'dev': self._set_dev_account()
+
         dataframe, run_partition = self._set_dataset_metadata(df=dataframe, run_id=run_id, session=session)
         if run_partition not in self.partitions:
             self.partitions.extend(run_partition)
 
         if publish_to_redshift:
-            if constants.ENVIRONMENT == 'dev': self._alter_redshift_schema()
-
             redshift_params = self.redshift_configuration
             self.logger.debug(f"Publishing dataframe to Redshift Spectrum database {redshift_params['db_name']} to schema.table \
                 {redshift_params['schema_name']}.{redshift_params['table_name']}...")
