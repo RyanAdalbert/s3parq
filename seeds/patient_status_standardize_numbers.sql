@@ -5,7 +5,7 @@ BEGIN;
     VALUES
         ((SELECT id
             FROM transformation_templates
-            WHERE name = 'standardize_numbers'), (SELECT id
+            WHERE name = 'patient_status_standardize_numbers'), (SELECT id
             FROM pipeline_states
             WHERE pipeline_state_type_id = (SELECT id
                 FROM pipeline_state_types
@@ -14,7 +14,7 @@ BEGIN;
                 WHERE name = 'sun_ilumya_patient_status')), 2, 'jtobias@integrichain.com'),
         ((SELECT id
             FROM transformation_templates
-            WHERE name = 'standardize_numbers'), (SELECT id
+            WHERE name = 'patient_status_standardize_numbers'), (SELECT id
             FROM pipeline_states
             WHERE pipeline_state_type_id = (SELECT id
                 FROM pipeline_state_types
@@ -23,7 +23,7 @@ BEGIN;
                 WHERE name = 'sun_odomzo_patient_status')), 2, 'jtobias@integrichain.com'),
         ((SELECT id
             FROM transformation_templates
-            WHERE name = 'standardize_numbers'), (SELECT id
+            WHERE name = 'patient_status_standardize_numbers'), (SELECT id
             FROM pipeline_states
             WHERE pipeline_state_type_id = (SELECT id
                 FROM pipeline_state_types
@@ -32,7 +32,7 @@ BEGIN;
                 WHERE name = 'bi_ofev_patient_status')), 2, 'jtobias@integrichain.com'),
         ((SELECT id
             FROM transformation_templates
-            WHERE name = 'standardize_numbers'), (SELECT id
+            WHERE name = 'patient_status_standardize_numbers'), (SELECT id
             FROM pipeline_states
             WHERE pipeline_state_type_id = (SELECT id
                 FROM pipeline_state_types
@@ -60,7 +60,7 @@ BEGIN;
                     WHERE tv.name = 'input_transform'
                     ORDER BY t.id)) AND id IN (SELECT t.id
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-                    WHERE tt.name = 'standardize_numbers')))
+                    WHERE tt.name = 'patient_status_standardize_numbers')))
             ORDER BY id LIMIT 1), 'patient_status_ingest_column_mapping', 'jtobias@integrichain.com'),
     ('number_columns',(SELECT id
     FROM transformations WHERE
@@ -78,7 +78,7 @@ BEGIN;
         WHERE tv.name = 'number_columns'
         ORDER BY t.id)) AND id IN (SELECT t.id
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-        WHERE tt.name = 'standardize_numbers'))
+        WHERE tt.name = 'patient_status_standardize_numbers'))
     )ORDER BY id LIMIT 1), 
         'pharmacy_npi,pharmacy_ncpdp,pharmacy_zip,transaction_id,transaction_sequence,longitudinal_patient_id,patient_zip,hcp_zip,hcp_phone,hcp_npi,rx_fills,rx_fill_number,rx_refills_remaining,prev_dispensed,ndc,days_supply,ship_zip,primary_payer_bin,primary_payer_iin,primary_payer_pcn,secondary_payer_bin,secondary_payer_iin,secondary_payer_pcn,aggregator_ship_id,referral_number,primary_plan_paid,secondary_plan_paid,primary_copay,primary_coins,primary_deductible,primary_patient_responsibility,secondary_copay,secondary_coins,secondary_deductible,secondary_patient_responsibility,copay_as_amount,other_payer_amount,primary_cost_amount', 'jtobias@integrichain.com');
 
@@ -103,7 +103,7 @@ BEGIN;
                     WHERE tv.name = 'input_transform'
                     ORDER BY t.id)) AND id IN (SELECT t.id
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-                    WHERE tt.name = 'standardize_numbers')))
+                    WHERE tt.name = 'patient_status_standardize_numbers')))
             ORDER BY id LIMIT 1), 'patient_status_ingest_column_mapping', 'jtobias@integrichain.com'),
     ('number_columns',(SELECT id
     FROM transformations WHERE
@@ -121,7 +121,7 @@ BEGIN;
         WHERE tv.name = 'number_columns'
         ORDER BY t.id)) AND id IN (SELECT t.id
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-        WHERE tt.name = 'standardize_numbers'))
+        WHERE tt.name = 'patient_status_standardize_numbers'))
     )ORDER BY id LIMIT 1), 
         'pharmacy_npi,pharmacy_ncpdp,pharmacy_zip,transaction_id,transaction_sequence,longitudinal_patient_id,patient_zip,hcp_zip,hcp_phone,hcp_npi,rx_fills,rx_fill_number,rx_refills_remaining,prev_dispensed,ndc,days_supply,ship_zip,primary_payer_bin,primary_payer_iin,primary_payer_pcn,secondary_payer_bin,secondary_payer_iin,secondary_payer_pcn,aggregator_ship_id,referral_number,primary_plan_paid,secondary_plan_paid,primary_copay,primary_coins,primary_deductible,primary_patient_responsibility,secondary_copay,secondary_coins,secondary_deductible,secondary_patient_responsibility,copay_as_amount,other_payer_amount,primary_cost_amount', 'jtobias@integrichain.com');
 
@@ -147,7 +147,7 @@ BEGIN;
                     WHERE tv.name = 'input_transform'
                     ORDER BY t.id)) AND id IN (SELECT t.id
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-                    WHERE tt.name = 'standardize_numbers')))
+                    WHERE tt.name = 'patient_status_standardize_numbers')))
             ORDER BY id LIMIT 1), 'patient_status_ingest_column_mapping', 'jtobias@integrichain.com'),
     ('number_columns',(SELECT id
     FROM transformations WHERE
@@ -165,7 +165,7 @@ BEGIN;
         WHERE tv.name = 'number_columns'
         ORDER BY t.id)) AND id IN (SELECT t.id
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-        WHERE tt.name = 'standardize_numbers'))
+        WHERE tt.name = 'patient_status_standardize_numbers'))
     )ORDER BY id LIMIT 1), 
         'pharmacy_npi,pharmacy_ncpdp,pharmacy_zip,transaction_id,transaction_sequence,longitudinal_patient_id,patient_zip,hcp_zip,hcp_phone,hcp_npi,rx_fills,rx_fill_number,rx_refills_remaining,prev_dispensed,ndc,days_supply,ship_zip,primary_payer_bin,primary_payer_iin,primary_payer_pcn,secondary_payer_bin,secondary_payer_iin,secondary_payer_pcn,aggregator_ship_id,referral_number,primary_plan_paid,secondary_plan_paid,primary_copay,primary_coins,primary_deductible,primary_patient_responsibility,secondary_copay,secondary_coins,secondary_deductible,secondary_patient_responsibility,copay_as_amount,other_payer_amount,primary_cost_amount', 'jtobias@integrichain.com');
 
@@ -191,7 +191,7 @@ BEGIN;
                     WHERE tv.name = 'input_transform'
                     ORDER BY t.id)) AND id IN (SELECT t.id
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-                    WHERE tt.name = 'standardize_numbers')))
+                    WHERE tt.name = 'patient_status_standardize_numbers')))
             ORDER BY id LIMIT 1), 'patient_status_ingest_column_mapping', 'jtobias@integrichain.com'),
     ('number_columns',(SELECT id
     FROM transformations WHERE
@@ -209,7 +209,7 @@ BEGIN;
         WHERE tv.name = 'number_columns'
         ORDER BY t.id)) AND id IN (SELECT t.id
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-        WHERE tt.name = 'standardize_numbers'))
+        WHERE tt.name = 'patient_status_standardize_numbers'))
     )ORDER BY id LIMIT 1), 
         'pharmacy_npi,pharmacy_ncpdp,pharmacy_zip,transaction_id,transaction_sequence,longitudinal_patient_id,patient_zip,hcp_zip,hcp_phone,hcp_npi,rx_fills,rx_fill_number,rx_refills_remaining,prev_dispensed,ndc,days_supply,ship_zip,primary_payer_bin,primary_payer_iin,primary_payer_pcn,secondary_payer_bin,secondary_payer_iin,secondary_payer_pcn,aggregator_ship_id,referral_number,primary_plan_paid,secondary_plan_paid,primary_copay,primary_coins,primary_deductible,primary_patient_responsibility,secondary_copay,secondary_coins,secondary_deductible,secondary_patient_responsibility,copay_as_amount,other_payer_amount,primary_cost_amount', 'jtobias@integrichain.com');
 
