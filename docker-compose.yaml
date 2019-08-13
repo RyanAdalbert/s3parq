@@ -25,7 +25,7 @@ services:
             - $HOME:/root
             - /var/run/docker.sock:/var/run/docker.sock
         ports:
-            - "8080:8080"
+            - "8008:8008"
         command: /airflow-entrypoint.sh webserver
         healthcheck:
             test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
