@@ -164,21 +164,6 @@ class DatasetContract(Contract):
         partitions = ['__metadata_run_id']
         return (df, partitions)
 
-    # def _alter_redshift_schema(self):
-    #     redshift_params = self.redshift_configuration
-    #     rhelp_params = {k:v for k,v in redshift_params.items() if k in ['region', 'cluster_id', 'host', 'port', 'db_name']}
-    #     iam_client = boto3.Session(region_name=redshift_params["region"]).client('iam')
-    #     iam_user = iam_client.get_user()
-    #     iam_user = iam_user['User']['UserName']
-
-    #     query = f"ALTER SCHEMA {redshift_params['schema_name']} OWNER TO \"{iam_user}\";"
-
-    #     redshift = RHelp(**rhelp_params)
-    #     redshift.configure_session_helper()
-    #     with redshift.db_session_scope() as scope:
-    #         self.logger.info(f'Altering schema {redshift_params["schema_name"]} owner to current IAM user {iam_user}...')
-    #         scope.execute(query)
-
     # functions for use
 
     def fetch(self, filters: List[dict] = [])->pd.DataFrame:
