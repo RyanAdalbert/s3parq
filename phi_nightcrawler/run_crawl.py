@@ -1,5 +1,5 @@
 import os
-from nightcrawler import Nightcrawler
+from phi_nightcrawler.nightcrawler import Nightcrawler
 
 # Set Environment Variables
 sftp_info = {

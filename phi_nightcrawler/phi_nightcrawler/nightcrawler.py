@@ -15,6 +15,7 @@ class Nightcrawler:
         user = creds['user']
         password = creds['password']
         port = creds['port']
+        transport = None
         logging.info(f"Connecting to host: {host} on port: {port}")
         # import pdb; pdb.set_trace()
 
