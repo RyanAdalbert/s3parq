@@ -7,3 +7,5 @@ psql -w -h localhost -U configurator -d configuration_application -f seeds/2019.
 psql -w -h localhost -U configurator -d configuration_application -f seeds/2019.07.08__09.41.sql
 psql -w -h localhost -U configurator -d configuration_application -f seeds/2019.07.19__09.20.sql
 psql -w -h localhost -U configurator -d configuration_application -f seeds/2019.08.05__13.40.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_date_standardization_template.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_date_standardization.sql
