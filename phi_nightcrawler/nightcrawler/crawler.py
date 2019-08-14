@@ -7,7 +7,6 @@ from stat import S_IWUSR, S_IWGRP, S_IWOTH
 logging.basicConfig()
 logging.getLogger().setLevel(logging.DEBUG)
 
-
 # Main Function
 class Nightcrawler:
     def __init__(self, creds):
@@ -15,9 +14,7 @@ class Nightcrawler:
         user = creds['user']
         password = creds['password']
         port = creds['port']
-        transport = None
         logging.info(f"Connecting to host: {host} on port: {port}")
-        # import pdb; pdb.set_trace()
 
         # Create Paramiko Client Object
         if port is None:

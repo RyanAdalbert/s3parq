@@ -1,10 +1,11 @@
 FROM python:3
 
-RUN mkdir /phi_nightcrawler
-WORKDIR /phi_nightcrawler
+RUN mkdir /app/phi_nightcrawler
+WORKDIR /app/phi_nightcrawler
 
 COPY requirements.txt /phi_nightcrawler
+COPY . /app/phi_nightcrawler
+
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
-COPY . /phi_nightcrawler
 
 CMD tail -f /dev/null
