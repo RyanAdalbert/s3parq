@@ -4,11 +4,10 @@ from airflow.utils.decorators import apply_defaults
 from airflow.contrib.operators.awsbatch_operator import AWSBatchOperator
 from airflow.contrib.operators.ssh_operator import SSHOperator
 from collections import namedtuple
-from core.constants import BATCH_JOB_QUEUE, BRANCH_NAME, ENVIRONMENT
+from core.constants import BATCH_JOB_QUEUE, BRANCH_NAME, ENVIRONMENT, BATCH_JOB_DEFINITION_NAME
 from core.contract import Contract
 from core.helpers.project_root import ProjectRoot
 from core.helpers.session_helper import SessionHelper
-from core.helpers.docker import get_core_job_def_name
 from airflow.contrib.hooks.ssh_hook import SSHHook
 import core.models.configuration as config
 from core.logging import get_logger
@@ -27,21 +26,24 @@ class TransformOperator(InheritOperator):
 
         self.__logger = get_logger(
             ".".join([self.__module__, self.__class__.__name__]))
-
         self.transform_id = transform_id
+        self.task_id = self._generate_task_id()
+        self.run_id = "{{ ti.xcom_pull(task_ids='RunEvent', key='run_id') }}"
 
-        task_id = self._generate_task_id()
-
-        params = self._generate_contract_params()
+        contract = self._generate_contract_params()
         
-        job_def_name = get_core_job_def_name()
-        job_name = f'{params.parent}_{params.child}_{params.state}_{params.dataset}'
+        job_def_name = BATCH_JOB_DEFINITION_NAME
+        job_name = f'{contract.parent}_{contract.child}_{contract.state}_{contract.dataset}'
+        if len(job_name) > 128: job_name = job_name[-128:] # batch jobs have a 128 character limit
+
         job_queue = BATCH_JOB_QUEUE
 
-        run_id = "{{ ti.xcom_pull(task_ids='RunEvent', key='run_id') }}"
-
-        run_command = f"corebot run {transform_id} "
-        run_command += run_id
+        run_command = [
+            'corebot',
+            'run',
+            f'{self.transform_id}',
+            f'{self.run_id}'
+        ]
 
         """ Run location control: this class inherits SSHOperator for dev, 
             AWSBatchOperator for prod  
@@ -56,10 +58,10 @@ class TransformOperator(InheritOperator):
 
             self.__logger.info(
                 f"Running Corebot command `{run_command}` locally in notebook container...")
-            super(TransformOperator, self).__init__(task_id=task_id,
+            super(TransformOperator, self).__init__(task_id=self.task_id,
                                                     ssh_hook=hook,
                                                     provide_context=True,
-                                                    command=run_command,  # SSH can only take a string here :(
+                                                    command=" ".join(run_command),  # SSH can only take a string here :(
                                                     **kwargs
                                                     )
             self.__logger.info(
@@ -72,11 +74,10 @@ class TransformOperator(InheritOperator):
             }
 
             self.__logger.info(f"Executing AWSBatchOperator for {job_name}.")
-            super(TransformOperator, self).__init__(task_id=task_id,
+            super(TransformOperator, self).__init__(task_id=self.task_id,
                                                     job_name=job_name,
                                                     job_definition=job_def_name,
                                                     job_queue=job_queue,
-                                                    provide_context=True,
                                                     overrides=job_container_overrides,
                                                     **kwargs
                                                     )
