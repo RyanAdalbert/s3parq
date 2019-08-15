@@ -136,8 +136,7 @@ BEGIN;
                     ORDER BY t.id)) AND id IN (SELECT t.id
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'patient_status_fill_rate')))
-            ORDER BY id LIMIT 1), 'FILLED', 'jlewis@integrichain.com')
-
+            ORDER BY id LIMIT 1), 'FILLED', 'jlewis@integrichain.com');
 
     COMMIT;
 
@@ -235,8 +234,7 @@ BEGIN;
                     ORDER BY t.id)) AND id IN (SELECT t.id
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'patient_status_fill_rate')))
-            ORDER BY id LIMIT 1), 'FILLED', 'jlewis@integrichain.com')
-
+            ORDER BY id LIMIT 1), 'FILLED', 'jlewis@integrichain.com');
 
     COMMIT;
 
@@ -334,8 +332,7 @@ BEGIN;
                     ORDER BY t.id)) AND id IN (SELECT t.id
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'patient_status_fill_rate')))
-            ORDER BY id LIMIT 1), 'FILLED', 'jlewis@integrichain.com')
-
+            ORDER BY id LIMIT 1), 'FILLED', 'jlewis@integrichain.com');
 
     COMMIT;
 
@@ -433,8 +430,7 @@ BEGIN;
                     ORDER BY t.id)) AND id IN (SELECT t.id
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'patient_status_fill_rate')))
-            ORDER BY id LIMIT 1), 'FILLED', 'jlewis@integrichain.com')
-
+            ORDER BY id LIMIT 1), 'FILLED', 'jlewis@integrichain.com');
 
     COMMIT;
 
