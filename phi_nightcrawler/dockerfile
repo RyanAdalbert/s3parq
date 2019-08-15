@@ -1,6 +1,10 @@
 FROM python:3
 
-RUN mkdir /app/phi_nightcrawler
+SHELL ["/bin/bash", "-c"]
+
+ENV PYTHONPATH=/usr/local/lib/python3.6/site-packages:/app
+
+RUN mkdir /app
 WORKDIR /app/phi_nightcrawler
 
 COPY requirements.txt /phi_nightcrawler

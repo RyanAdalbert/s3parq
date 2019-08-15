@@ -1,5 +1,5 @@
 import os
-from phi_nightcrawler.nightcrawler import Nightcrawler
+from nightcrawler.crawler import Nightcrawler
 
 # Set Environment Variables
 sftp_info = {
@@ -13,4 +13,4 @@ phi_dir = os.getenv('PHI_DIR')
 
 # Run Crawl
 crawler = Nightcrawler(sftp_info)
-crawler.create_new_dir(sftp_info, phi_dir)
+crawler.create_remote_dir(sftp_info, phi_dir)

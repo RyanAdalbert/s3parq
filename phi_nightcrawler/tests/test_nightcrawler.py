@@ -22,7 +22,4 @@ class TestNightcrawler:
         crawl = Nightcrawler(mock_creds)
         crawl.transport.connect.assert_called_with(username='user', password='password')
     
-    def test_file_crawle(self):
-
-
-
+    # def test_file_crawl(self):
