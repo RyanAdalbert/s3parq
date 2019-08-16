@@ -1,0 +1,12 @@
+version: '3'
+services:
+  nightcrawler:
+    build:
+      dockerfile: ./dockerfile
+      context: .
+    image: nightcrawler
+    working_dir: /phi_nightcrawler
+    env_file:
+      ./.env_file
+    volumes:
+      - .:/phi_nightcrawler/
