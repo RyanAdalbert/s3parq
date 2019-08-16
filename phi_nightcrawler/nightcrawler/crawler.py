@@ -59,10 +59,8 @@ class Nightcrawler:
     # Create list of files in remote dir, loop over files in list
     def crawl_files(self, sftp, remote_dir):
 
-        # Get list of file names in remote dir
         file_list = self.sftp.listdir_attr(remote_dir)
 
-        #Use list of names to open files and crawl for phi
         for file in file_list:
             print(file)
 

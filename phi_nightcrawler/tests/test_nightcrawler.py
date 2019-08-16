@@ -7,7 +7,7 @@ from nightcrawler.crawler import Nightcrawler
 
 class TestNightcrawler:
 
-    #Test paramikos transport.connect called with correct args
+    # Test paramikos transport.connect called with correct args
     @patch('nightcrawler.crawler.paramiko.Transport', autospec=True)
     @patch('nightcrawler.crawler.paramiko.SFTPClient')
     def test_connect(self, mock_sftp, mock_transport):
