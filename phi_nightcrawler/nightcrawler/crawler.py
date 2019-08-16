@@ -64,10 +64,6 @@ class Nightcrawler:
 
         #Use list of names to open files and crawl for phi
         for file in file_list:
-            if file.longname.st_uid != 2:
-                print(file.longname)
-
-        # Open test file, write to it
-        # test_file = self.sftp.file('/upload/nightcrawler-test/test_file.txt', mode='r')
+            print(file)
 
         
