@@ -1,5 +1,5 @@
 BEGIN;
-justin
+
     INSERT INTO transformations
         (transformation_template_id, pipeline_state_id, graph_order, last_actor)
     VALUES
