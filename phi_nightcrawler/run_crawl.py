@@ -10,8 +10,7 @@ sftp_info = {
 }
 
 phi_dir = os.getenv('PHI_DIR')
-temp_dir = '/app/phi_nightcrawler/temp_dir'
-remote_dir = '/upload/nightcrawler-test/'
+remote_dir = os.getenv('CRAWL_DIR')
 # Run Crawl
 crawler = Nightcrawler(sftp_info)
 crawler.create_remote_dir(sftp_info, phi_dir)

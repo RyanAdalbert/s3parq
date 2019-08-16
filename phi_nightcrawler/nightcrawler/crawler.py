@@ -1,7 +1,7 @@
 import os, logging, shutil, sys
 import paramiko
 from shutil import copyfile
-from stat import S_IWUSR, S_IWGRP, S_IWOTH
+from stat import S_IWUSR, S_IWGRP, S_IWOTH, S_ISDIR
 
 # Set loggin level
 logging.basicConfig()
@@ -56,27 +56,18 @@ class Nightcrawler:
         except FileNotFoundError:
             return False
 
-    # Create local temp_dir if does not exist, move files to temp dir, start crawl
+    # Create list of files in remote dir, loop over files in list
     def crawl_files(self, sftp, remote_dir):
-        # Create local temp_dir if does not exist
-        # try:
-        #     if self.temp_dir_exists(temp_dir):
-        #         logging.info(f"Directory {temp_dir} Already Exists Locally")
-        #     else:
-        #         os.mkdir(temp_dir)
-        #         logging.info(f"Directory {temp_dir} Created Locally")
-        # except Exception as e: 
-        #     logging.error(e)
-        #     raise e
 
         # Get list of file names in remote dir
-        # file_list = self.sftp.listdir(remote_dir)
-        # print(file_list)
-
-
-        # Open test file, write to it
-        test_file = self.sftp.file('/upload/nightcrawler-test/test_file.py')
-
-        test_file.write("Guy has on 3 pairs of sunglasses")
+        file_list = self.sftp.listdir_attr(remote_dir)
 
         #Use list of names to open files and crawl for phi
+        for file in file_list:
+            if file.longname.st_uid != 2:
+                print(file.longname)
+
+        # Open test file, write to it
+        # test_file = self.sftp.file('/upload/nightcrawler-test/test_file.txt', mode='r')
+
+        
