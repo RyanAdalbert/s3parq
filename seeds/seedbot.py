@@ -29,7 +29,7 @@ VALID_STATES = ['raw', 'ingest', 'master', 'enhance', 'enrich', 'metrics', 'dime
 VALID_TYPES = ['str', 'string', 'char', 'varchar', 'text', 'datetime', 'date', 'int', 'integer', 'float', 'decimal', 'number', 'double', 'bool', 'boolean']
 
 def _strip_row(row: list)->list:
-    return [x for x in row if x]
+    return [x for x in row if x] # Seedbot only cares about cells with data
 
 def _invalid_tt_head(tt_head)->bool:
     '''
@@ -47,6 +47,9 @@ def _invalid_tt_head(tt_head)->bool:
     return tt_head.sort() != expected.sort()
 
 def _invalid_tr_head(tr_head)->bool:
+    '''
+    Returns true if and only if the transformation & variable header row of the input CSV doesn't follow our expected convention
+    '''
     expected = ['tr.pipeline', 'tr.graphorder']
     tv_var = ['tv.name', 'tv.value']
     for var in range(VARIABLE_COUNT): expected.extend(tv_var)
