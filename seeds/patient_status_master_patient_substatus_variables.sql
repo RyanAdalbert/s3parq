@@ -10,7 +10,7 @@ BEGIN;
                 FROM pipeline_states
                 WHERE pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_patient_journey')) 
+                WHERE name = 'sun_ilumya_patient_status')) 
                 AND id IN (SELECT id
                 FROM transformations
                 WHERE (id NOT IN (SELECT t.id
@@ -29,7 +29,7 @@ BEGIN;
     FROM pipeline_states
     WHERE pipeline_id = (SELECT id
     FROM pipelines
-    WHERE name = 'sun_patient_journey'))
+    WHERE name = 'sun_ilumya_patient_status'))
     AND id IN
     (SELECT id
     FROM transformations
@@ -50,7 +50,7 @@ BEGIN;
 		    FROM pipeline_states
 		    WHERE pipeline_id = (SELECT id
 		    FROM pipelines
-		    WHERE name = 'sun_patient_journey'))
+		    WHERE name = 'sun_ilumya_patient_status'))
 		    AND id IN
 		    (SELECT id
 		    FROM transformations
@@ -77,7 +77,7 @@ BEGIN;
                 FROM pipeline_states
                 WHERE pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_ilumya_extract')) 
+                WHERE name = 'sun_odomzo_patient_status')) 
                 AND id IN (SELECT id
                 FROM transformations
                 WHERE (id NOT IN (SELECT t.id
@@ -96,7 +96,7 @@ BEGIN;
     FROM pipeline_states
     WHERE pipeline_id = (SELECT id
     FROM pipelines
-    WHERE name = 'sun_ilumya_extract'))
+    WHERE name = 'sun_odomzo_patient_status'))
     AND id IN
     (SELECT id
     FROM transformations
@@ -117,7 +117,7 @@ BEGIN;
 		    FROM pipeline_states
 		    WHERE pipeline_id = (SELECT id
 		    FROM pipelines
-		    WHERE name = 'sun_ilumya_extract'))
+		    WHERE name = 'sun_odomzo_patient_status'))
 		    AND id IN
 		    (SELECT id
 		    FROM transformations
@@ -142,7 +142,7 @@ BEGIN;
                 FROM pipeline_states
                 WHERE pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_odomzo_extract')) 
+                WHERE name = 'sun_yonsa_patient_status')) 
                 AND id IN (SELECT id
                 FROM transformations
                 WHERE (id NOT IN (SELECT t.id
@@ -161,7 +161,7 @@ BEGIN;
     FROM pipeline_states
     WHERE pipeline_id = (SELECT id
     FROM pipelines
-    WHERE name = 'sun_odomzo_extract'))
+    WHERE name = 'sun_yonsa_patient_status'))
     AND id IN
     (SELECT id
     FROM transformations
@@ -182,7 +182,7 @@ BEGIN;
 		    FROM pipeline_states
 		    WHERE pipeline_id = (SELECT id
 		    FROM pipelines
-		    WHERE name = 'sun_odomzo_extract'))
+		    WHERE name = 'sun_yonsa_patient_status'))
 		    AND id IN
 		    (SELECT id
 		    FROM transformations
