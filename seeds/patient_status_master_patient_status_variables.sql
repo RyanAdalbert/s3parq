@@ -20,7 +20,7 @@ BEGIN;
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'master_patient_status')))
             ORDER BY id LIMIT 1),
-            'patient_status_standardize_dates', 
+            'patient_status_ingest_brand_derivation', 
             'jshea@integrichain.com'),
     ('col_status',(SELECT id
     FROM transformations WHERE
@@ -65,7 +65,7 @@ BEGIN;
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'master_patient_status')))
             ORDER BY id LIMIT 1),
-            'patient_status_standardize_dates', 
+            'patient_status_ingest_brand_derivation', 
             'jshea@integrichain.com'),
     ('col_status',(SELECT id
     FROM transformations WHERE
@@ -109,7 +109,7 @@ BEGIN;
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'master_patient_status')))
             ORDER BY id LIMIT 1),
-            'patient_status_standardize_dates', 
+            'patient_status_ingest_brand_derivation', 
             'jshea@integrichain.com'),
     ('col_status',(SELECT id
     FROM transformations WHERE
