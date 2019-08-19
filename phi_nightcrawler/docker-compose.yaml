@@ -5,8 +5,9 @@ services:
       dockerfile: ./dockerfile
       context: .
     image: nightcrawler
-    working_dir: /phi_nightcrawler
+    working_dir: /app/phi_nightcrawler
     env_file:
       ./.env_file
     volumes:
-      - .:/phi_nightcrawler/
+      - .:/app/phi_nightcrawler/
+      - $HOME:/root
