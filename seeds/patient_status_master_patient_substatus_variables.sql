@@ -20,7 +20,7 @@ BEGIN;
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'master_patient_substatus')))
             ORDER BY id LIMIT 1),
-            'sun_ilumya_patient_status', 
+            'master_patient_status', 
             'jshea@integrichain.com'),
     ('col_substatus',(SELECT id
     FROM transformations WHERE
@@ -40,10 +40,10 @@ BEGIN;
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
         WHERE tt.name = 'master_patient_substatus')))
         ORDER BY id LIMIT 1), 
-        'sub_status',
+        'customer_substatus',
         'jshea@integrichain.com')
 		,
-		    ('customer_name',(SELECT id
+		    ('col_customer_name',(SELECT id
 		    FROM transformations WHERE
 		    (pipeline_state_id IN
 		    (SELECT id
@@ -56,7 +56,7 @@ BEGIN;
 		    FROM transformations
 		    WHERE (id NOT IN (SELECT t.id
 		        FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id
-		        WHERE tv.name = 'col_substatus'
+		        WHERE tv.name = 'col_customer_name'
 		        ORDER BY t.id)) AND id IN (SELECT t.id
 		        from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
 		        WHERE tt.name = 'master_patient_substatus')))
@@ -87,7 +87,7 @@ BEGIN;
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'master_patient_substatus')))
             ORDER BY id LIMIT 1),
-            'sun_odomzo_patient_status', 
+            'master_patient_status', 
             'jshea@integrichain.com'),
     ('col_substatus',(SELECT id
     FROM transformations WHERE
@@ -107,10 +107,10 @@ BEGIN;
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
         WHERE tt.name = 'master_patient_substatus')))
         ORDER BY id LIMIT 1), 
-        'sub_status',
+        'customer_substatus',
         'jshea@integrichain.com')
 		,
-		    ('customer_name',(SELECT id
+		    ('col_customer_name',(SELECT id
 		    FROM transformations WHERE
 		    (pipeline_state_id IN
 		    (SELECT id
@@ -152,7 +152,7 @@ BEGIN;
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'master_patient_substatus')))
             ORDER BY id LIMIT 1),
-            'sun_yonsa_patient_status', 
+            'master_patient_status', 
             'jshea@integrichain.com'),
     ('col_substatus',(SELECT id
     FROM transformations WHERE
@@ -172,10 +172,10 @@ BEGIN;
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
         WHERE tt.name = 'master_patient_substatus')))
         ORDER BY id LIMIT 1), 
-        'sub_status',
+        'customer_substatus',
         'jshea@integrichain.com')
 		,
-		    ('customer_name',(SELECT id
+		    ('col_customer_name',(SELECT id
 		    FROM transformations WHERE
 		    (pipeline_state_id IN
 		    (SELECT id
