@@ -56,7 +56,7 @@ BEGIN;
 		    FROM transformations
 		    WHERE (id NOT IN (SELECT t.id
 		        FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id
-		        WHERE tv.name = 'col_substatus'
+		        WHERE tv.name = 'col_customer_name'
 		        ORDER BY t.id)) AND id IN (SELECT t.id
 		        from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
 		        WHERE tt.name = 'master_patient_substatus')))

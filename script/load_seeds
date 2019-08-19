@@ -19,3 +19,6 @@ psql -w -h localhost -U configurator -d configuration_application -f seeds/patie
 psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_master_patient_substatus_template.sql
 psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_master_patient_substatus.sql
 psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_master_patient_substatus_variables.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_enrich_patient_journey_hierarchy_template.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_enrich_patient_journey_hierarchy.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_enrich_patient_journey_hierarchy_variables.sql
