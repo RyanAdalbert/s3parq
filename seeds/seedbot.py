@@ -1,7 +1,12 @@
 '''
 ┗┃・ ◡ ・┃┛ Hello World!
 
-I am Seedbot. I generate SQL statements used to seed a transformation in the Core configuration database. I expect a CSV/TSV separated by DELIMITER saved to the path INPUT_PATH. Using that file, I write a file to the path specified as OUTPUT_PATH. By default, I'll look for an INPUT_PATH ./seedbot_input.tsv separated by \t and write to an OUTPUT_PATH ./{transform name}.sql. For example, a transform named patient_status_unblind would be saved to ./patient_status_unblind.sql.
+I am Seedbot. I generate SQL statements used to seed a transformation in the Core
+configuration database. I expect a CSV/TSV separated by DELIMITER saved to the path
+INPUT_PATH. Using that file, I write a file to the path specified as OUTPUT_PATH.
+By default, I'll look for an INPUT_PATH ./seedbot_input.tsv separated by \t and write
+to an OUTPUT_PATH ./{transform name}.sql. For example, a transform named patient_status_unblind
+would be saved to ./patient_status_unblind.sql.
 '''
 
 INPUT_PATH = None
