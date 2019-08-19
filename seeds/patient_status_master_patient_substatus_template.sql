@@ -4,8 +4,8 @@ INSERT INTO transformation_templates (name, variable_structures, pipeline_state_
         ('master_patient_substatus', 
         '{
             "input_transform":{"datatype": "string", "description": "The name of the transform to input source data from"},
-            "col_substatus":{"dataype": "string","description": "The column of interest for this transform"},
-            "customer_name":{"datatype": "str", "description": "The customer name"}
+            "col_substatus":{"datatype": "string","description": "The column of interest for this transform"},
+            "col_customer_name":{"datatype": "str", "description": "The customer name"}
         }', 
         (SELECT id FROM pipeline_state_types WHERE name = 'master'),
         'jshea@integrichain.com');
