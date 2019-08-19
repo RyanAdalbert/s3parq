@@ -14,3 +14,4 @@ psql -w -h localhost -U configurator -d configuration_application -f seeds/patie
 #psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_standardize_numbers.sql
 psql -w -h localhost -U configurator -d configuration_application -f seeds/enrich_pending_too_long_template.sql
 psql -w -h localhost -U configurator -d configuration_application -f seeds/enrich_pending_too_long.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_enrich_fill_null_ref_date.sql
