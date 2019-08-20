@@ -17,6 +17,7 @@ if INPUT_PATH is None: INPUT_PATH = 'seedbot_input.tsv'
 
 import csv, os, sys
 from core.logging import LoggerSingleton
+logger = LoggerSingleton().logger
 
 # constants pulled from the CSV injected into the resulting SQL
 TT_NAME = ''
@@ -26,15 +27,13 @@ TT_VARIABLE_TYPES = []
 TT_VARIABLE_DESCRIPTIONS = []
 TR_PIPELINE_NAMES = []
 TR_GRAPH_ORDERS = []
-TR_VARIABLE_NAMES = []
-TR_VARIABLE_VALUES = []
+TV_VARIABLE_NAMES = []
+TV_VARIABLE_VALUES = []
 ACTOR = ''
 # other constants
 VARIABLE_COUNT = 0
 VALID_STATES = ['raw', 'ingest', 'master', 'enhance', 'enrich', 'metrics', 'dimensional']
 VALID_TYPES = ['str', 'string', 'char', 'varchar', 'text', 'datetime', 'date', 'int', 'integer', 'float', 'decimal', 'number', 'double', 'bool', 'boolean']
-
-logger = LoggerSingleton().logger
 
 def _strip_row(row: list)->list:
     return [x for x in row if x] # Seedbot only cares about cells in a row with data
@@ -106,7 +105,7 @@ def _parse_head(tsv: csv.reader)->csv.reader:
     return tsv
 
 def _parse_variables(row: list)->None:
-    global TT_VARIABLE_NAMES, TR_VARIABLE_NAMES, TR_VARIABLE_VALUES
+    global TT_VARIABLE_NAMES, TV_VARIABLE_NAMES, TV_VARIABLE_VALUES
     var_names = []
     var_vals = []
     for var_num in range(VARIABLE_COUNT):
@@ -116,8 +115,8 @@ def _parse_variables(row: list)->None:
             raise ValueError(f"Error. Found variable {var_name} which is not in the transformation template for {TT_NAME}.")
         var_names.append(var_name)
         var_vals.append(var_val)
-    TR_VARIABLE_NAMES.append(var_names)
-    TR_VARIABLE_VALUES.append(var_vals)
+    TV_VARIABLE_NAMES.append(var_names)
+    TV_VARIABLE_VALUES.append(var_vals)
 
 def _parse_body(tsv: csv.reader)->None:
     '''
@@ -159,7 +158,7 @@ def _generate_tr_sql()->str:
 def _generate_tv_sql()->str:
     statement = f"BEGIN;\n\tINSERT INTO transformation_variables\n\t\t(name, transformation_id, value, last_actor)\n\tVALUES\n"
     for i in range(len(TR_PIPELINE_NAMES)):
-        variables = dict(zip(TR_VARIABLE_NAMES[i], TR_VARIABLE_VALUES[i]))
+        variables = dict(zip(TV_VARIABLE_NAMES[i], TV_VARIABLE_VALUES[i]))
         for name, val in variables.items():
             statement += f"\t\t('{name}',\n\t\t(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = '{TR_PIPELINE_NAMES[i]}')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = '{name}' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = '{TT_NAME}')))ORDER BY id LIMIT 1),\n\t\t'{val}',\n\t\t'{ACTOR}'),\n"
     statement = statement[:-2] + ";\nCOMMIT;"
@@ -181,16 +180,16 @@ def _set_output_path()->None:
 
     return
 
-# main procedure
-with open(INPUT_PATH) as tsv_file:
-    tsv = csv.reader(tsv_file, delimiter=DELIMITER)
-    _parse_body(_parse_head(tsv)) # populates global configuration vars from tsv template
-logger.info(f"File {INPUT_PATH} successfully processed. Generating SQL for transform {TT_NAME}.")
+if __name__ == '__main__':
+    with open(INPUT_PATH) as tsv_file:
+        tsv = csv.reader(tsv_file, delimiter=DELIMITER)
+        _parse_body(_parse_head(tsv)) # populates global configuration vars from tsv template
+    logger.info(f"File {INPUT_PATH} successfully processed. Generating SQL for transform {TT_NAME}.")
 
-_set_output_path()
+    _set_output_path()
 
-contents = f"{_generate_tt_sql()}\n\n{_generate_tr_sql()}\n\n{_generate_tv_sql()}"
-logger.info(f"SQL successfully generated. Writing SQL to output file {OUTPUT_PATH}...")
+    contents = f"{_generate_tt_sql()}\n\n{_generate_tr_sql()}\n\n{_generate_tv_sql()}"
+    logger.info(f"SQL successfully generated. Writing SQL to output file {OUTPUT_PATH}...")
 
-with open(OUTPUT_PATH, "w+") as output:
-    output.write(contents) 
+    with open(OUTPUT_PATH, "w+") as output:
+        output.write(contents) 
