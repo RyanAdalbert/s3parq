@@ -15,3 +15,15 @@ psql -w -h localhost -U configurator -d configuration_application -f seeds/patie
 psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_fill_rate.sql
 psql -w -h localhost -U configurator -d configuration_application -f seeds/enrich_pending_too_long_template.sql
 psql -w -h localhost -U configurator -d configuration_application -f seeds/enrich_pending_too_long.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_master_patient_status_template.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_master_patient_status.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_master_patient_status_variables.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_master_patient_substatus_template.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_master_patient_substatus.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_master_patient_substatus_variables.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_enrich_patient_journey_hierarchy_template.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_enrich_patient_journey_hierarchy.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_enrich_patient_journey_hierarchy_variables.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_enrich_fill_null_long_pat_id.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_ingest_brand_derivation.sql
+psql -w -h localhost -U configurator -d configuration_application -f seeds/patient_status_enrich_fill_null_ref_date.sql

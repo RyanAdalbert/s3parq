@@ -9,5 +9,6 @@ INSERT INTO
         ('njb@integrichain.com','Natie','Bohnel'),
         ('ajw@integrichain.com','Alec','Wertheimer'),
         ('jlewis@integrichain.com', 'Justin', 'Lewis'),
+        ('jdann@integrichain.com', 'Jim', 'Dann'),
         ('jtobias@integrichain.com', 'Jacob', 'Tobias');
 COMMIT;
