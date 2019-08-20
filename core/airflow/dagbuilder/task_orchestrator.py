@@ -53,6 +53,12 @@ class TaskOrchestrator(LoggerMixin):
 
             self.logger.debug(
                 f"Ordering transforms in state {state.pipeline_state_type.name}...")
+            
+            if state.transformations == []:
+                self.logger.info(
+                    f"Pipeline state {state.pipeline_state_type.name} has no transforms, being skipped.")
+                continue
+
             transformations = self._order_transformations_within_group(
                 state.transformations)
             self.logger.debug(
