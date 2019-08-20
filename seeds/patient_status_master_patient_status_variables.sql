@@ -20,7 +20,7 @@ BEGIN;
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'master_patient_status')))
             ORDER BY id LIMIT 1),
-            'sun_ilumya_patient_status', 
+            'patient_status_ingest_brand_derivation', 
             'jshea@integrichain.com'),
     ('col_status',(SELECT id
     FROM transformations WHERE
@@ -40,7 +40,7 @@ BEGIN;
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
         WHERE tt.name = 'master_patient_status')))
         ORDER BY id LIMIT 1), 
-        'status_code',
+        'customer_status',
         'jshea@integrichain.com');
 
 
@@ -65,7 +65,7 @@ BEGIN;
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'master_patient_status')))
             ORDER BY id LIMIT 1),
-            'sun_odomzo_patient_status', 
+            'patient_status_ingest_brand_derivation', 
             'jshea@integrichain.com'),
     ('col_status',(SELECT id
     FROM transformations WHERE
@@ -85,7 +85,7 @@ BEGIN;
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
         WHERE tt.name = 'master_patient_status')))
         ORDER BY id LIMIT 1), 
-        'status_code',
+        'customer_status',
         'jshea@integrichain.com');
     
     -- next sun pipeline
@@ -109,7 +109,7 @@ BEGIN;
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'master_patient_status')))
             ORDER BY id LIMIT 1),
-            'sun_yonsa_patient_status', 
+            'patient_status_ingest_brand_derivation', 
             'jshea@integrichain.com'),
     ('col_status',(SELECT id
     FROM transformations WHERE
@@ -129,7 +129,7 @@ BEGIN;
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
         WHERE tt.name = 'master_patient_status')))
         ORDER BY id LIMIT 1), 
-        'status_code',
+        'customer_status',
         'jshea@integrichain.com');   
        
     COMMIT;
