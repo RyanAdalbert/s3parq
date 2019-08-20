@@ -15,7 +15,8 @@ DELIMITER = '\t'
 
 if INPUT_PATH is None: INPUT_PATH = 'seedbot_input.tsv'
 
-import csv, os
+import csv, os, sys
+from core.logging import LoggerSingleton
 
 # constants pulled from the CSV injected into the resulting SQL
 TT_NAME = ''
@@ -33,8 +34,10 @@ VARIABLE_COUNT = 0
 VALID_STATES = ['raw', 'ingest', 'master', 'enhance', 'enrich', 'metrics', 'dimensional']
 VALID_TYPES = ['str', 'string', 'char', 'varchar', 'text', 'datetime', 'date', 'int', 'integer', 'float', 'decimal', 'number', 'double', 'bool', 'boolean']
 
+logger = LoggerSingleton().logger
+
 def _strip_row(row: list)->list:
-    return [x for x in row if x] # Seedbot only cares about cells with data
+    return [x for x in row if x] # Seedbot only cares about cells in a row with data
 
 def _invalid_tt_head(tt_head)->bool:
     '''
@@ -109,16 +112,18 @@ def _parse_variables(row: list)->None:
     for var_num in range(VARIABLE_COUNT):
         var_name = row.pop(0)
         var_val = row.pop(0)
-        if var_name.lower() != TT_VARIABLE_NAMES[var_num].lower():
-            raise ValueError(f"Error. Found variable {var_name} which is not in the transformation template for {TT_NAME}")
+        if var_name.lower() not in map(str.lower, TT_VARIABLE_NAMES):
+            raise ValueError(f"Error. Found variable {var_name} which is not in the transformation template for {TT_NAME}.")
         var_names.append(var_name)
         var_vals.append(var_val)
     TR_VARIABLE_NAMES.append(var_names)
     TR_VARIABLE_VALUES.append(var_vals)
 
 def _parse_body(tsv: csv.reader)->None:
-    '''Parses the remainder of the CSV. These rows are all Transformation and TransformationVariable field values.'''
-    row_num = 6 # this should be the first row of the body, i.e. the first tr/tv row (as opposed to tt)
+    '''
+    Parses the remainder of the CSV. These rows are all Transformation and TransformationVariable field values.
+    '''
+    row_num = 6 # this should be the first row of the body, i.e. the first tr/tv row of values, not headers (as opposed to tt)
     expected_len = 2 + (VARIABLE_COUNT * 2) # each row should have a pipeline name, graph order, and a name/value for each template variable
     for row in tsv:
         row = _strip_row(row)
@@ -160,15 +165,32 @@ def _generate_tv_sql()->str:
     statement = statement[:-2] + ";\nCOMMIT;"
     return statement
 
+def _set_output_path()->None:
+    '''
+    Sets the OUTPUT_PATH if it isn't specified at the top and validates that the output path is valid and doesn't already exist (unless we --force).
+    '''
+    global OUTPUT_PATH
+    if OUTPUT_PATH is None:
+        logger.info(f"No OUTPUT_PATH supplied. Using default ./{TT_NAME}.sql...")
+        OUTPUT_PATH = f"{TT_NAME}.sql"
+    if not str(OUTPUT_PATH).endswith('.sql'):
+        raise ValueError(f"Error: Output path {OUTPUT_PATH} does not end in required .sql suffix.")
+    if os.path.exists(OUTPUT_PATH):
+        if len(sys.argv) != 2 or sys.argv[1].lower() not in ('f', '-f', '--force'):
+            raise ValueError(f"Error: Output path {OUTPUT_PATH} already exists. Please call Seedbot with -f or --force if you wish to overwrite the existing file.")
+
+    return
 
 # main procedure
 with open(INPUT_PATH) as tsv_file:
     tsv = csv.reader(tsv_file, delimiter=DELIMITER)
-    _parse_body(_parse_head(tsv))
+    _parse_body(_parse_head(tsv)) # populates global configuration vars from tsv template
+logger.info(f"File {INPUT_PATH} successfully processed. Generating SQL for transform {TT_NAME}.")
 
-if OUTPUT_PATH is None: OUTPUT_PATH = f"{TT_NAME}.sql"
+_set_output_path()
 
 contents = f"{_generate_tt_sql()}\n\n{_generate_tr_sql()}\n\n{_generate_tv_sql()}"
+logger.info(f"SQL successfully generated. Writing SQL to output file {OUTPUT_PATH}...")
 
 with open(OUTPUT_PATH, "w+") as output:
     output.write(contents) 
