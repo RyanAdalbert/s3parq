@@ -1,4 +1,13 @@
 BEGIN;
+INSERT INTO transformation_templates (name, variable_structures, pipeline_state_type_id, last_actor)
+    VALUES
+        ('patient_status_standardize_dates',
+        '{"input_transform":{"datatype": "string","description": "Source transform for the data"},"date_exceptions":{"datatype": "string","description": "Explicit values to expect and null out in the date field, list of csv in a string."},"status_date":{"datatype": "string","description": "String format of the status date. Blank default to attempt to auto-read."},"transaction_date":{"datatype": "string","description": "String format of the transaction date. Blank default to attempt to auto-read."},"referral_date":{"datatype": "string","description": "String format of the referral date. Blank default to attempt to auto-read."},"patient_dob":{"datatype": "string","description": "String format of the patient date of birth. Blank default to attempt to auto-read."},"rx_date":{"datatype": "string","description": "String format of the rx date. Blank default to attempt to auto-read."},"ship_date":{"datatype": "string","description": "String format of the ship date. Blank default to attempt to auto-read."},"primary_prior_auth_expiration_date":{"datatype": "string","description": "String format of the primary prior auth expiration date. Blank default to attempt to auto-read."},"patient_consent_date":{"datatype": "string","description": "String format of the patient consent date. Blank default to attempt to auto-read."},"enroll_received_date":{"datatype": "string","description": "String format of the enroll received date. Blank default to attempt to auto-read."},"fitness_for_duty_ship_date":{"datatype": "string","description": "String format of the fitness for duty ship date. Blank default to attempt to auto-read."},"triage_date":{"datatype": "string","description": "String format of the triage date. Blank default to attempt to auto-read."}}',
+        (SELECT id FROM pipeline_state_types WHERE name = 'ingest'),
+        'rns@integrichain.com');
+COMMIT;
+
+BEGIN;
 INSERT INTO transformations (transformation_template_id, pipeline_state_id, graph_order, last_actor)
     VALUES
         ((SELECT id FROM transformation_templates WHERE name = 'patient_status_standardize_dates'),(SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'ingest') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')), 3, 'rns@integrichain.com'),
@@ -6,7 +15,6 @@ INSERT INTO transformations (transformation_template_id, pipeline_state_id, grap
         ((SELECT id FROM transformation_templates WHERE name = 'patient_status_standardize_dates'),(SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'ingest') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'sun_odomzo_patient_status')), 3, 'rns@integrichain.com'),
         ((SELECT id FROM transformation_templates WHERE name = 'patient_status_standardize_dates'),(SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'ingest') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'bi_ofev_patient_status')), 3, 'rns@integrichain.com');    
 COMMIT;
-
 
 BEGIN;
 INSERT INTO transformation_variables (name, transformation_id, value, last_actor)
