@@ -1,9 +1,3 @@
-BEGIN;
-INSERT INTO pipelines (name, is_active, description, pipeline_type_id, brand_id, run_frequency, last_actor)
-    VALUES
-        ('sun_ilumya_extract', TRUE, 'Extract for Symphony Health Association -- ILUMYA', (SELECT id FROM pipeline_types WHERE name = 'patient_journey'), (SELECT id from brands WHERE name = 'ILUMYA'), 'weekly', 'njb@integrichain.com'),
-        ('sun_odomzo_extract', TRUE, 'Extract for Symphony Health Association -- ODOMZO', (SELECT id FROM pipeline_types WHERE name = 'patient_journey'), (SELECT id from brands WHERE name = 'ODOMZO'), 'weekly', 'njb@integrichain.com');
-
 INSERT INTO transformation_templates (name, variable_structures, pipeline_state_type_id, last_actor) 
     VALUES
        ('initial_ingest', 
@@ -55,20 +49,6 @@ INSERT INTO transformation_templates (name, variable_structures, pipeline_state_
         '{"input_transform":{"datatype": "string", "description": "name of transformation to pull dataset from"},"prefix":{"datatype": "string", "description": "file prefix to publish to ftp"},"suffix":{"datatype": "string", "description": "file suffix to publish to ftp"},"filetype":{"datatype": "string", "description": "filetype to publish to ftp (DO NOT INCLUDE . IN FILETYPE)"},"separator":{"datatype": "string", "description": "single character separator for output file"},"compression":{"datatype": "bool", "description": "if true published file will be compressed as gzip"},"date_format":{"datatype": "string", "description": "string formatting for datetime"},"remote_path":{"datatype": "string", "description": "path to publish to on FTP server"},"secret_name":{"datatype": "string", "description": "AWS secret name containing FTP credentials"},"secret_type_of":{"datatype": "string", "description": "AWS secret type of. should almost always be FTP"}}', 
         (SELECT id FROM pipeline_state_types WHERE name = 'dimensional'),
         'njb@integrichain.com');
-
-INSERT INTO pipeline_states (pipeline_state_type_id, pipeline_id, graph_order, last_actor)
-    VALUES 
-        ((SELECT id FROM pipeline_state_types WHERE name = 'raw'), (SELECT id FROM pipelines WHERE name = 'sun_ilumya_extract'), 0, 'njb@integrichain.com'),
-        ((SELECT id FROM pipeline_state_types WHERE name = 'ingest'), (SELECT id FROM pipelines WHERE name = 'sun_ilumya_extract'), 1, 'njb@integrichain.com'),
-        ((SELECT id FROM pipeline_state_types WHERE name = 'master'), (SELECT id FROM pipelines WHERE name = 'sun_ilumya_extract'), 2, 'njb@integrichain.com'),
-        ((SELECT id FROM pipeline_state_types WHERE name = 'enrich'), (SELECT id FROM pipelines WHERE name = 'sun_ilumya_extract'), 3, 'njb@integrichain.com'),
-        ((SELECT id FROM pipeline_state_types WHERE name = 'dimensional'), (SELECT id FROM pipelines WHERE name = 'sun_ilumya_extract'), 4, 'njb@integrichain.com'),
-
-        ((SELECT id FROM pipeline_state_types WHERE name = 'raw'), (SELECT id FROM pipelines WHERE name = 'sun_odomzo_extract'), 0, 'njb@integrichain.com'),
-        ((SELECT id FROM pipeline_state_types WHERE name = 'ingest'), (SELECT id FROM pipelines WHERE name = 'sun_odomzo_extract'), 1, 'njb@integrichain.com'),
-        ((SELECT id FROM pipeline_state_types WHERE name = 'master'), (SELECT id FROM pipelines WHERE name = 'sun_odomzo_extract'), 2, 'njb@integrichain.com'),
-        ((SELECT id FROM pipeline_state_types WHERE name = 'enrich'), (SELECT id FROM pipelines WHERE name = 'sun_odomzo_extract'), 3, 'njb@integrichain.com'),
-        ((SELECT id FROM pipeline_state_types WHERE name = 'dimensional'), (SELECT id FROM pipelines WHERE name = 'sun_odomzo_extract'), 4, 'njb@integrichain.com');
 
 INSERT INTO transformations (transformation_template_id, pipeline_state_id, graph_order, last_actor)
     VALUES
