@@ -1,0 +1,3 @@
+col_substatus~str~# The column of interest for the transform 
+customer_name~str~# The customer name
+input_transform~str~# the name of the dataset to pull from 

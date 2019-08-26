@@ -13,15 +13,16 @@ git+git://github.com/IntegriChain1/moto
 sqlalchemy==1.3.5
 psycopg2==2.7.6.1
 alembic==1.0.6
-papermill==0.17.1
+papermill==1.1.0
 jupyter==1.0.0
 jupyterlab==0.35.4
 mysql-connector==2.2.9
 
 ###TEST RESOURCES
-s3parq==2.1.2
+s3parq==2.1.3
 dfmock==0.0.14
 paramiko
 flask==1.0.2
+flask-cors==3.0.7
 requests==2.21
 pytest-mock==1.10.4
