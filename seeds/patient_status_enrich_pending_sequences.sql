@@ -6,7 +6,7 @@ BEGIN;
 		'{"input_transform":{"datatype": "str", "description": "Name of transform to fetch data from"},
 			"substatus_list":{"datatype": "str", "description": "Comma-separated list of integrichain substatuses for current customer. Order of variables does not matter"},
 			"pjh":{"datatype": "str", "description": "Patient Journey Hiearchy column, should have been added in an early transform"}}',
-		(SELECT id FROM pipeline_state_types WHERE name = 'ingest'),
+		(SELECT id FROM pipeline_state_types WHERE name = 'enrich'),
 		'njb@integrichain.com');
 COMMIT;
 
@@ -15,7 +15,7 @@ BEGIN;
 		(transformation_template_id, pipeline_state_id, graph_order, last_actor)
 	VALUES
 		((SELECT id FROM transformation_templates WHERE name = 'patient_status_enrich_pending_sequences'),
-		(SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'ingest') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')),
+		(SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'enrich') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')),
 		3,
 		'njb@integrichain.com');
 COMMIT;
