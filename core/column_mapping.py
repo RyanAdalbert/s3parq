@@ -18,7 +18,7 @@ logger = LoggerSingleton().logger
 # Given the try except, other exceptions could catch valid errors occuring
 class MissingRequiredColumnError(Exception):
     """ This class is meant to be an Exception thrown only when dataframes are 
-        received without all the specifid required columns.
+        received without all the specific required columns.
         Possibly later may get a notification option.
     """
     pass
@@ -82,7 +82,7 @@ def rename_and_correct_shape(df: pd.DataFrame, column_renames: Dict)->pd.DataFra
     column_renames_pandas_style = {value: key for key, value in column_renames.items()}
     df = df.rename(column_renames_pandas_style, axis="columns")
     
-    # Add missing columns to match schema and fill with NaN
+    # Add missing columns to match schema and fill with empty strings
     missing_columns = set(column_renames.keys()) - set(df.columns)
     for column in missing_columns:
         df[column] = ""
