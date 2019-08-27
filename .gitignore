@@ -11,3 +11,4 @@ htmlcov/
 dist/
 output_notebooks/
 node_modules/
+seedbot_input.tsv
