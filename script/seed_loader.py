@@ -20,14 +20,6 @@ def load_run_sql(seeds_dir, seed_file):
     session.close()
     logging.info(f'\tFinished')
 
-
-def run_alembic_migrations():
-    migrations_dir = os.path.dirname('/host/core/core/database/')
-    config_file = os.path.join(migrations_dir, "alembic.ini")
-    config = Config(file_=config_file)
-    config.set_main_option("script_location", migrations_dir)
-    upgrade(config, "head")
-
 seeds_dir = os.path.dirname('/host/core/seeds/')
 
 logging.info("Starting seed loading...")
