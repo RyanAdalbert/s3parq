@@ -98,13 +98,14 @@ def rename_and_correct_shape(df: pd.DataFrame, column_renames: Dict)->pd.DataFra
             df[v] = df[key]
 
     df = df.rename(column_renames_pandas_style, axis="columns")
-    # All the stuff above makes the order unpredictable client-to-client
-    df = df.reindex(list(column_renames.keys()),axis='columns')
 
     # Add missing columns to match schema and fill with empty strings
     missing_columns = set(column_renames.keys()) - set(df.columns)
     for column in missing_columns:
         df[column] = ""
+
+    # All the stuff above makes the order unpredictable client-to-client
+    df = df.reindex(list(column_renames.keys()),axis='columns')
 
     return df
 
