@@ -85,8 +85,7 @@ def rename_and_correct_shape(df: pd.DataFrame, column_renames: Dict)->pd.DataFra
     for key, value in column_renames.items():
         if value == "":
             continue
-
-        if value not in column_renames_pandas_style:
+        elif value not in column_renames_pandas_style:
             column_renames_pandas_style[value] = key
         else:
             if value not in duplicate_columns:
