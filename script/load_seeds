@@ -1,2 +1,2 @@
 #!/bin/sh
-docker-compose exec notebook /bin/bash -c "cd /usr/src/app/script && python docker_seed_loader.py"
+docker-compose exec notebook /bin/bash -c "cd /usr/src/app/script && python seed_loader.py"
