@@ -1,9 +1,2 @@
 #!/bin/sh
-
-export PGPASSWORD=configurator
-
-psql -w -h localhost -U configurator -d configuration_application -f seeds/2019.02.13__14.02.sql
-psql -w -h localhost -U configurator -d configuration_application -f seeds/2019.04.15__14.19.sql
-psql -w -h localhost -U configurator -d configuration_application -f seeds/2019.07.08__09.41.sql
-psql -w -h localhost -U configurator -d configuration_application -f seeds/2019.07.19__09.20.sql
-psql -w -h localhost -U configurator -d configuration_application -f seeds/2019.08.05__13.40.sql
+docker-compose exec notebook /bin/bash -c "cd /usr/src/app/script && python seed_loader.py"

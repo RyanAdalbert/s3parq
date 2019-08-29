@@ -2,6 +2,7 @@ AWS_BATCH_TEST_JOB_QUEUE: core
 AWS_REGION: us-east-1
 CORE_VERSION: 0.0.11
 DEV_AWS_ACCOUNT: '265991248033'
+DEV_AWS_SECRET: 'dev/core-iam'
 DEV_BUCKET: ichain-dev
 DEV_CONFIGURATION_APPLICATION_CONN_STRING: postgresql://configurator:configurator@core_configurationpg_1/configuration_application
 DOCKER_REPO: ichain/core

@@ -106,7 +106,7 @@ RUN rm -r /usr/local/lib/python3.6/site-packages/enum \
 RUN python setup.py install
 
 
-EXPOSE 8080 5555 8793 22
+EXPOSE 8008 5555 8793 22
 
 ENV AWS_DEFAULT_REGION="us-east-1"
 
