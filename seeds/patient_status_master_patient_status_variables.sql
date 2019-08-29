@@ -1,6 +1,8 @@
 
 BEGIN;
-
+    ------------------------------------------------
+    -- sun pipeline = sun_ilumya_patient_status
+    ------------------------------------------------
     INSERT INTO transformation_variables
         (name, transformation_id, value, last_actor)
     VALUES
@@ -42,10 +44,9 @@ BEGIN;
         ORDER BY id LIMIT 1), 
         'customer_status',
         'jshea@integrichain.com');
-
-
-       -- next sun pipeline
-       
+    ------------------------------------------------
+    -- sun pipeline = sun_odomzo_patient_status
+    ------------------------------------------------
     INSERT INTO transformation_variables
         (name, transformation_id, value, last_actor)
     VALUES
@@ -86,10 +87,10 @@ BEGIN;
         WHERE tt.name = 'master_patient_status')))
         ORDER BY id LIMIT 1), 
         'customer_status',
-        'jshea@integrichain.com');
-    
-    -- next sun pipeline
-       
+        'jshea@integrichain.com');  
+    ------------------------------------------------
+    -- sun pipeline = sun_yonsa_patient_status
+    ------------------------------------------------    
     INSERT INTO transformation_variables
         (name, transformation_id, value, last_actor)
     VALUES
@@ -131,7 +132,50 @@ BEGIN;
         ORDER BY id LIMIT 1), 
         'customer_status',
         'jshea@integrichain.com');   
-       
+    -----------------------------------------------------
+    -- alkermes pipeline alkermes_vivitrol_patient_status
+    -----------------------------------------------------   
+    INSERT INTO transformation_variables
+        (name, transformation_id, value, last_actor)
+    VALUES
+        ('input_transform', (SELECT id
+            FROM transformations
+            WHERE (pipeline_state_id IN (SELECT id
+                FROM pipeline_states
+                WHERE pipeline_id = (SELECT id
+                FROM pipelines
+                WHERE name = 'alkermes_vivitrol_patient_status')) 
+                AND id IN (SELECT id
+                FROM transformations
+                WHERE (id NOT IN (SELECT t.id
+                    FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id
+                    WHERE tv.name = 'input_transform'
+                    ORDER BY t.id)) AND id IN (SELECT t.id
+                    from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
+                    WHERE tt.name = 'master_patient_status')))
+            ORDER BY id LIMIT 1),
+            'patient_status_standardize_dates', 
+            'jshea@integrichain.com'),
+    ('col_status',(SELECT id
+    FROM transformations WHERE
+    (pipeline_state_id IN
+    (SELECT id
+    FROM pipeline_states
+    WHERE pipeline_id = (SELECT id
+    FROM pipelines
+    WHERE name = 'alkermes_vivitrol_patient_status'))
+    AND id IN
+    (SELECT id
+    FROM transformations
+    WHERE (id NOT IN (SELECT t.id
+        FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id
+        WHERE tv.name = 'col_status'
+        ORDER BY t.id)) AND id IN (SELECT t.id
+        from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
+        WHERE tt.name = 'master_patient_status')))
+        ORDER BY id LIMIT 1), 
+        'customer_status',
+        'jshea@integrichain.com');   
     COMMIT;
 
    
