@@ -114,6 +114,6 @@ BEGIN;
 		'hjz@integrichain.com'),
 		('pharmacy_name_map',
 		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'pharmacy_name_map' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'enrich_active_shipment')))ORDER BY id LIMIT 1),
-		'{'CVS':'CVS Specialty'}',
+		'{"CVS":"CVS Specialty"}',
 		'hjz@integrichain.com');
 COMMIT;
