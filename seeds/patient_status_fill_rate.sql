@@ -151,7 +151,7 @@ BEGIN;
                 FROM pipeline_states
                 WHERE pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_ilumya_patient_status')) AND id IN (SELECT id
+                WHERE name = 'sun_odomzo_patient_status')) AND id IN (SELECT id
                 FROM transformations
                 WHERE (id NOT IN (SELECT t.id
                     FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id
@@ -249,7 +249,7 @@ BEGIN;
                 FROM pipeline_states
                 WHERE pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_ilumya_patient_status')) AND id IN (SELECT id
+                WHERE name = 'bi_ofev_patient_status')) AND id IN (SELECT id
                 FROM transformations
                 WHERE (id NOT IN (SELECT t.id
                     FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id
@@ -347,7 +347,7 @@ BEGIN;
                 FROM pipeline_states
                 WHERE pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_ilumya_patient_status')) AND id IN (SELECT id
+                WHERE name = 'alkermes_vivitrol_patient_status')) AND id IN (SELECT id
                 FROM transformations
                 WHERE (id NOT IN (SELECT t.id
                     FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id
