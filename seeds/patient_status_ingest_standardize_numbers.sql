@@ -11,7 +11,7 @@ BEGIN;
                 FROM pipeline_state_types
                 WHERE name = 'ingest') AND pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_ilumya_patient_status')), 2, 'jtobias@integrichain.com'),
+                WHERE name = 'sun_allbrands_patient_status')), 2, 'jtobias@integrichain.com'),
         ((SELECT id
             FROM transformation_templates
             WHERE name = 'patient_status_standardize_numbers'), (SELECT id
@@ -53,7 +53,7 @@ BEGIN;
                 FROM pipeline_states
                 WHERE pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_ilumya_patient_status')) AND id IN (SELECT id
+                WHERE name = 'sun_allbrands_patient_status')) AND id IN (SELECT id
                 FROM transformations
                 WHERE (id NOT IN (SELECT t.id
                     FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id
@@ -69,7 +69,7 @@ BEGIN;
     FROM pipeline_states
     WHERE pipeline_id = (SELECT id
     FROM pipelines
-    WHERE name = 'sun_ilumya_patient_status'))
+    WHERE name = 'sun_allbrands_patient_status'))
     AND id IN
     (SELECT id
     FROM transformations

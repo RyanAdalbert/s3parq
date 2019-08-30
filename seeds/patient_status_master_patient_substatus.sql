@@ -10,7 +10,7 @@ BEGIN;
                 FROM pipeline_state_types
                 WHERE name = 'master') AND pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_ilumya_patient_status')), 1, 'jshea@integrichain.com'),
+                WHERE name = 'sun_allbrands_patient_status')), 1, 'jshea@integrichain.com'),
         ((SELECT id
             FROM transformation_templates
             WHERE name = 'master_patient_substatus'), (SELECT id

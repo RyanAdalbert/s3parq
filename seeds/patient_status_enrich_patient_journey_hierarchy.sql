@@ -10,7 +10,7 @@ BEGIN;
                 FROM pipeline_state_types
                 WHERE name = 'enrich') AND pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_ilumya_patient_status')), 0, 'jshea@integrichain.com'),
+                WHERE name = 'sun_allbrands_patient_status')), 0, 'jshea@integrichain.com'),
         ((SELECT id
             FROM transformation_templates
             WHERE name = 'patient_status_enrich_patient_journey_hierarchy'), (SELECT id

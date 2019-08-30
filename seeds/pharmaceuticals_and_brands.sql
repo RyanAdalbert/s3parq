@@ -45,6 +45,15 @@ VALUES
             name = 'Sun'
     ), 'njb@integrichain.com'),
 
+    ('All Brands', 'allbrands', 
+        (SELECT 
+            id 
+        FROM 
+            pharmaceutical_companies 
+        WHERE 
+            name = 'Sun'
+    ), 'njb@integrichain.com'),
+
     ('VIVITROL', 'VIVITROL', 
         (SELECT 
             id 
