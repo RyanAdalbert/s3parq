@@ -34,6 +34,7 @@ ACTOR = ''
 VARIABLE_COUNT = 0
 VALID_STATES = ['raw', 'ingest', 'master', 'enhance', 'enrich', 'metrics', 'dimensional']
 VALID_TYPES = ['str', 'string', 'char', 'varchar', 'text', 'datetime', 'date', 'int', 'integer', 'float', 'decimal', 'number', 'double', 'bool', 'boolean']
+NULL_VALUES = ('seedbot_null', 'seedbot-null', 'seedbot.null', 'seedbotnull')
 
 def _strip_row(row: list)->list:
     return [x for x in row if x] # Seedbot only cares about cells in a row with data
@@ -113,6 +114,7 @@ def _parse_variables(row: list)->None:
         var_val = row.pop(0)
         if var_name.lower() not in map(str.lower, TT_VARIABLE_NAMES):
             raise ValueError(f"Error. Found variable {var_name} which is not in the transformation template for {TT_NAME}.")
+        if var_val.lower() in NULL_VALUES: var_val = '' # variables with values in NULL_VALUES should be set to empty strings (null)
         var_names.append(var_name)
         var_vals.append(var_val)
     TV_VARIABLE_NAMES.append(var_names)
