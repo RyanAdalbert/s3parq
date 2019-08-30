@@ -50,5 +50,6 @@ load_run_sql(seeds_dir, "patient_status_enrich_patient_journey_hierarchy_variabl
 load_run_sql(seeds_dir, "patient_status_enrich_fill_null_long_pat_id.sql")
 load_run_sql(seeds_dir, "patient_status_ingest_brand_derivation.sql")
 load_run_sql(seeds_dir, "patient_status_enrich_fill_null_ref_date.sql")
+load_run_sql(seeds_dir, "patient_status_enrich_cancel_before_active_template.sql")
 load_run_sql(seeds_dir, "patient_status_enrich_cancel_before_active.sql")
 logging.info("Seed loading complete!")
