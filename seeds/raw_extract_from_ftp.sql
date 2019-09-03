@@ -1,4 +1,11 @@
 BEGIN;
+INSERT INTO transformation_templates (name, variable_structures, pipeline_state_type_id, last_actor) 
+    VALUES
+        ('extract_from_ftp', 
+        '{"filesystem_path":{"datatype": "string", "description": "the remote path to the files"},"secret_name":{"datatype":"string","description":"the name of the secret in secret manager"},"prefix":{"datatype":"string","description":"the prefix of the files to get on the remote filesystem"},"secret_type_of":{"datatype":"string","description":"the type of the remote server, used in the secret path"}}', 
+        (SELECT id FROM pipeline_state_types WHERE name = 'raw'),
+        'rns@integrichain.com');
+
 INSERT INTO transformations (transformation_template_id, pipeline_state_id, graph_order, last_actor)
     VALUES
         ((SELECT id FROM transformation_templates WHERE name = 'extract_from_ftp'),(SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'raw') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'sun_allbrands_patient_status')), 0, 'rns@integrichain.com'),
