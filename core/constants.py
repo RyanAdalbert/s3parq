@@ -67,14 +67,17 @@ def reset_constants():
             return f"{globals()['ENVIRONMENT']}-core"
 
     def get_core_job_def_name():
-        if ENVIRONMENT == 'dev':
-            return f"core_{BRANCH_NAME}"
-        elif ENVIRONMENT == 'uat':
-            return "core_uat"
-        elif ENVIRONMENT == 'prod':
-            return "core_prod"    
+        if 'ICHAIN_BATCH_JOB_DEFINITION_NAME' in os.environ.keys():
+            return os.environ['ICHAIN_BATCH_JOB_DEFINITION_NAME']
         else:
-            raise Exception(f"Can't create a core tag job definition name for environment {ENVIRONMENT}")
+            if ENVIRONMENT == 'dev':
+                return f"core_{BRANCH_NAME}"
+            elif ENVIRONMENT == 'uat':
+                return "core_uat"
+            elif ENVIRONMENT == 'prod':
+                return "core_prod"    
+            else:
+                raise Exception(f"Can't create a core tag job definition name for environment {ENVIRONMENT}")
 
     # Dynamic (smart) Constants
     globals()['BRANCH_NAME'] = get_branch_name()

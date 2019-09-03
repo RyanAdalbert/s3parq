@@ -113,9 +113,9 @@ class DatasetContract(Contract):
             redshift_params['cluster_id'] = constants.DEV_REDSHIFT_CLUSTER_ID
             redshift_params['host'] = constants.DEV_REDSHIFT_DB_HOST
         else:
-            redshift_params['iam_role'] = constants.REDSHIFT_IAM_ROLE
-            redshift_params['cluster_id'] = constants.REDSHIFT_CLUSTER_ID
-            redshift_params['host'] = constants.REDSHIFT_DB_HOST
+            #redshift_params['iam_role'] = constants.REDSHIFT_IAM_ROLE
+            #redshift_params['cluster_id'] = constants.REDSHIFT_CLUSTER_ID
+            #redshift_params['host'] = constants.REDSHIFT_DB_HOST
             
         redshift_params['schema_name'] = constants.REDSHIFT_SCHEMA
         redshift_params['db_name'] = constants.REDSHIFT_DB
