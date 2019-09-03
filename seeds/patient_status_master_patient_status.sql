@@ -1,11 +1,10 @@
 BEGIN;
 INSERT INTO transformation_templates (name, variable_structures, pipeline_state_type_id, last_actor) 
     VALUES       
-        ('master_patient_substatus', 
+        ('master_patient_status', 
         '{
             "input_transform":{"datatype": "string", "description": "The name of the transform to input source data from"},
-            "col_substatus":{"datatype": "string","description": "The column of interest for this transform"},
-            "col_customer_name":{"datatype": "str", "description": "The customer name"}
+            "col_status":{"datatype": "string","description": "The column of interest for this transform"}
         }', 
         (SELECT id FROM pipeline_state_types WHERE name = 'master'),
         'jshea@integrichain.com');
@@ -35,12 +34,13 @@ BEGIN;
                 WHERE name = 'alkermes_vivitrol_patient_status')), 0, 'jshea@integrichain.com')                
                 ;
 
-COMMIT;
+    COMMIT;
+
 
 BEGIN;
     ------------------------------------------------
-    -- sun pipeline = sun_ilumya_patient_status
-    -------------------------------------------
+    -- sun pipeline = sun_allbrands_patient_status
+    ------------------------------------------------
     INSERT INTO transformation_variables
         (name, transformation_id, value, last_actor)
     VALUES
@@ -58,11 +58,11 @@ BEGIN;
                     WHERE tv.name = 'input_transform'
                     ORDER BY t.id)) AND id IN (SELECT t.id
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-                    WHERE tt.name = 'master_patient_substatus')))
+                    WHERE tt.name = 'master_patient_status')))
             ORDER BY id LIMIT 1),
-            'master_patient_status', 
+            'patient_status_ingest_brand_derivation', 
             'jshea@integrichain.com'),
-    ('col_substatus',(SELECT id
+    ('col_status',(SELECT id
     FROM transformations WHERE
     (pipeline_state_id IN
     (SELECT id
@@ -75,38 +75,17 @@ BEGIN;
     FROM transformations
     WHERE (id NOT IN (SELECT t.id
         FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id
-        WHERE tv.name = 'col_substatus'
+        WHERE tv.name = 'col_status'
         ORDER BY t.id)) AND id IN (SELECT t.id
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-        WHERE tt.name = 'master_patient_substatus')))
+        WHERE tt.name = 'master_patient_status')))
         ORDER BY id LIMIT 1), 
-        'customer_substatus',
-        'jshea@integrichain.com')
-		,
-		    ('col_customer_name',(SELECT id
-		    FROM transformations WHERE
-		    (pipeline_state_id IN
-		    (SELECT id
-		    FROM pipeline_states
-		    WHERE pipeline_id = (SELECT id
-		    FROM pipelines
-		    WHERE name = 'sun_allbrands_patient_status'))
-		    AND id IN
-		    (SELECT id
-		    FROM transformations
-		    WHERE (id NOT IN (SELECT t.id
-		        FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id
-		        WHERE tv.name = 'col_customer_name'
-		        ORDER BY t.id)) AND id IN (SELECT t.id
-		        from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-		        WHERE tt.name = 'master_patient_substatus')))
-		        ORDER BY id LIMIT 1), 
-		        'sun',
-		        'jshea@integrichain.com');
+        'customer_status',
+        'jshea@integrichain.com');
 
     -----------------------------------------------------
     -- alkermes pipeline alkermes_vivitrol_patient_status
-    ------------------------------------------------------
+    -----------------------------------------------------   
     INSERT INTO transformation_variables
         (name, transformation_id, value, last_actor)
     VALUES
@@ -124,11 +103,11 @@ BEGIN;
                     WHERE tv.name = 'input_transform'
                     ORDER BY t.id)) AND id IN (SELECT t.id
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-                    WHERE tt.name = 'master_patient_substatus')))
+                    WHERE tt.name = 'master_patient_status')))
             ORDER BY id LIMIT 1),
-            'master_patient_status', 
+            'patient_status_standardize_dates', 
             'jshea@integrichain.com'),
-    ('col_substatus',(SELECT id
+    ('col_status',(SELECT id
     FROM transformations WHERE
     (pipeline_state_id IN
     (SELECT id
@@ -141,34 +120,11 @@ BEGIN;
     FROM transformations
     WHERE (id NOT IN (SELECT t.id
         FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id
-        WHERE tv.name = 'col_substatus'
+        WHERE tv.name = 'col_status'
         ORDER BY t.id)) AND id IN (SELECT t.id
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-        WHERE tt.name = 'master_patient_substatus')))
+        WHERE tt.name = 'master_patient_status')))
         ORDER BY id LIMIT 1), 
-        'customer_status_description',
-        'jshea@integrichain.com')
-		,
-		    ('col_customer_name',(SELECT id
-		    FROM transformations WHERE
-		    (pipeline_state_id IN
-		    (SELECT id
-		    FROM pipeline_states
-		    WHERE pipeline_id = (SELECT id
-		    FROM pipelines
-		    WHERE name = 'alkermes_vivitrol_patient_status'))
-		    AND id IN
-		    (SELECT id
-		    FROM transformations
-		    WHERE (id NOT IN (SELECT t.id
-		        FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id
-		        WHERE tv.name = 'col_substatus'
-		        ORDER BY t.id)) AND id IN (SELECT t.id
-		        from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
-		        WHERE tt.name = 'master_patient_substatus')))
-		        ORDER BY id LIMIT 1), 
-		        'alkermes',
-		        'jshea@integrichain.com');  
-  
- COMMIT;
- 
+        'customer_status',
+        'jshea@integrichain.com');   
+    COMMIT;
