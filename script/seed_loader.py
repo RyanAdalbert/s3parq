@@ -11,7 +11,7 @@ def load_run_sql(seeds_dir, seed_file):
     '''
     Runs a SQL file using the SQLAlchecmy Session Helper
     '''
-    logging.info(f'Executing {seeds_dir}{seed_file}')
+    logging.info(f'Executing {seeds_dir}/{seed_file}')
     filepath = os.path.join(seeds_dir, seed_file)
     file = open(filepath)
     helper = SHelp()
