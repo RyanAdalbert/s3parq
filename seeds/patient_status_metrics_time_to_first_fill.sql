@@ -9,7 +9,7 @@ BEGIN;
 			"hierarchy":{"datatype": "str", "description": "Hierarchy column"},
 			"active_status_code":{"datatype": "str", "description": "Active shipment status code"},
 			"active_substatus_code":{"datatype": "str", "description": "Active shipment substatus code"},
-			"fulfillment_hierarchy":{"datatype": "str", "description": "Hierarchy used for statuses after the first fill, e.g. 'ACTIVE - SHIPMENT'"},
+			"fulfillment_hierarchy":{"datatype": "str", "description": "Hierarchy used for statuses after the first fill, e.g. ACTIVE - SHIPMENT"},
 			"discontinued_hierarchy":{"datatype": "str", "description": "Comma separated list of any hierarchies that we know should be excluded from TTFF"}}',
 		(SELECT id FROM pipeline_state_types WHERE name = 'metrics'),
 		'njb@integrichain.com');
