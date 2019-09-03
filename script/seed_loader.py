@@ -5,6 +5,8 @@ from alembic.config import Config
 from glob import glob
 import os
 import logging
+from time import sleep
+from tempfile import NamedTemporaryFile
 
 
 def load_run_sql(seeds_dir, seed_file):
@@ -24,7 +26,7 @@ def load_run_sql(seeds_dir, seed_file):
 seeds_dir = os.path.dirname('/host/core/seeds/')
 
 logging.info("Starting seed loading...")
-# load_run_sql(seeds_dir, "truncate_tables.sql")
+load_run_sql(seeds_dir, "truncate_tables.sql")
 load_run_sql(seeds_dir, "pharmaceuticals_and_brands.sql")
 load_run_sql(seeds_dir, "statetypes_types_and_segments.sql")
 load_run_sql(seeds_dir, "pipelines_and_pipelinestates.sql")
@@ -33,7 +35,7 @@ load_run_sql(seeds_dir, "raw_extract_from_ftp.sql")
 load_run_sql(seeds_dir, "initial_ingest.sql")
 load_run_sql(seeds_dir, "dispense_ingest_column_mapping.sql")
 
-# List of all filenames in /seeds beginning with patient_status.
+# List of all filenames in /seeds beginning with patient_status
 patient_status_seeds = glob(os.path.join(seeds_dir, 'patient_status*')) 
 patient_status_seeds = list(map(os.path.basename, patient_status_seeds))
 # patient_status_seeds.remove("filename.sql") to not load undesired patient_status seeds
