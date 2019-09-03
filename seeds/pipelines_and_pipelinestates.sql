@@ -39,7 +39,7 @@ INSERT INTO pipeline_states (pipeline_state_type_id, pipeline_id, graph_order, l
         ((SELECT id FROM pipeline_state_types WHERE name = 'dimensional'), (SELECT id FROM pipelines WHERE name = 'bi_ofev_patient_status'), 6, 'jtobias@integrichain.com'),
 
         ((SELECT id FROM pipeline_state_types WHERE name = 'raw'), (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status'), 0, 'rns@integrichain.com'),
-        ((SELECT id FROM pipeline_state_types WHERE name = 'ingest'), (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status'), 1, 'rns@integrichain.com')
+        ((SELECT id FROM pipeline_state_types WHERE name = 'ingest'), (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status'), 1, 'rns@integrichain.com'),
         ((SELECT id FROM pipeline_state_types WHERE name = 'master'), (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status'), 2, 'jtobias@integrichain.com'),
         ((SELECT id FROM pipeline_state_types WHERE name = 'enhance'), (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status'), 3, 'jtobias@integrichain.com'),
         ((SELECT id FROM pipeline_state_types WHERE name = 'enrich'), (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status'), 4, 'jtobias@integrichain.com'),
