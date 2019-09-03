@@ -5,9 +5,6 @@ from alembic.config import Config
 from glob import glob
 import os
 import logging
-from time import sleep
-from tempfile import NamedTemporaryFile
-
 
 def load_run_sql(seeds_dir, seed_file):
     '''
