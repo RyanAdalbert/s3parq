@@ -13,6 +13,11 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
+#ENV AIRFLOW_HOME=${AIRFLOW_HOME}
+
+# Install development version of s3parq
+RUN mkdir /root/s3parq
+COPY ./s3parq/. /root/s3parq
 
 RUN set -ex \
     && buildDeps=' \
@@ -105,6 +110,9 @@ RUN rm -r /usr/local/lib/python3.6/site-packages/enum \
 
 RUN python setup.py install
 
+# Install development version of s3parq
+RUN pip uninstall -y s3parq
+RUN pip install -e /root/s3parq
 
 EXPOSE 8008 5555 8793 22
 

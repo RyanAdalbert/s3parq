@@ -12,6 +12,9 @@ from core import constants
 from core.contract import Contract
 from core.helpers.session_helper import SessionHelper as SHelp
 from core.models.configuration import RunEvent
+import urllib
+import urllib.request
+
 
 class DatasetContract(Contract):
     ''' The s3 contract is how we structure our data lake. 
@@ -135,7 +138,16 @@ class DatasetContract(Contract):
         os.environ['AWS_ACCESS_KEY_ID'] = response['AWS_ACCESS_KEY_ID']
         os.environ['AWS_SECRET_ACCESS_KEY'] = response['AWS_SECRET_ACCESS_KEY']   
         return
-        
+
+    # def _set_uat_account(self):
+    #     self.logger.info("Setting environment variables to Core dev service account...")
+    #     session = boto3.session.Session()
+    #     credentials = session.get_credentials()
+    #     current_credentials = credentials.get_frozen_credentials()
+    #     os.environ['AWS_ACCESS_KEY_ID'] = current_credentials.access_key
+    #     os.environ['AWS_SECRET_ACCESS_KEY'] = current_credentials.secret_key
+    #     return
+
     def _format_datetime(self, date: datetime)->str:
         return date.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -163,6 +175,14 @@ class DatasetContract(Contract):
         partitions = ['__metadata_run_id']
         return (df, partitions)
 
+    def _get_server(self):
+        ''' Determine if the session is running on an ec2 server.'''
+        try:
+            self.instance_id = urllib.request.urlopen('http://169.254.169.254/latest/meta-data/instance-id',timeout=2).read().decode()
+            return "ec2"
+        except urllib.error.URLError:
+            return "other"
+
     # functions for use
 
     def fetch(self, filters: List[dict] = [])->pd.DataFrame:
@@ -185,7 +205,9 @@ class DatasetContract(Contract):
         self.logger.info(
             f'Publishing dataframe to s3 location {self.s3_path} with run ID {run_id}.')
 
-        if constants.ENVIRONMENT == 'dev': self._set_dev_account()
+        if self._get_server() != "ec2":
+            if constants.ENVIRONMENT == 'dev':
+                self._set_dev_account()
 
         dataframe, run_partition = self._set_dataset_metadata(df=dataframe, run_id=run_id, session=session)
         if run_partition not in self.partitions:

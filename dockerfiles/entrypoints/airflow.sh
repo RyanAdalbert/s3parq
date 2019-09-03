@@ -79,6 +79,13 @@ if [ "$AIRFLOW__CORE__EXECUTOR" = "CeleryExecutor" ]; then
   wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
 fi
 
+# Check that AIRFLOW_HOME is defined correctly in the environment
+# if [[ $AIRFLOW_HOME != "/usr/local/airflow" ]] then
+#     echo "AIRFLOW_HOME is not set to /usr/local/airflow"
+#     echo "Killing entrypoint script..."
+#     exit 1
+# fi
+
 case "$1" in
   webserver)
     if [ "${INITDB:=n}" == "y" ]; then
