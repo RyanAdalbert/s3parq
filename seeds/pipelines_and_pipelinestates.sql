@@ -2,7 +2,7 @@ BEGIN;
 
 INSERT INTO pipelines (name, is_active, description, pipeline_type_id, brand_id, run_frequency, last_actor)
     VALUES
-        ('sun_all_brands_patient_status', TRUE, 'Sun patient status pipeline -- ILUMYA', (SELECT id FROM pipeline_types WHERE name = 'patient_journey'), (SELECT id from brands WHERE name = 'all_brands'), 'weekly', 'rns@integrichain.com'),
+        ('sun_all_brands_patient_status', TRUE, 'Sun patient status pipeline -- ALL BRANDS (ILUMYA, ODOMZO, YONSA)', (SELECT id FROM pipeline_types WHERE name = 'patient_journey'), (SELECT id from brands WHERE name = 'all_brands'), 'weekly', 'rns@integrichain.com'),
         ('bi_ofev_patient_status', TRUE, 'BI patient status pipeline -- OFEV', (SELECT id FROM pipeline_types WHERE name = 'patient_journey'), (SELECT id from brands WHERE name = 'OFEV'), 'weekly', 'rns@integrichain.com'),
         ('alkermes_vivitrol_patient_status', TRUE, 'Alkermes patient status pipeline -- VIVITROL', (SELECT id FROM pipeline_types WHERE name = 'patient_journey'), (SELECT id from brands WHERE name = 'VIVITROL'), 'weekly', 'rns@integrichain.com');
         -- ('sun_ilumya_extract', TRUE, 'Extract for Symphony Health Association -- ILUMYA', (SELECT id FROM pipeline_types WHERE name = 'patient_journey'), (SELECT id from brands WHERE name = 'ILUMYA'), 'weekly', 'njb@integrichain.com'),
