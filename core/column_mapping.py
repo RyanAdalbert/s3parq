@@ -77,15 +77,35 @@ def rename_and_correct_shape(df: pd.DataFrame, column_renames: Dict)->pd.DataFra
     extra_columns = set(df.columns) - set(column_renames.values())
     df = df.drop(axis=1,labels=list(extra_columns))
 
-    # Rename based on above created configuration variables
     # Reverse dictionary made since theres a clash in order needs
-    column_renames_pandas_style = {value: key for key, value in column_renames.items()}
+    # More complicated case to handle duplicate column mappings
+    column_renames_pandas_style = {}
+    duplicate_columns = {}
+
+    for key, value in column_renames.items():
+        if value == "":
+            continue
+        elif value not in column_renames_pandas_style:
+            column_renames_pandas_style[value] = key
+        else:
+            if value not in duplicate_columns:
+                duplicate_columns[value] = [key]
+            else:
+                duplicate_columns[value].append(key)
+
+    for key, value in duplicate_columns.items():
+        for v in value:
+            df[v] = df[key]
+
     df = df.rename(column_renames_pandas_style, axis="columns")
-    
+
     # Add missing columns to match schema and fill with empty strings
     missing_columns = set(column_renames.keys()) - set(df.columns)
     for column in missing_columns:
         df[column] = ""
+
+    # All the stuff above makes the order unpredictable client-to-client
+    df = df.reindex(list(column_renames.keys()),axis='columns')
 
     return df
 
