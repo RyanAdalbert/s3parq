@@ -1,4 +1,50 @@
 BEGIN;
+INSERT INTO transformation_templates (name, variable_structures, pipeline_state_type_id, last_actor) 
+    VALUES
+        ('symphony_health_association_ingest_column_mapping', 
+        '{"ingest_source_transform":{"datatype": "string", "description": ""},"ingest_source_file_prefix":{"datatype": "string", "description": ""},"rec_date_col":{"datatype": "string", "description": ""},"pharm_code_col":{"datatype": "string", "description": ""},"pharm_npi":{"datatype": "string", "description": ""},"transtype":{"datatype": "string", "description": ""},"pharm_transaction_id":{"datatype": "string", "description": ""},"trans_seq":{"datatype": "string", "description": ""},"ref_source":{"datatype": "string", "description": ""},"ref_date":{"datatype": "string", "description": ""},"program_id":{"datatype": "string", "description": ""},"pharmacy_id":{"datatype": "string", "description": ""},"pat_last_name":{"datatype": "string", "description": ""},"pat_first_name":{"datatype": "string", "description": ""},"pat_dob":{"datatype": "string", "description": ""},"pat_gender":{"datatype": "string", "description": ""},"pat_addr1":{"datatype": "string", "description": ""},"pat_addr2":{"datatype": "string", "description": ""},"pat_city":{"datatype": "string", "description": ""},"pat_state":{"datatype": "string", "description": ""},"pat_zip":{"datatype": "string", "description": ""},"dx1_code":{"datatype": "string", "description": ""},"dx2_code":{"datatype": "string", "description": ""},"status_date":{"datatype": "string", "description": ""},"status_code":{"datatype": "string", "description": ""},"sub_status":{"datatype": "string", "description": ""},"pres_last_name":{"datatype": "string", "description": ""},"pres_first_name":{"datatype": "string", "description": ""},"pres_addr1":{"datatype": "string", "description": ""},"pres_addr2":{"datatype": "string", "description": ""},"pres_city":{"datatype": "string", "description": ""},"pres_state":{"datatype": "string", "description": ""},"pres_zip":{"datatype": "string", "description": ""},"pres_phone":{"datatype": "string", "description": ""},"pres_npi":{"datatype": "string", "description": ""},"pres_dea":{"datatype": "string", "description": ""},"facility_name":{"datatype": "string", "description": ""},"rxdate":{"datatype": "string", "description": ""},"rxnumber":{"datatype": "string", "description": ""},"rxrefills":{"datatype": "string", "description": ""},"rxfill":{"datatype": "string", "description": ""},"refill_remaining":{"datatype": "string", "description": ""},"prev_disp":{"datatype": "string", "description": ""},"rx_ndc_number":{"datatype": "string", "description": ""},"medication":{"datatype": "string", "description": ""},"quantity":{"datatype": "string", "description": ""},"day_supply":{"datatype": "string", "description": ""},"ship_date":{"datatype": "string", "description": ""},"ship_carrier":{"datatype": "string", "description": ""},"shiptracking_num":{"datatype": "string", "description": ""},"ship_location":{"datatype": "string", "description": ""},"ship_address":{"datatype": "string", "description": ""},"ship_city":{"datatype": "string", "description": ""},"ship_state":{"datatype": "string", "description": ""},"ship_zip":{"datatype": "string", "description": ""},"has_medical":{"datatype": "string", "description": ""},"primary_coverage_type":{"datatype": "string", "description": ""},"primary_payer_name":{"datatype": "string", "description": ""},"primary_payer_type":{"datatype": "string", "description": ""},"secondary_coverage_type":{"datatype": "string", "description": ""},"secondary_payer_name":{"datatype": "string", "description": ""},"secondary_payer_type":{"datatype": "string", "description": ""},"plan_paid_amt":{"datatype": "string", "description": ""},"pat_copay":{"datatype": "string", "description": ""},"copay_assist_amount":{"datatype": "string", "description": ""},"oth_payer_amt":{"datatype": "string", "description": ""},"xfer_pharmname":{"datatype": "string", "description": ""},"msa_patient_id":{"datatype": "string", "description": ""},"msa_patient_bmap":{"datatype": "string", "description": ""}}', 
+        (SELECT id FROM pipeline_state_types WHERE name = 'ingest'),
+        'njb@integrichain.com'),
+
+        ('symphony_health_association_map_product_ndcs', 
+        '{"input_transform":{"datatype": "string", "description": "The name of the transform to input source data from"},"index_col":{"datatype":"string","description":"The index column to map NDCs in the source dataset (default is rx_ndc_number)"},"secret_name":{"datatype":"string","description":"The name of the secret in Secret Manager for the remote server"},"secret_type_of":{"datatype":"string","description":"The type of the secret in Secret Manager for the remote server"}}', 
+        (SELECT id FROM pipeline_state_types WHERE name = 'master'),
+        'njb@integrichain.com'),
+
+        ('symphony_health_association_filter_to_brand', 
+        '{"input_transform":{"datatype": "string", "description": "The name of the transform to input source data from"}}', 
+        (SELECT id FROM pipeline_state_types WHERE name = 'master'),
+        'njb@integrichain.com'),
+
+        ('symphony_health_association_infer_med_details', 
+        '{"input_transform":{"datatype": "string", "description": "The name of the transform to input source data from"}}', 
+        (SELECT id FROM pipeline_state_types WHERE name = 'master'),
+        'njb@integrichain.com'),
+
+        ('symphony_health_association_remap_pharm_codes', 
+        '{"input_transform":{"datatype": "string", "description": "The name of the transform to input source data from"}}', 
+        (SELECT id FROM pipeline_state_types WHERE name = 'enrich'),
+        'njb@integrichain.com'),
+
+        ('symphony_health_association_filter_shipment_only', 
+        '{"input_transform":{"datatype": "string", "description": "The name of the transform to input source data from"}}', 
+        (SELECT id FROM pipeline_state_types WHERE name = 'enrich'),
+        'njb@integrichain.com'),
+
+        ('symphony_health_association_extract_column_mapping', 
+        '{"input_transform":{"datatype": "string", "description": "The name of the transform to input source data from"}}', 
+        (SELECT id FROM pipeline_state_types WHERE name = 'dimensional'),
+        'njb@integrichain.com'),
+
+        ('publish_to_S3', 
+        '{"input_transform":{"datatype": "string", "description": "name of transformation to pull dataset from"},"prefix":{"datatype": "string", "description": "file prefix to publish to s3"},"suffix":{"datatype": "string", "description": "file suffix to publish to s3"},"filetype":{"datatype": "string", "description": "filetype to publish to s3 (DO NOT INCLUDE . IN FILETYPE)"},"separator":{"datatype": "string", "description": "single character separator for output file"},"compression":{"datatype": "bool", "description": "if true published file will be compressed as gzip"},"date_format":{"datatype": "string", "description": "string formatting for datetime"}}', 
+        (SELECT id FROM pipeline_state_types WHERE name = 'dimensional'),
+        'njb@integrichain.com'),
+
+        ('publish_to_ftp', 
+        '{"input_transform":{"datatype": "string", "description": "name of transformation to pull dataset from"},"prefix":{"datatype": "string", "description": "file prefix to publish to ftp"},"suffix":{"datatype": "string", "description": "file suffix to publish to ftp"},"filetype":{"datatype": "string", "description": "filetype to publish to ftp (DO NOT INCLUDE . IN FILETYPE)"},"separator":{"datatype": "string", "description": "single character separator for output file"},"compression":{"datatype": "bool", "description": "if true published file will be compressed as gzip"},"date_format":{"datatype": "string", "description": "string formatting for datetime"},"remote_path":{"datatype": "string", "description": "path to publish to on FTP server"},"secret_name":{"datatype": "string", "description": "AWS secret name containing FTP credentials"},"secret_type_of":{"datatype": "string", "description": "AWS secret type of. should almost always be FTP"}}', 
+        (SELECT id FROM pipeline_state_types WHERE name = 'dimensional'),
+        'njb@integrichain.com');
 
 INSERT INTO transformations (transformation_template_id, pipeline_state_id, graph_order, last_actor)
     VALUES
