@@ -5,8 +5,8 @@ BEGIN;
 		('patient_status_enrich_accredo_cancel',
 		'{"input_transform":{"datatype": "str", "description": "Name of transform to fetch data from"},
 			"pjh":{"datatype": "str", "description": "patient journey hierarchy column"},
-			"pending_new":{"datatype": "str", "description": "New substatus when status is 'PENDING' (NEW)"},
-			"active_shipped":{"datatype": "str", "description": "Shipment substatus when status is 'ACTIVE'"},
+			"pending_new":{"datatype": "str", "description": "New substatus when status is PENDING (NEW)"},
+			"active_shipped":{"datatype": "str", "description": "Shipment substatus when status is ACTIVE"},
 			"no_clarity":{"datatype": "str", "description": "final result of enrichment"}}',
 		(SELECT id FROM pipeline_state_types WHERE name = 'enrich'),
 		'njb@integrichain.com');
