@@ -1,0 +1,14 @@
+BEGIN;
+truncate table administrators;
+truncate table transformation_variables;
+truncate table transformation_templates_tags;
+truncate table transformations cascade;
+truncate table transformation_templates cascade;
+truncate table pipeline_states cascade;
+truncate table pipeline_state_types cascade;
+truncate table pipelines cascade;
+truncate table brands cascade;
+truncate table pharmaceutical_companies cascade;
+truncate table pipeline_types cascade;
+truncate table segments cascade;
+COMMIT;
