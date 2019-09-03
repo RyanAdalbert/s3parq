@@ -30,12 +30,12 @@ load_run_sql(seeds_dir, "statetypes_types_and_segments.sql")
 load_run_sql(seeds_dir, "pipelines_and_pipelinestates.sql")
 load_run_sql(seeds_dir, "administrators.sql")
 load_run_sql(seeds_dir, "raw_extract_from_ftp.sql")
-load_run_sql(seeds_dir, "intial_ingest.sql")
+load_run_sql(seeds_dir, "initial_ingest.sql")
 load_run_sql(seeds_dir, "dispense_ingest_column_mapping.sql")
 
 # List of all filenames in /seeds beginning with patient_status.
-patient_status_seeds = glob(f"{seeds_dir}patient_status*") 
-patient_status_seeds = map(os.path.basename, patient_status_seeds)
+patient_status_seeds = glob(os.path.join(seeds_dir, 'patient_status*')) 
+patient_status_seeds = list(map(os.path.basename, patient_status_seeds))
 # patient_status_seeds.remove("filename.sql") to not load undesired patient_status seeds
 for seed in patient_status_seeds:
     load_run_sql(seeds_dir, seed)
