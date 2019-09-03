@@ -139,7 +139,7 @@ class RawContract(Contract):
             else:
                 raise e
 
-    def list_files(self, file_prefix='') -> List[str]:
+    def list_files(self, file_prefix='',file_suffix='') -> List[str]:
         key = self.key
         keyfix = key+file_prefix
         try:
@@ -147,12 +147,39 @@ class RawContract(Contract):
             bucket = s3.Bucket(self.bucket)
             objects = [obj.key for obj in bucket.objects.filter(Prefix=keyfix)]
 
+            objects = [obj for obj in objects if obj.endswith(file_suffix)]
+
             return objects
         except ClientError as e:
             if e.response['Error']['Code'] == "404":
                 raise FileNotFoundError("s3 object not found: %s" % file_prefix)
             else:
                 raise
+    
+    def get_latest_file_name(self, file_prefix='',file_suffix='') -> str:
+        key = self.key
+        # Gotta keep consistency on this glorious variable name
+        keyfix = key+file_prefix
+
+        newest_file_time = utc.localize(datetime(1970,1,1))
+        newest_file=""
+
+        # objs = s3.list_objects_v2(Bucket="ichain-dev",)['Contents']
+        paginator = s3_client.get_paginator('list_objects')
+        operation_parameters = {'Bucket': self.bucket,
+                                'Prefix': keyfix}
+        page_iterator = paginator.paginate(**operation_parameters)
+        for page in page_iterator:
+            if not "Contents" in page.keys():
+                break
+
+            for item in page['Contents']:
+                if item['Key'].endswith(file_suffix):
+                    if item['LastModified'] > newest_file_time:
+                        new_file_time = item['LastModified']
+                        newest_file = item['Key']
+
+        return newest_file
 
     @contextmanager
     def download_raw_file(self, filename):
