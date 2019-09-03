@@ -20,7 +20,7 @@ BEGIN;
                 FROM pipeline_state_types
                 WHERE name = 'master') AND pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_allbrands_patient_status')), 0, 'jlewis@integrichain.com'),
+                WHERE name = 'sun_all_brands_patient_status')), 0, 'jlewis@integrichain.com'),
         ((SELECT id
             FROM transformation_templates
             WHERE name = 'master_patient_secondary_benefit_type'), (SELECT id
@@ -53,7 +53,7 @@ BEGIN;
                 FROM pipeline_states
                 WHERE pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_allbrands_patient_status')) AND id IN (SELECT id
+                WHERE name = 'sun_all_brands_patient_status')) AND id IN (SELECT id
                 FROM transformations
                 WHERE (id NOT IN (SELECT t.id
                     FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id

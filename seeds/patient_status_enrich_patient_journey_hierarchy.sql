@@ -22,7 +22,7 @@ BEGIN;
                 FROM pipeline_state_types
                 WHERE name = 'enrich') AND pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_allbrands_patient_status')), 0, 'jshea@integrichain.com'),
+                WHERE name = 'sun_all_brands_patient_status')), 0, 'jshea@integrichain.com'),
         ((SELECT id
             FROM transformation_templates
             WHERE name = 'patient_status_enrich_patient_journey_hierarchy'), (SELECT id
@@ -47,7 +47,7 @@ BEGIN;
                 FROM pipeline_states
                 WHERE pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_allbrands_patient_status'))
+                WHERE name = 'sun_all_brands_patient_status'))
                 AND id IN (SELECT id
                 FROM transformations
                 WHERE (id NOT IN (SELECT t.id
@@ -66,7 +66,7 @@ BEGIN;
     FROM pipeline_states
     WHERE pipeline_id = (SELECT id
     FROM pipelines
-    WHERE name = 'sun_allbrands_patient_status'))
+    WHERE name = 'sun_all_brands_patient_status'))
     AND id IN
     (SELECT id
     FROM transformations
@@ -89,7 +89,7 @@ BEGIN;
         FROM pipeline_states
         WHERE pipeline_id = (SELECT id
         FROM pipelines
-        WHERE name = 'sun_allbrands_patient_status'))
+        WHERE name = 'sun_all_brands_patient_status'))
         AND id IN
     (SELECT id
         FROM transformations

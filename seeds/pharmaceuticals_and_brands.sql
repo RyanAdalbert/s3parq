@@ -45,7 +45,7 @@ VALUES
             name = 'Sun'
     ), 'njb@integrichain.com'),
 
-    ('All Brands', 'allbrands', 
+    ('All Brands', 'all_brands', 
         (SELECT 
             id 
         FROM 

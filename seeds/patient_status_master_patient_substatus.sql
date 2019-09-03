@@ -22,7 +22,7 @@ BEGIN;
                 FROM pipeline_state_types
                 WHERE name = 'master') AND pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_allbrands_patient_status')), 1, 'jshea@integrichain.com'),
+                WHERE name = 'sun_all_brands_patient_status')), 1, 'jshea@integrichain.com'),
         ((SELECT id
             FROM transformation_templates
             WHERE name = 'master_patient_substatus'), (SELECT id
@@ -38,7 +38,7 @@ BEGIN;
 
 BEGIN;
     ------------------------------------------------
-    -- sun pipeline = sun_allbrands_patient_status
+    -- sun pipeline = sun_all_brands_patient_status
     -------------------------------------------
     INSERT INTO transformation_variables
         (name, transformation_id, value, last_actor)
@@ -49,7 +49,7 @@ BEGIN;
                 FROM pipeline_states
                 WHERE pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'sun_allbrands_patient_status')) 
+                WHERE name = 'sun_all_brands_patient_status')) 
                 AND id IN (SELECT id
                 FROM transformations
                 WHERE (id NOT IN (SELECT t.id
@@ -68,7 +68,7 @@ BEGIN;
     FROM pipeline_states
     WHERE pipeline_id = (SELECT id
     FROM pipelines
-    WHERE name = 'sun_allbrands_patient_status'))
+    WHERE name = 'sun_all_brands_patient_status'))
     AND id IN
     (SELECT id
     FROM transformations
