@@ -36,6 +36,7 @@ load_run_sql(seeds_dir, "dispense_ingest_column_mapping.sql")
 patient_status_seeds = glob(os.path.join(seeds_dir, 'patient_status*')) 
 patient_status_seeds = list(map(os.path.basename, patient_status_seeds))
 # patient_status_seeds.remove("filename.sql") to not load undesired patient_status seeds
+patient_status_seeds.remove("patient_status_master_patient_secondary_benefit_type.sql")
 for seed in patient_status_seeds:
     load_run_sql(seeds_dir, seed)
 
