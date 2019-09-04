@@ -112,7 +112,7 @@ def _parse_variables(row: list)->None:
     for var_num in range(VARIABLE_COUNT):
         var_name = row.pop(0)
         var_val = row.pop(0)
-        if var_name.lower() not in map(str.lower, TT_VARIABLE_NAMES):
+        if var_name.lower() not in list(map(str.lower, TT_VARIABLE_NAMES)):
             raise ValueError(f"Error. Found variable {var_name} which is not in the transformation template for {TT_NAME}.")
         if var_val.lower() in NULL_VALUES: var_val = '' # variables with values in NULL_VALUES should be set to empty strings (null)
         var_names.append(var_name)
