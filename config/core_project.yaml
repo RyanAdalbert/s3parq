@@ -4,8 +4,8 @@ CORE_VERSION: 0.0.11
 DEV_AWS_ACCOUNT: '265991248033'
 DEV_AWS_SECRET: 'dev/core-iam'
 DEV_BUCKET: ichain-dev
-#DEV_CONFIGURATION_APPLICATION_CONN_STRING: postgresql://configurator:configurator@core_configurationpg_1/configuration_application
-DEV_CONFIGURATION_APPLICATION_CONN_STRING: postgresql://configurator:configurator@test-core-db.cbptgzgybgnp.us-east-1.rds.amazonaws.com/configuration_application
+DEV_CONFIGURATION_APPLICATION_CONN_STRING: postgresql://configurator:configurator@core_configurationpg_1/configuration_application
+#DEV_CONFIGURATION_APPLICATION_CONN_STRING: postgresql://configurator:configurator@test-core-db.cbptgzgybgnp.us-east-1.rds.amazonaws.com/configuration_application
 DOCKER_REPO: ichain/core
 ENVIRONMENT: dev
 FORCE_POSTGRES: false
@@ -14,11 +14,11 @@ PROD_AWS_ACCOUNT: '687531504312'
 PROD_BUCKET: ichain-production
 UAT_BUCKET: ichain-uat
 REDSHIFT_DB: ichain_core
-#REDSHIFT_DB_HOST: tbd
+REDSHIFT_DB_HOST: core-sandbox-cluster-1.c3swieqn0nz0.us-east-1.redshift.amazonaws.com
 REDSHIFT_DB_PORT: 5439
 REDSHIFT_SCHEMA: data_core
-#REDSHIFT_IAM_ROLE: tbd
-#REDSHIFT_CLUSTER_ID: tbd
+REDSHIFT_IAM_ROLE: arn:aws:iam::265991248033:role/mySpectrumRole
+REDSHIFT_CLUSTER_ID: core-sandbox-cluster-1
 REDSHIFT_REGION: us-east-1
 DEV_REDSHIFT_DB_HOST: core-sandbox-cluster-1.c3swieqn0nz0.us-east-1.redshift.amazonaws.com
 DEV_REDSHIFT_IAM_ROLE: arn:aws:iam::265991248033:role/mySpectrumRole
