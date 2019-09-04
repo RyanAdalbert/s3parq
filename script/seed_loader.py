@@ -33,7 +33,7 @@ load_run_sql(seeds_dir, "initial_ingest.sql")
 load_run_sql(seeds_dir, "dispense_ingest_column_mapping.sql")
 
 # List of all filenames in /seeds beginning with patient_status
-patient_status_seeds = glob(os.path.join(seeds_dir, 'patient_status*')) 
+patient_status_seeds = glob(os.path.join(seeds_dir, 'patient_status*'))
 patient_status_seeds = list(map(os.path.basename, patient_status_seeds))
 # patient_status_seeds.remove("filename.sql") to not load undesired patient_status seeds
 for seed in patient_status_seeds:
