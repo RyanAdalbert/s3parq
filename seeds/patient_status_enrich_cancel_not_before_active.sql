@@ -34,7 +34,7 @@ BEGIN;
 		'njb@integrichain.com'),
 		((SELECT id FROM transformation_templates WHERE name = 'patient_status_enrich_cancel_not_before_active'),
 		(SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'enrich') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')),
-		6,
+		8,
 		'njb@integrichain.com');
 COMMIT;
 
@@ -112,7 +112,7 @@ BEGIN;
 		'njb@integrichain.com'),
 		('input_transform',
 		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'input_transform' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'patient_status_enrich_cancel_not_before_active')))ORDER BY id LIMIT 1),
-		'enrich_cancel_before_active',
+		'patient_status_enrich_pending_new_2',
 		'njb@integrichain.com'),
 		('hierarchy',
 		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'hierarchy' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'patient_status_enrich_cancel_not_before_active')))ORDER BY id LIMIT 1),

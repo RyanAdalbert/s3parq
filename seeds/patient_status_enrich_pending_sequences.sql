@@ -16,7 +16,7 @@ BEGIN;
 	VALUES
 		((SELECT id FROM transformation_templates WHERE name = 'patient_status_enrich_pending_sequences'),
 		(SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'enrich') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')),
-		3,
+		5,
 		'njb@integrichain.com');
 COMMIT;
 

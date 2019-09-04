@@ -1,11 +1,11 @@
 BEGIN;
-INSERT INTO transformation_templates (name, variable_structures, pipeline_state_type_id, last_actor) 
-    VALUES       
-        ('patient_status_enrich_patient_journey_hierarchy', 
+INSERT INTO transformation_templates (name, variable_structures, pipeline_state_type_id, last_actor)
+    VALUES
+        ('patient_status_enrich_patient_journey_hierarchy',
         '{
             "col_status":{"datatype": "str", "description": "Column containing the status"},
             "col_substatus":{"datatype": "str", "description": "Column containing the substatus"},
-            "input_transform":{"datatype": "str", "description": "The name of the dataset to pull from"}}', 
+            "input_transform":{"datatype": "str", "description": "The name of the dataset to pull from"}}',
         (SELECT id FROM pipeline_state_types WHERE name = 'enrich'),
         'jtobias@integrichain.com');
 COMMIT;
@@ -31,7 +31,7 @@ BEGIN;
                 FROM pipeline_state_types
                 WHERE name = 'enrich') AND pipeline_id = (SELECT id
                 FROM pipelines
-                WHERE name = 'alkermes_vivitrol_patient_status')), 0, 'jshea@integrichain.com')   
+                WHERE name = 'alkermes_vivitrol_patient_status')), 0, 'jshea@integrichain.com')
                 ;
 
     COMMIT;
@@ -57,7 +57,7 @@ BEGIN;
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'patient_status_enrich_patient_journey_hierarchy')))
             ORDER BY id LIMIT 1),
-            'master_patient_substatus', 
+            'master_patient_substatus',
             'jshea@integrichain.com'),
     ('col_substatus',(SELECT id
     FROM transformations WHERE
@@ -77,7 +77,7 @@ BEGIN;
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
         WHERE tt.name = 'patient_status_enrich_patient_journey_hierarchy'))
     )
-        ORDER BY id LIMIT 1), 
+        ORDER BY id LIMIT 1),
         'customer_substatus',
         'jshea@integrichain.com'),
     ('col_status',
@@ -99,13 +99,13 @@ BEGIN;
             ORDER BY t.id)) AND id IN (SELECT t.id
             from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
             WHERE tt.name = 'patient_status_enrich_patient_journey_hierarchy')))
-    ORDER BY id LIMIT 1), 
+    ORDER BY id LIMIT 1),
         'customer_status',
         'jshea@integrichain.com')
 		,
 -- end insert variables into sun ilumya patient status
 --------------------------------------
--- start insert variables for alkermes 
+-- start insert variables for alkermes
 ---------------------------------------
         ('input_transform', (SELECT id
             FROM transformations
@@ -123,7 +123,7 @@ BEGIN;
                     from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
                     WHERE tt.name = 'patient_status_enrich_patient_journey_hierarchy')))
             ORDER BY id LIMIT 1),
-            'master_patient_substatus', 
+            'patient_status_master_payer',
             'jshea@integrichain.com'),
     ('col_substatus',(SELECT id
     FROM transformations WHERE
@@ -143,7 +143,7 @@ BEGIN;
         from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
         WHERE tt.name = 'patient_status_enrich_patient_journey_hierarchy'))
     )
-        ORDER BY id LIMIT 1), 
+        ORDER BY id LIMIT 1),
         'customer_status_description',
         'jshea@integrichain.com'),
     ('col_status',
@@ -165,7 +165,7 @@ BEGIN;
             ORDER BY t.id)) AND id IN (SELECT t.id
             from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id
             WHERE tt.name = 'patient_status_enrich_patient_journey_hierarchy')))
-    ORDER BY id LIMIT 1), 
+    ORDER BY id LIMIT 1),
         'customer_status',
         'jshea@integrichain.com');
 
