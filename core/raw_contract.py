@@ -5,8 +5,10 @@ import tempfile
 from core.contract import Contract
 from botocore.exceptions import ClientError
 
-from typing import List
+from datetime import datetime
 from contextlib import contextmanager
+from typing import List
+import pytz
 
 
 def download_s3_object(bucket: str, key: str, local_dir: str) -> str:
@@ -166,10 +168,12 @@ class RawContract(Contract):
         # Gotta keep consistency on this glorious variable name
         keyfix = key+file_prefix
 
+        utc=pytz.UTC
         newest_file_time = utc.localize(datetime(1970, 1, 1))
         newest_file = ""
 
-        # objs = s3.list_objects_v2(Bucket="ichain-dev",)['Contents']
+        s3_client = boto3.client('s3')
+        
         paginator = s3_client.get_paginator('list_objects')
         operation_parameters = {'Bucket': self.bucket,
                                 'Prefix': keyfix}
