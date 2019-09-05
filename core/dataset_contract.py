@@ -175,13 +175,13 @@ class DatasetContract(Contract):
         partitions = ['__metadata_run_id']
         return (df, partitions)
 
-    def _get_server(self):
+    def _is_ec2(self):
         ''' Determine if the session is running on an ec2 server.'''
         try:
             self.instance_id = urllib.request.urlopen('http://169.254.169.254/latest/meta-data/instance-id',timeout=2).read().decode()
-            return "ec2"
+            return True
         except urllib.error.URLError:
-            return "other"
+            return False
 
     # functions for use
 
@@ -205,7 +205,7 @@ class DatasetContract(Contract):
         self.logger.info(
             f'Publishing dataframe to s3 location {self.s3_path} with run ID {run_id}.')
 
-        if self._get_server() != "ec2":
+        if not self._is_ec2():
             if constants.ENVIRONMENT == 'dev':
                 self._set_dev_account()
 

@@ -7,8 +7,8 @@
 docker-compose build --no-cache airflow;
 
 #### SET THE TAG HERE ####
-#TAG="ichain/core:corebot-batch"
-TAG="ichain/core:airflow"
+TAG="ichain/core:corebot-batch"
+#TAG="ichain/core:airflow"
 
 # Login to aws
 GET_LOGIN=$(aws ecr get-login --no-include-email --region us-east-1)
