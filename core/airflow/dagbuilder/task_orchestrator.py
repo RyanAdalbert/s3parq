@@ -92,7 +92,7 @@ class TaskOrchestrator(LoggerMixin):
             if t.graph_order == graph_cursor:
                 ordered_transformation_groups[list_cursor].add(t)
             else:
-                list_cursor = +1
+                list_cursor = list_cursor + 1
                 graph_cursor = t.graph_order
                 ordered_transformation_groups.append({t})
             self.logger.debug(
