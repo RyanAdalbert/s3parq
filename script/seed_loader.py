@@ -24,7 +24,7 @@ def load_run_sql(seeds_dir, seed_file):
 seeds_dir = os.path.dirname('/host/core/seeds/')
 
 logging.info("Starting seed loading...")
-if ENVIRONMENT.lower() == "dev":
+if ENVIRONMENT.lower() != "dev":
     load_run_sql(seeds_dir, "truncate_tables.sql")
 load_run_sql(seeds_dir, "pharmaceuticals_and_brands.sql")
 load_run_sql(seeds_dir, "statetypes_types_and_segments.sql")
