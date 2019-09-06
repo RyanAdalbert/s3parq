@@ -1,6 +1,2 @@
 #!/bin/sh
-docker-compose exec airflow /bin/bash -c "cd /root/airflow/dags/ && touch pause_executor"
-echo "Sleeping 11 seconds to give Airflow time to stop querying tables..."
-sleep 11
 docker-compose exec notebook /bin/bash -c "cd /usr/src/app/script && python seed_loader.py"
-docker-compose exec airflow /bin/bash -c "cd /root/airflow/dags/ && rm -f pause_executor"
