@@ -4,11 +4,16 @@ BEGIN;
 	VALUES
 		('enrich_active_shipment',
 		'{"input_transform":{"datatype": "string", "description": "The name of the transform to input source data from"},
+			"hierarchy":{"datatype": "string", "description": "Column header for Patient Journey Hierarchy"},
 			"dispense_input_transform":{"datatype": "string", "description": "The name of the transform to input dispense data from"},
 			"active_shipment_status":{"datatype": "string", "description": "Status indicating active shipment (customer-specific)"},
 			"active_shipment_substatus":{"datatype": "string", "description": "Substatus indicating active shipment (customer-specific)"},
 			"active_hierarchy":{"datatype": "string", "description": "Hierarchy indicating active shipment (customer-specific)"},
+<<<<<<< HEAD
 			"pharmacy_name_map":{"datatype": "string", "description": "Dictionary with pharmacy names found in Dispense data to be mapped to standardized names, e.g. {"CVS":"CVS Specialty"} (customer-specific)"}}',
+=======
+			"pharmacy_name_map":{"datatype": "string", "description": "Dictionary with pharmacy names found in Dispense data to be mapped to standardized names, e.g. {"CVS"":"CVS Specialty"} (customer-specific)"}}',
+>>>>>>> 4e71bf6cffea60e86d6e0719d6142325e1beb32f
 		(SELECT id FROM pipeline_state_types WHERE name = 'enrich'),
 		'hjz@integrichain.com');
 COMMIT;
@@ -20,6 +25,10 @@ BEGIN;
 		((SELECT id FROM transformation_templates WHERE name = 'enrich_active_shipment'),
 		(SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'enrich') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')),
 		3,
+		'hjz@integrichain.com'),
+		((SELECT id FROM transformation_templates WHERE name = 'enrich_active_shipment'),
+		(SELECT id FROM pipeline_states WHERE pipeline_state_type_id = (SELECT id FROM pipeline_state_types WHERE name = 'enrich') AND pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status_asembia')),
+		3,
 		'hjz@integrichain.com');
 COMMIT;
 
@@ -30,6 +39,10 @@ BEGIN;
 		('input_transform',
 		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'input_transform' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'enrich_active_shipment')))ORDER BY id LIMIT 1),
 		'patient_status_enrich_referral_date',
+		'hjz@integrichain.com'),
+		('hierarchy',
+		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'hierarchy' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'enrich_active_shipment')))ORDER BY id LIMIT 1),
+		'patient_journey_hierarchy',
 		'hjz@integrichain.com'),
 		('dispense_input_transform',
 		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'dispense_input_transform' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'enrich_active_shipment')))ORDER BY id LIMIT 1),
@@ -49,6 +62,34 @@ BEGIN;
 		'hjz@integrichain.com'),
 		('pharmacy_name_map',
 		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'pharmacy_name_map' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'enrich_active_shipment')))ORDER BY id LIMIT 1),
+		'{"CVS":"CVS Specialty"}',
+		'hjz@integrichain.com'),
+		('input_transform',
+		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status_asembia')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'input_transform' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'enrich_active_shipment')))ORDER BY id LIMIT 1),
+		'patient_status_enrich_referral_date',
+		'hjz@integrichain.com'),
+		('hierarchy',
+		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status_asembia')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'hierarchy' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'enrich_active_shipment')))ORDER BY id LIMIT 1),
+		'patient_journey_hierarchy',
+		'hjz@integrichain.com'),
+		('dispense_input_transform',
+		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status_asembia')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'dispense_input_transform' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'enrich_active_shipment')))ORDER BY id LIMIT 1),
+		'dispense_master_asembia_preprocess',
+		'hjz@integrichain.com'),
+		('active_shipment_status',
+		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status_asembia')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'active_shipment_status' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'enrich_active_shipment')))ORDER BY id LIMIT 1),
+		'ACTIVE',
+		'hjz@integrichain.com'),
+		('active_shipment_substatus',
+		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status_asembia')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'active_shipment_substatus' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'enrich_active_shipment')))ORDER BY id LIMIT 1),
+		'AS01',
+		'hjz@integrichain.com'),
+		('active_hierarchy',
+		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status_asembia')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'active_hierarchy' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'enrich_active_shipment')))ORDER BY id LIMIT 1),
+		'FULFILLMENT',
+		'hjz@integrichain.com'),
+		('pharmacy_name_map',
+		(SELECT id FROM transformations WHERE (pipeline_state_id IN (SELECT id FROM pipeline_states WHERE pipeline_id = (SELECT id FROM pipelines WHERE name = 'alkermes_vivitrol_patient_status_asembia')) AND id IN (SELECT id FROM transformations WHERE (id NOT IN (SELECT t.id FROM transformations t INNER JOIN transformation_variables tv ON t.id = tv.transformation_id WHERE tv.name = 'pharmacy_name_map' ORDER BY t.id)) AND id IN (SELECT t.id from transformations t INNER JOIN transformation_templates tt ON t.transformation_template_id = tt.id WHERE tt.name = 'enrich_active_shipment')))ORDER BY id LIMIT 1),
 		'{"CVS":"CVS Specialty"}',
 		'hjz@integrichain.com');
 COMMIT;
