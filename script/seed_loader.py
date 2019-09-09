@@ -33,6 +33,7 @@ load_run_sql(seeds_dir, "administrators.sql")
 load_run_sql(seeds_dir, "raw_extract_from_ftp.sql")
 load_run_sql(seeds_dir, "initial_ingest.sql")
 load_run_sql(seeds_dir, "dispense_ingest_column_mapping.sql")
+load_run_sql(seeds_dir, "master_column_mocker.sql")
 
 # List of all filenames in /seeds beginning with patient_status
 patient_status_seeds = glob(os.path.join(seeds_dir, 'patient_status*'))
