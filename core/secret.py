@@ -83,3 +83,15 @@ class Secret(LoggerMixin):
             for val in ('user', 'password', 'rdbms', 'schema', 'role', 'host', 'database'):
                 self.__dict__[val] = secret.get(val, None)
                 self.port = int(secret.get('port', None))
+
+        elif self.type_of == 'email':
+            for val in ('address', 'password'):
+                self.__dict__[val] = secret.get(val, None)
+            if secret.get('host', None) is not None:
+                self.host = str(secret.get('host'))
+            else:
+                self.host = None
+            if secret.get('port', None) is not None:
+                self.port = int(secret.get('port'))
+            else:
+                self.port = None
