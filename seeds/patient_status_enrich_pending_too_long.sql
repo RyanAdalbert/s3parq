@@ -7,7 +7,7 @@ BEGIN;
 			"pending_status_code":{"datatype": "string", "description": "Pending status code (customer-specific)"},
 			"cancel_status_code":{"datatype": "string", "description": "Cancel status code (customer-specific)"},
 			"pending_too_long_code":{"datatype": "string", "description": "Pending Too Long status code"},
-			"ptl_threshold":{"datatype": "int", "description": "Number of days threshold for inserting a PENDING TOO LONG record (customer-specific)"},
+			"ptl_threshold":{"datatype": "int", "description": "Number of days threshold for inserting a PENDING TOO LONG record (customer-specific)"}',
 		(SELECT id FROM pipeline_state_types WHERE name = 'enrich'),
 		'jlewis@integrichain.com');
 COMMIT;
