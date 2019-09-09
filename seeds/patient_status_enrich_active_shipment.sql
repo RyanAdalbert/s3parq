@@ -9,11 +9,7 @@ BEGIN;
 			"active_shipment_status":{"datatype": "string", "description": "Status indicating active shipment (customer-specific)"},
 			"active_shipment_substatus":{"datatype": "string", "description": "Substatus indicating active shipment (customer-specific)"},
 			"active_hierarchy":{"datatype": "string", "description": "Hierarchy indicating active shipment (customer-specific)"},
-<<<<<<< HEAD
-			"pharmacy_name_map":{"datatype": "string", "description": "Dictionary with pharmacy names found in Dispense data to be mapped to standardized names, e.g. {"CVS":"CVS Specialty"} (customer-specific)"}}',
-=======
-			"pharmacy_name_map":{"datatype": "string", "description": "Dictionary with pharmacy names found in Dispense data to be mapped to standardized names, e.g. {"CVS"":"CVS Specialty"} (customer-specific)"}}',
->>>>>>> 4e71bf6cffea60e86d6e0719d6142325e1beb32f
+			"pharmacy_name_map":{"datatype": "string", "description": "Dictionary with pharmacy names found in Dispense data to be mapped to standardized names, e.g. {CVS:CVS Specialty} (customer-specific)"}}',
 		(SELECT id FROM pipeline_state_types WHERE name = 'enrich'),
 		'hjz@integrichain.com');
 COMMIT;
