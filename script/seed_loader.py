@@ -21,7 +21,10 @@ def load_run_sql(seeds_dir, seed_file):
     session.close()
     logging.info(f'\tFinished')
 
-seeds_dir = os.path.dirname('/host/core/seeds/')
+if ENVIRONMENT.lower() == "dev":
+    seeds_dir = os.path.dirname('/host/core/seeds/')
+else:
+    seeds_dir = os.path.dirname('/usr/src/app/seeds/')
 
 logging.info("Starting seed loading...")
 if ENVIRONMENT.lower() != "dev":
