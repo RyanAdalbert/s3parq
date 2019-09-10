@@ -1,4 +1,0 @@
-paramiko==2.4.2
-cryptography==2.4.2
-pytest==5.0.1
-mock==3.0.5
