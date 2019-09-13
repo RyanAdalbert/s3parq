@@ -13,7 +13,7 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
-#ENV AIRFLOW_HOME=${AIRFLOW_HOME}
+ENV AIRFLOW_HOME=${AIRFLOW_HOME}
 
 # Install development version of s3parq
 RUN mkdir /root/s3parq
@@ -102,7 +102,7 @@ COPY dockerfiles/entrypoints/notebook.sh /notebook-entrypoint.sh
 RUN chown -R airflow: ${AIRFLOW_HOME}
 
 COPY . $core_location
-COPY ./core/airflow/dags /root/airflow/dags
+COPY ./core/airflow/dags ${AIRFLOW_HOME}/dags
 
 # remove the enum package that some jerkface dependency is installing
 RUN rm -r /usr/local/lib/python3.6/site-packages/enum \
