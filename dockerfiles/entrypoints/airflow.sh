@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# Check that AIRFLOW_HOME is defined correctly in the environment before continuing
+if [ $AIRFLOW_HOME != "/usr/local/airflow" ]; then
+    echo "AIRFLOW_HOME is not set to /usr/local/airflow"
+    echo "Killing entrypoint script..."
+    sleep 10
+    exit 1
+fi
+# echo "AIRFLOW HOME VALUE IS:"
+# echo $AIRFLOW_HOME
+
 TRY_LOOP="20"
 
 : "${REDIS_HOST:="redis"}"
@@ -78,13 +88,6 @@ if [ "$AIRFLOW__CORE__EXECUTOR" = "CeleryExecutor" ]; then
   AIRFLOW__CELERY__BROKER_URL="redis://$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT/1"
   wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
 fi
-
-# Check that AIRFLOW_HOME is defined correctly in the environment
-# if [[ $AIRFLOW_HOME != "/usr/local/airflow" ]] then
-#     echo "AIRFLOW_HOME is not set to /usr/local/airflow"
-#     echo "Killing entrypoint script..."
-#     exit 1
-# fi
 
 case "$1" in
   webserver)
