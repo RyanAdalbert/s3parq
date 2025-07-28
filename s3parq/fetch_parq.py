@@ -224,7 +224,7 @@ def convert_type(val: Any, dtype: str) -> Any:
             val, '%Y-%m-%d %H:%M:%S')
     elif dtype == 'category':
         return pd.Category(val)
-    elif dtype == 'bool':
+    elif dtype in ('bool', 'boolean'):
         return bool(val)
 
 
