@@ -1,4 +1,5 @@
 import boto3, s3fs, re, sys, logging
+from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -68,15 +69,18 @@ def s3_url(bucket: str, key: str):
     return '/'.join(["s3:/", bucket, key])
 
 def _gen_parquet_to_s3(bucket: str, key: str, dataframe: pd.DataFrame,
-                       partitions: list) -> None:
+                       partitions: list,
+                       fs: s3fs.S3FileSystem = None) -> None:
     """ pushes the parquet dataset directly to s3. """
     logger.info("Writing to S3...")
     table = pa.Table.from_pandas(df=dataframe, schema=_parquet_schema(dataframe), preserve_index=False)
 
     uri = s3_url(bucket, key)
     logger.debug(f"Writing to s3 location: {uri}...")
+    if fs is None:
+        fs = s3fs.S3FileSystem(config_kwargs={'max_pool_connections': 50})
     pq.write_to_dataset(table, compression="snappy", root_path=uri,
-                        partition_cols=partitions, filesystem=s3fs.S3FileSystem())
+                        partition_cols=partitions, filesystem=fs)
     logger.debug("Done writing to location.")
 
 
@@ -95,14 +99,21 @@ def _assign_partition_meta(bucket: str, key: str, dataframe: pd.DataFrame, parti
                     if redshift_params and partitions:
                         sql_command = publish_redshift.create_partitions(bucket, redshift_params['schema_name'], redshift_params['table_name'], obj['Key'], session_helper)
 
-    for obj in all_files_without_meta:
-        logger.debug(f"Appending metadata to file {obj}..")
-        s3_client.copy_object(Bucket=bucket, CopySource={'Bucket': bucket, 'Key': obj}, Key=obj,
-                              Metadata={'partition_data_types': str(
-                                  _parse_dataframe_col_types(
-                                      dataframe=dataframe, partitions=partitions)
-                              )}, MetadataDirective='REPLACE')
+    meta = _parse_dataframe_col_types(dataframe=dataframe, partitions=partitions)
+
+    def copy_meta(obj_key):
+        logger.debug(f"Appending metadata to file {obj_key}..")
+        s3_client.copy_object(
+            Bucket=bucket,
+            CopySource={"Bucket": bucket, "Key": obj_key},
+            Key=obj_key,
+            Metadata={"partition_data_types": str(meta)},
+            MetadataDirective="REPLACE"
+        )
         logger.debug("Done appending metadata.")
+
+    with ThreadPoolExecutor(max_workers=min(8, len(all_files_without_meta))) as executor:
+        list(executor.map(copy_meta, all_files_without_meta))
     return all_files_without_meta
 
 def _get_dataframe_datatypes(dataframe: pd.DataFrame, partitions=[], use_parts=False) -> dict:
@@ -272,19 +283,25 @@ def publish(bucket: str, key: str, partitions: List['str'], dataframe: pd.DataFr
     logger.debug("Begin writing to S3..")
 
     files = []
-    for frame in _sized_dataframes(dataframe):
+    frames = list(_sized_dataframes(dataframe))
+    fs = s3fs.S3FileSystem(config_kwargs={'max_pool_connections': 50})
+
+    def write_frame(frame):
         _gen_parquet_to_s3(bucket=bucket,
                            key=key,
                            dataframe=frame,
-                           partitions=partitions)
+                           partitions=partitions,
+                           fs=fs)
 
-        published_files = _assign_partition_meta(bucket=bucket,
-                                                 key=key,
-                                                 dataframe=frame,
-                                                 partitions=partitions,
-                                                 session_helper=session_helper, 
-                                                 redshift_params=redshift_params)
-        files = files + published_files
+    with ThreadPoolExecutor(max_workers=min(8, len(frames))) as executor:
+        list(executor.map(write_frame, frames))
+
+    files = _assign_partition_meta(bucket=bucket,
+                                   key=key,
+                                   dataframe=dataframe,
+                                   partitions=partitions,
+                                   session_helper=session_helper,
+                                   redshift_params=redshift_params)
 
     logger.debug("Done writing to S3.")
 
